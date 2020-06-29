@@ -48,7 +48,7 @@
     "sass-loader": "^6.0.0",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^2.11.5",
+    "webpack-dev-server": "^3.11.0",
     "write-file-webpack-plugin": "^4.5.1"
   }
 }

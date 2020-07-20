@@ -1,5 +1,8 @@
 import { TextSelection } from 'prosemirror-state'
+import { findParentNode } from 'prosemirror-utils';
 import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list'
+import { encodeObject } from './utils';
+import { fromHtml } from './schema';
 
 
 export function changeIndent(dir = 1) {
@@ -13,7 +16,6 @@ export function changeIndent(dir = 1) {
 
     if (node) {
       let indent = parseInt(node.attrs.indent) || 0;
-      // console.log({ indent })
       indent = indent / INDENT_WIDTH;
 
       let inLimit = dir === 1 ? indent < 6 : indent >= 1;
@@ -156,3 +158,91 @@ export function toggleMark1(markType, attrs, force) {
     return true
   }
 }
+
+
+export function insertCitations(citations, pos) {
+  return function (state, dispatch) {
+    let html = '';
+    for (let citation of citations) {
+      html += `<span class="citation" data-citation="${encodeObject(citation)}"></span>`;
+    }
+    dispatch(state.tr.insert(pos, fromHtml(html)));
+  }
+}
+
+export function insertAnnotationsAndCitations(list, pos) {
+  return function (state, dispatch) {
+    for (let { annotation, citation } of list) {
+
+      let savedAnnotation = {
+        uri: annotation.uri,
+        position: annotation.position
+      }
+
+      let html = '';
+
+      if (annotation.image) {
+        html += `<img class="area" data-annotation="${encodeObject(savedAnnotation)}" src="${annotation.image}"/>`;
+      }
+
+      if (annotation.comment) {
+        html += `${annotation.comment}`;
+      }
+
+      if (annotation.text) {
+        html += html.length ? ' ' : '';
+        html += `<span class="highlight" data-annotation="${encodeObject(savedAnnotation)}">"${annotation.text}"</span>`;
+      }
+
+      html += html.length ? ' ' : '';
+      html += `<span class="citation" data-citation="${encodeObject(citation)}"></span>`;
+
+      if (pos) {
+        dispatch(state.tr.insert(pos, fromHtml(html)));
+      }
+      else {
+        dispatch(state.tr.replaceSelectionWith(fromHtml(html)));
+      }
+    }
+  }
+
+}
+
+function isList(node, schema) {
+  return (node.type === schema.nodes.bullet_list
+    || node.type === schema.nodes.ordered_list)
+}
+
+export function toggleList(listType, itemType) {
+  return (state, dispatch, view) => {
+    const { schema, selection } = state
+    const { $from, $to } = selection
+    const range = $from.blockRange($to)
+
+    if (!range) {
+      return false
+    }
+
+    const parentList = findParentNode(node => isList(node, schema))(selection)
+
+    if (range.depth >= 1 && parentList && range.depth - parentList.depth <= 1) {
+      if (parentList.node.type === listType) {
+        return liftListItem(itemType)(state, dispatch, view)
+      }
+
+      if (isList(parentList.node, schema) && listType.validContent(parentList.node.content)) {
+        const { tr } = state
+        tr.setNodeMarkup(parentList.pos, listType)
+
+        if (dispatch) {
+          dispatch(tr)
+        }
+
+        return false
+      }
+    }
+
+    return wrapInList(listType)(state, dispatch, view)
+  }
+}
+

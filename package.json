@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Magic Zotero note editor",
   "scripts": {
-    "build": "NODE_ENV=production webpack --display-modules",
+    "build": "NODE_ENV=development webpack --display-modules",
     "start": "webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,8 +12,6 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "prop-types": "^15.7.2",
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2",
     "prosemirror-commands": "^1.0.8",
     "prosemirror-dropcursor": "^1.1.2",
     "prosemirror-example-setup": "^1.0.1",
@@ -27,7 +25,10 @@
     "prosemirror-schema-list": "^1.0.3",
     "prosemirror-state": "^1.2.4",
     "prosemirror-tables": "^0.9.5",
-    "prosemirror-view": "^1.11.5"
+    "prosemirror-utils": "^0.9.6",
+    "prosemirror-view": "^1.11.5",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",

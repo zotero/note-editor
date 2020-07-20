@@ -1,8 +1,9 @@
 'use strict';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import cx from 'classnames';
 
-const POPUP_WIDTH = 154;
+const POPUP_WIDTH = 150;
 
 const DEFAULT_COLOR_INDEX = 0;
 
@@ -48,32 +49,34 @@ const COLORS = [
   ['#CC99FF', 'Plum']
 ];
 
-function ColorPicker(props) {
+export default function ColorPicker(props) {
   const [color, setColor] = useState(COLORS[DEFAULT_COLOR_INDEX]);
   const [popupPosition, setPopupPosition] = useState(null);
-  const colorPickerRef = useRef();
+  const rootRef = useRef();
 
-  const handleDragLeaveCallback = useCallback(handleWindowMousedown, []);
+  const handleMouseDownCallback = useCallback(handleWindowMousedown, [props.state]);
 
   useEffect(() => {
-    window.addEventListener('mousedown', handleDragLeaveCallback);
+    window.addEventListener('mousedown', handleMouseDownCallback);
     return () => {
-      window.removeEventListener('mousedown', handleDragLeaveCallback);
+      window.removeEventListener('mousedown', handleMouseDownCallback);
     }
-  }, [handleDragLeaveCallback]);
+  }, [handleMouseDownCallback]);
 
   function handleWindowMousedown(event) {
-    if (!event.target.closest('.color-picker')) {
+    let parent = event.target;
+    while (parent && parent !== rootRef.current) parent = parent.parentNode;
+    if (!parent) {
       setPopupPosition(null);
     }
   }
 
   function openPopup() {
-    if (colorPickerRef.current) {
-      let rect = colorPickerRef.current.getBoundingClientRect();
+    if (rootRef.current) {
+      let rect = rootRef.current.getBoundingClientRect();
       console.log('openPopup', rect)
-      let left = rect.left - (POPUP_WIDTH - colorPickerRef.current.offsetWidth) / 2;
-      let top = rect.top + colorPickerRef.current.offsetHeight;
+      let left = rect.left - (POPUP_WIDTH - rootRef.current.offsetWidth) / 2;
+      let top = rect.top + rootRef.current.offsetHeight;
       if (left < 0) {
         left = 0;
       }
@@ -85,30 +88,35 @@ function ColorPicker(props) {
   }
 
   function handleColorButtonClick() {
-    props.type.run(props.view.state, props.view.dispatch, props.view, color[0]);
+    props.state.run(color[0]);
   }
 
   function handleDownButtonClick(event) {
     openPopup();
-    props.type.run(props.view.state, props.view.dispatch, props.view, color);
+    props.state.run(color);
     event.preventDefault();
   }
 
   function handleColorPick(color) {
     // setIsShowingPopup(false);
     setColor(color);
-    props.type.run(props.view.state, props.view.dispatch, props.view, color[0]);
+    props.state.run(color[0]);
+    setPopupPosition(null);
   }
 
   function handleColorClear() {
     // setIsShowingPopup(false);
-    props.type.run(props.view.state, props.view.dispatch, props.view, null);
+    props.color.run(null);
     setColor(COLORS[DEFAULT_COLOR_INDEX]);
+    setPopupPosition(null);
   }
 
   return (
-    <div ref={colorPickerRef} className="color-picker">
-      <div className="color-button" style={{ backgroundColor: color[0] }} onClick={handleColorButtonClick}/>
+    <div ref={rootRef} className={cx('color-picker', { 'background': props.isBackground })}>
+      <div className="color-button" onClick={handleColorButtonClick}>
+        <div className="mce-ico mce-i-forecolor"/>
+        <div className="preview" style={{ backgroundColor: color[0] }}/>
+      </div>
       <div className="down-button" onClick={handleDownButtonClick}>
         <div className="mce-caret"/>
       </div>
@@ -131,5 +139,3 @@ function ColorPicker(props) {
     </div>
   )
 }
-
-export default ColorPicker;

@@ -1,12 +1,4 @@
 @font-face {
-  font-family: 'tinymce';
-  src: url('fonts/tinymce.eot');
-  src: url('fonts/tinymce.eot?#iefix') format('embedded-opentype'), url('fonts/tinymce.woff') format('woff'), url('fonts/tinymce.ttf') format('truetype'), url('fonts/tinymce.svg#tinymce') format('svg');
-  font-weight: normal;
-  font-style: normal
-}
-
-@font-face {
   font-family: 'tinymce-small';
   src: url('fonts/tinymce-small.eot');
   src: url('fonts/tinymce-small.eot?#iefix') format('embedded-opentype'), url('fonts/tinymce-small.woff') format('woff'), url('fonts/tinymce-small.ttf') format('truetype'), url('fonts/tinymce-small.svg#tinymce') format('svg');
@@ -15,21 +7,21 @@
 }
 
 .mce-ico {
-  font-family: 'tinymce', Arial;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
+  font-family: 'tinymce-small', Arial;
+  //font-style: normal;
+  //font-weight: normal;
+  //font-variant: normal;
   font-size: 16px;
-  line-height: 16px;
-  vertical-align: text-top;
+  //line-height: 16px;
+  //vertical-align: text-top;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  display: inline-block;
+  //display: inline-block;
   background: transparent center center;
   background-size: cover;
   width: 16px;
-  height: 16px;
-  color: #595959
+  //height: 16px;
+  //color: #595959
 }
 
 .mce-btn-small .mce-ico {

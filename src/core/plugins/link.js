@@ -1,0 +1,242 @@
+import { Plugin, PluginKey, TextSelection } from 'prosemirror-state'
+import { schema } from '../schema';
+import { toggleMark } from 'prosemirror-commands';
+
+function textRange(node, from, to) {
+  const range = document.createRange()
+  range.setEnd(node, to == null ? node.nodeValue.length : to)
+  range.setStart(node, from || 0)
+  return range
+}
+
+function singleRect(object, bias) {
+  const rects = object.getClientRects()
+  return !rects.length ? object.getBoundingClientRect() : rects[bias < 0 ? 0 : rects.length - 1]
+}
+
+function coordsAtPos(view, pos, end = false) {
+  const { node, offset } = view.docView.domFromPos(pos)
+  let side
+  let rect
+  if (node.nodeType === 3) {
+    if (end && offset < node.nodeValue.length) {
+      rect = singleRect(textRange(node, offset - 1, offset), -1)
+      side = 'right'
+    }
+    else if (offset < node.nodeValue.length) {
+      rect = singleRect(textRange(node, offset, offset + 1), -1)
+      side = 'left'
+    }
+  }
+  else if (node.firstChild) {
+    if (offset < node.childNodes.length) {
+      const child = node.childNodes[offset]
+      rect = singleRect(child.nodeType === 3 ? textRange(child) : child, -1)
+      side = 'left'
+    }
+    if ((!rect || rect.top === rect.bottom) && offset) {
+      const child = node.childNodes[offset - 1]
+      rect = singleRect(child.nodeType === 3 ? textRange(child) : child, 1)
+      side = 'right'
+    }
+  }
+  else {
+    rect = node.getBoundingClientRect()
+    side = 'left'
+  }
+
+  const x = rect[side]
+
+  return {
+    top: rect.top,
+    bottom: rect.bottom,
+    left: x,
+    right: x
+  }
+}
+
+class Link {
+
+  constructor(state) {
+    this.isActive = false;
+  }
+
+  update(state, oldState) {
+    if (!this.view) {
+      this.isActive = false;
+      return;
+    }
+    let { dispatch } = this.view;
+
+    // Don't do anything if the document/selection didn't change
+    if (oldState && oldState.doc.eq(state.doc) && oldState.selection.eq(state.selection)) {
+      return
+    }
+
+    if (state.selection.empty) {
+      this.isActive = false;
+      return;
+    }
+
+    // Otherwise, reposition it and update its content
+    const { from, to } = state.selection
+
+    // These are in screen coordinates
+    // We can't use EditorView.cordsAtPos here because it can't handle linebreaks correctly
+    // See: https://github.com/ProseMirror/prosemirror-view/pull/47
+    const start = coordsAtPos(this.view, from)
+    const end = coordsAtPos(this.view, to, true)
+
+    let isMultiline = start.top !== end.top;
+    let left = isMultiline ? start.left : start.left + (end.left - start.left) / 2;
+
+
+    let href = this.getHref(state);
+
+    let visible = false;
+    if (this.view.state.selection.empty && href !== null) {
+      visible = true;
+    }
+
+
+    this.left = left;
+    this.top = start.top;
+    this.href = href;
+    this.isMultiline = isMultiline;
+
+    this.isActive = visible;
+  }
+
+  create() {
+    let { state, dispatch } = this.view;
+    if (!state.selection.empty) {
+      this.isActive = true;
+      dispatch(state.tr.setSelection(new TextSelection(state.selection.$from, state.selection.$to)));
+    }
+  }
+
+  setUrl(url) {
+    this.updateMark(schema.marks.link, { href: url })(this.view.state, this.view.dispatch);
+  }
+
+  removeUrl() {
+    this.removeMark(schema.marks.link)(this.view.state, this.view.dispatch);
+  }
+
+  getHref(state) {
+    let $pos = state.selection.$from;
+    let start = $pos.parent.childAfter($pos.parentOffset);
+    if (start.node) {
+      let mark = start.node.marks.find(mark => mark.type.name === 'link');
+      if (mark) {
+        return mark.attrs.href;
+      }
+    }
+    return null;
+  }
+
+  getMarkRange($pos = null, type = null) {
+
+    if (!$pos || !type) {
+      return false
+    }
+
+    const start = $pos.parent.childAfter($pos.parentOffset)
+
+    if (!start.node) {
+      return false
+    }
+
+    const link = start.node.marks.find(mark => mark.type === type)
+    if (!link) {
+      return false
+    }
+
+    let startIndex = $pos.index()
+    let startPos = $pos.start() + start.offset
+    let endIndex = startIndex + 1
+    let endPos = startPos + start.node.nodeSize
+
+    while (startIndex > 0 && link.isInSet($pos.parent.child(startIndex - 1).marks)) {
+      startIndex -= 1
+      startPos -= $pos.parent.child(startIndex).nodeSize
+    }
+
+    while (endIndex < $pos.parent.childCount && link.isInSet($pos.parent.child(endIndex).marks)) {
+      endPos += $pos.parent.child(endIndex).nodeSize
+      endIndex += 1
+    }
+
+    return { from: startPos, to: endPos }
+
+  }
+
+  updateMark(type, attrs) {
+    return (state, dispatch) => {
+      const { tr, selection, doc } = state
+      let { from, to } = selection
+      const { $from, empty } = selection
+
+      if (empty) {
+        const range = this.getMarkRange($from, type)
+
+        from = range.from
+        to = range.to
+      }
+
+      const hasMark = doc.rangeHasMark(from, to, type)
+
+      if (hasMark) {
+        tr.removeMark(from, to, type)
+      }
+
+      tr.addMark(from, to, type.create(attrs))
+
+      return dispatch(tr)
+    }
+  }
+
+  removeMark(type) {
+    return (state, dispatch) => {
+      const { tr, selection } = state
+      let { from, to } = selection
+      const { $from, empty } = selection
+
+      if (empty) {
+        const range = this.getMarkRange($from, type)
+
+        from = range.from
+        to = range.to
+      }
+
+      tr.removeMark(from, to, type)
+
+      return dispatch(tr)
+    }
+  }
+
+  destroy() {
+  }
+}
+
+export let linkKey = new PluginKey('link');
+
+export function link() {
+  return new Plugin({
+    key: linkKey,
+    state: {
+      init(config, state) {
+        return new Link(state);
+      },
+      apply(tr, pluginState, oldState, newState) {
+        pluginState.update(newState, oldState);
+        return pluginState;
+      }
+    },
+    view: (view) => {
+      let pluginState = linkKey.getState(view.state);
+      pluginState.view = view;
+      return {}
+    }
+  });
+}

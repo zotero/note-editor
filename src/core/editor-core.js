@@ -110,11 +110,12 @@ class EditorCore {
       nodeViews,
       dispatchTransaction(transaction) {
         let newState = this.state.apply(transaction)
-        this.updateState(newState);
-        if (transaction.docChanged) {
+        if (transaction.docChanged
+          && toHtml(this.state.doc.content) !== toHtml(newState.doc.content)) {
           that.docChanged = true;
           updateNote();
         }
+        this.updateState(newState);
 
         that.updatePluginState(this.state);
         that.onUpdateState && that.onUpdateState();

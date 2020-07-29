@@ -45,10 +45,6 @@ class EditorInstance {
           }
         });
       },
-      onOpenUrl: (url) => {
-        console.log('onOpenUrl', url);
-        this.postMessage({ op: 'openURL', url });
-      },
       onUpdateCitations: (id, citation) => {
         this.postMessage({ op: 'updateCitation', id, citation });
       },
@@ -83,6 +79,10 @@ class EditorInstance {
       <Editor
         readOnly={this.readOnly}
         editorCore={this.editorCore}
+        onOpenUrl={(url) => {
+          console.log('onOpenUrl', url);
+          this.postMessage({ op: 'openURL', url });
+        }}
       />,
       document.getElementById('editor-container')
     );
@@ -121,37 +121,16 @@ class EditorInstance {
 
     let message = event.data.message;
 
-
-    // if (message.op === 'open') {
-    // 	let data = {};
-    // 	init(message.data.itemId, message.data.html);
-    // 	window.postMessage({responseId: message.id, data}, '*');
-    // 	document.querySelector('.ProseMirror').setAttribute('contenteditable', !readOnly);
-    // }
-
     if (message.op === 'setFormattedCitations') {
       this.editorCore.setFormattedCitations(message.formattedCitations);
     }
-
-    if (message.op === 'setCitation') {
+    else if (message.op === 'setCitation') {
       this.editorCore.updateCitation(message.id, message.citation, message.formattedCitation);
     }
-
-    if (message.op === 'setReadOnly') {
-      return;
-      let enable = message.data;
-      readOnly = enable;
-      let pmNode = document.querySelector('.ProseMirror');
-      if (pmNode) {
-        pmNode.setAttribute('contenteditable', !readOnly);
-      }
-    }
-
-    if (message.op === 'updateImage') {
+    else if (message.op === 'updateImage') {
       this.editorCore.updateImage(message.attachmentKey, message.dataUrl);
     }
-
-    if (message.op === 'contextMenuAction') {
+    else if (message.op === 'contextMenuAction') {
       this.handleContextMenuAction(message.ctxAction, message.payload);
     }
     else if (message.op === 'insertCitations') {
@@ -196,7 +175,7 @@ class EditorInstance {
 
       let id = randomString();
       let citationNode = schema.nodes.citation.create({ id, citation });
-      view.dispatch(this.editorCore.view.state.tr.insert(this.editorCore.view.state.selection.from, citationNode));
+      this.editorCore.view.dispatch(this.editorCore.view.state.tr.insert(this.editorCore.view.state.selection.from, citationNode));
       this.postMessage({ op: 'quickFormat', id, citation });
     }
     else if (cmd === 'toggleDir') {
@@ -247,7 +226,7 @@ class EditorInstance {
 let currentInstance = null;
 
 window.addEventListener('message', function (e) {
-  console.log('Worker: Message received from the main script0');
+  // console.log('Editor: Message received from the main script');
   // console.log(e);
   let message = e.data.message;
   let instanceId = e.data.instanceId;

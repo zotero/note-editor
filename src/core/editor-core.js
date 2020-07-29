@@ -31,7 +31,6 @@ class EditorCore {
   constructor(options) {
     this.readOnly = options.readOnly;
     this.onUpdate = options.onUpdate;
-    this.onOpenUrl = options.onOpenUrl;
     this.onUpdateCitations = options.onUpdateCitations;
     this.onInsertObject = options.onInsertObject;
     this.onNavigate = options.onNavigate;
@@ -66,6 +65,9 @@ class EditorCore {
     let that = this;
     this.view = new EditorView(null, {
       editable: () => !this.readOnly,
+      attributes: {
+        'spellcheck': false
+      },
       state: EditorState.create({
         doc,
         plugins: [
@@ -173,6 +175,14 @@ class EditorCore {
 
   updateCitation(id, citation, formattedCitation) {
     _updateCitation(id, citation, formattedCitation)(this.view.state, this.view.dispatch);
+  }
+
+  insertCitations(citations, pos) {
+    insertCitations(citations, pos)(this.view.state, this.view.dispatch);
+  }
+
+  insertAnnotationsAndCitations(list, pos) {
+    insertAnnotationsAndCitations(list, pos)(this.view.state, this.view.dispatch);
   }
 
   getHtml() {

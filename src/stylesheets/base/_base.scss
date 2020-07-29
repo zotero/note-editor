@@ -1,0 +1,15 @@
+//
+// Base
+//
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: white;
+  color: -moz-DialogText;
+  font: message-box;
+}

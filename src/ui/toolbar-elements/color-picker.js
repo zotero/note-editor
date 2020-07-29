@@ -121,8 +121,9 @@ export default function ColorPicker(props) {
         <div className="mce-caret"/>
       </div>
       {popupPosition && <div className="popup" style={{ ...popupPosition }}>
-        {COLORS.map(color => (
+        {COLORS.map((color, index) => (
           <div
+            key={index}
             className="color"
             style={{ backgroundColor: color[0] }}
             title={color[1]}

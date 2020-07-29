@@ -46,7 +46,6 @@ function coordsAtPos(view, pos, end = false) {
   }
 
   const x = rect[side]
-
   return {
     top: rect.top,
     bottom: rect.bottom,
@@ -56,29 +55,24 @@ function coordsAtPos(view, pos, end = false) {
 }
 
 class Link {
-
   constructor(state) {
-    this.isActive = false;
+    this.popup = {
+      isActive: false
+    }
   }
 
   update(state, oldState) {
     if (!this.view) {
-      this.isActive = false;
+      this.popup = { ...this.popup, isActive: false };
       return;
     }
-    let { dispatch } = this.view;
 
-    // Don't do anything if the document/selection didn't change
+    this.isActive = this.hasMark(schema.marks.link)(this.view.state, this.view.dispatch);
+
     if (oldState && oldState.doc.eq(state.doc) && oldState.selection.eq(state.selection)) {
       return
     }
 
-    if (state.selection.empty) {
-      this.isActive = false;
-      return;
-    }
-
-    // Otherwise, reposition it and update its content
     const { from, to } = state.selection
 
     // These are in screen coordinates
@@ -89,8 +83,6 @@ class Link {
 
     let isMultiline = start.top !== end.top;
     let left = isMultiline ? start.left : start.left + (end.left - start.left) / 2;
-
-
     let href = this.getHref(state);
 
     let visible = false;
@@ -98,20 +90,30 @@ class Link {
       visible = true;
     }
 
-
-    this.left = left;
-    this.top = start.top;
-    this.href = href;
-    this.isMultiline = isMultiline;
-
-    this.isActive = visible;
+    this.popup = {
+      isActive: visible,
+      left,
+      top: start.top,
+      bottom: end.bottom,
+      href,
+      isMultiline,
+      pos: from,
+      setUrl: this.setUrl.bind(this),
+      removeUrl: this.removeUrl.bind(this),
+      toggle: this.toggle.bind(this)
+    };
   }
 
-  create() {
+  toggle() {
     let { state, dispatch } = this.view;
-    if (!state.selection.empty) {
-      this.isActive = true;
-      dispatch(state.tr.setSelection(new TextSelection(state.selection.$from, state.selection.$to)));
+    if (this.hasMark(schema.marks.link)(this.view.state, this.view.dispatch)) {
+      this.removeMark(schema.marks.link)(this.view.state, this.view.dispatch);
+    }
+    else {
+      if (!state.selection.empty) {
+        this.popup = { ...this.popup, isActive: true };
+        dispatch(state.tr);
+      }
     }
   }
 
@@ -136,7 +138,6 @@ class Link {
   }
 
   getMarkRange($pos = null, type = null) {
-
     if (!$pos || !type) {
       return false
     }
@@ -215,7 +216,26 @@ class Link {
     }
   }
 
+
+  hasMark(type) {
+    return (state, dispatch) => {
+      const { tr, selection, doc } = state
+      let { from, to } = selection
+      const { $from, empty } = selection
+
+      if (empty) {
+        const range = this.getMarkRange($from, type)
+
+        from = range.from
+        to = range.to
+      }
+
+      return doc.rangeHasMark(from, to, type)
+    }
+  }
+
   destroy() {
+    this.popup = { ...this.popup, isActive: false };
   }
 }
 
@@ -229,14 +249,20 @@ export function link() {
         return new Link(state);
       },
       apply(tr, pluginState, oldState, newState) {
-        pluginState.update(newState, oldState);
         return pluginState;
       }
     },
     view: (view) => {
       let pluginState = linkKey.getState(view.state);
       pluginState.view = view;
-      return {}
+      return {
+        update(view, lastState) {
+          pluginState.update(view.state, lastState);
+        },
+        destroy() {
+          pluginState.destroy();
+        }
+      }
     }
   });
 }

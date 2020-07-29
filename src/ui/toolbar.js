@@ -1,26 +1,9 @@
 'use strict';
 
-import React, { useState } from 'react';
-import cx from 'classnames';
+import React from 'react';
+import Button from './toolbar-elements/button';
 import ColorPicker from './toolbar-elements/color-picker';
 import Dropdown from './toolbar-elements/dropdown';
-
-function Button({ state, icon, title }) {
-  return (
-    <div
-      className={cx('button', { active: state.isActive })}
-      title={title}
-      disabled={!state.isEnabled}
-      onMouseDown={e => {
-        e.preventDefault();
-        state.run();
-      }}
-    >
-      <div className={cx('mce-ico', icon)}/>
-    </div>
-  );
-}
-
 
 function Line({ children }) {
   return (
@@ -62,7 +45,7 @@ function Toolbar({ menuState, linkState, searchState }) {
         </Group>
         <Group>
           <Button state={menuState.blockquote} icon="mce-i-blockquote"/>
-          <Button state={{ isActive: linkState.isActive, run: () => linkState.create() }} icon="mce-i-link"/>
+          <Button state={{ isActive: linkState.isActive, run: () => linkState.popup.toggle() }} icon="mce-i-link"/>
         </Group>
       </Line>
       <Line>

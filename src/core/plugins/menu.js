@@ -35,14 +35,12 @@ function hasMarkup(node, type, attrs) {
 
 class Menu {
   constructor(state) {
-    this.test = 12345;
     this.update(state)
   }
 
   buildToggle(type, attrs) {
     return {
       isActive: markActive3(type.create(attrs))(this.state),
-      isEnabled: true,
       run: () => {
         toggleMark(type, attrs)(this.view.state, this.view.dispatch)
       }
@@ -51,7 +49,6 @@ class Menu {
 
   buildBlock(nodeType, attrs) {
     let command = setBlockType(nodeType, attrs);
-
     let isActive;
 
     const { $from, to, node } = this.state.selection
@@ -72,9 +69,7 @@ class Menu {
   }
 
   update(newState) {
-
     let dispatch;
-
     if (this.view) {
       dispatch = this.view.dispatch;
     }
@@ -89,7 +84,6 @@ class Menu {
     this.superscript = this.buildToggle(schema.marks.subsup, { type: 'sup' })
 
     this.textColor = {
-      isEnabled: true,
       color: getActiveColor(state),
       run(color) {
         commands.toggleMark1(schema.marks.textColor, { textColor: color }, true)(state, dispatch);
@@ -97,7 +91,6 @@ class Menu {
     };
 
     this.backgroundColor = {
-      isEnabled: true,
       color: getActiveColor(state),
       run(color) {
         commands.toggleMark1(schema.marks.backgroundColor, { backgroundColor: color }, true)(state, dispatch);
@@ -106,7 +99,6 @@ class Menu {
 
     this.clearFormatting = {
       isActive: false,
-      isEnabled: true,
       run() {
         dispatch(state.tr.removeMark(state.selection.from, state.selection.to).setStoredMarks([]));
       }
@@ -125,8 +117,6 @@ class Menu {
 
     this.alignLeft = {
       isActive: commands.hasAttr(state, 'align', 'left'),
-      isEnabled: true,
-
       run() {
         commands.toggleAlignment('left')(state, dispatch)
       }
@@ -134,8 +124,6 @@ class Menu {
 
     this.alignCenter = {
       isActive: commands.hasAttr(state, 'align', 'center'),
-      isEnabled: true,
-
       run() {
         commands.toggleAlignment('center')(state, dispatch)
       }
@@ -143,17 +131,13 @@ class Menu {
 
     this.alignRight = {
       isActive: commands.hasAttr(state, 'align', 'right'),
-      isEnabled: true,
-
       run() {
         commands.toggleAlignment('right')(state, dispatch)
       }
     }
 
     this.alignJustify = {
-      isActive: commands.hasAttr(state, 'align', 'right'),
-      isEnabled: true,
-
+      isActive: commands.hasAttr(state, 'align', 'justify'),
       run() {
         commands.toggleAlignment('justify')(state, dispatch)
       }
@@ -161,30 +145,13 @@ class Menu {
 
     this.blockquote = {
       isActive: blockActive(schema.marks.blockquote)(state),
-      isEnabled: true,
-
       run() {
         return wrapIn(schema.nodes.blockquote)(state, dispatch);
       }
     }
 
-    this.link = {
-      isActive: markActive3(schema.marks.link)(state),
-      isEnabled: !state.selection.empty,
-      run() {
-        if (markActive3(schema.marks.link)(state)) {
-          toggleMark(schema.marks.link)(state, dispatch);
-        }
-        else {
-          window.addLink = true;
-          dispatch(state.tr.setSelection(new TextSelection(state.selection.$from, state.selection.$to)));
-        }
-      }
-    }
-
     this.bulletList = {
       isActive: nodeIsActive(state, schema.nodes.bullet_list),
-      isEnabled: true,
       run() {
         commands.toggleList(schema.nodes.bullet_list, schema.nodes.list_item)(state, dispatch);
       }
@@ -192,7 +159,6 @@ class Menu {
 
     this.orderedList = {
       isActive: nodeIsActive(state, schema.nodes.ordered_list),
-      isEnabled: true,
       run() {
         commands.toggleList(schema.nodes.ordered_list, schema.nodes.list_item)(state, dispatch);
       }
@@ -200,7 +166,6 @@ class Menu {
 
     this.indent = {
       isActive: false,
-      isEnabled: true,
       run() {
         commands.changeIndent(1)(state, dispatch)
       }
@@ -208,7 +173,6 @@ class Menu {
 
     this.outdent = {
       isActive: false,
-      isEnabled: true,
       run() {
         commands.changeIndent(-1)(state, dispatch)
       }
@@ -217,7 +181,6 @@ class Menu {
 }
 
 export let menuKey = new PluginKey('menu');
-
 export function menu() {
   return new Plugin({
     key: menuKey,

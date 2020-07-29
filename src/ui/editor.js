@@ -23,8 +23,8 @@ function Editor(props) {
       <Toolbar menuState={editorState.menu} linkState={editorState.link} searchState={editorState.search}/>}
       {editorState.search.active && <Findbar searchState={editorState.search}/>}
       <div className="editor-core" ref={editorRef}>
-        {editorState.link && editorState.link.isActive &&
-        <LinkPopup className="link-popup" linkState={editorState.link}/>}
+        <div className="relative-container">{editorState.link &&
+        <LinkPopup parentRef={editorRef} linkState={editorState.link.popup} onOpenUrl={props.onOpenUrl}/>}</div>
       </div>
     </div>
   );

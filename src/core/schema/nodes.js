@@ -190,6 +190,15 @@ export default {
   },
 
 
+  horizontal_rule: {
+    group: 'block',
+    parseDOM: [{ tag: 'hr' }],
+    toDOM() {
+      return ['hr']
+    }
+  },
+
+
   hard_break: {
     inline: true,
     group: 'inline',

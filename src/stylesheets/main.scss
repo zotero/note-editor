@@ -1,3 +1,11 @@
-@import "ui/normalize";
-@import "core/core";
-@import "ui/ui";
+@import "base/base";
+@import "base/normalize";
+
+@import "components/core/core";
+
+@import "components/ui/editor";
+@import "components/ui/findbar";
+@import "components/ui/link-popup";
+@import "components/ui/mce-helpers";
+@import "components/ui/mce-icons";
+@import "components/ui/toolbar";

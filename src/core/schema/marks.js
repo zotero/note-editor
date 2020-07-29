@@ -112,19 +112,6 @@ export default {
   },
 
 
-  rtl: {
-    excludes: 'subsup',
-    parseDOM: [
-      { tag: 'sup' },
-      {
-        tag: 'span',
-        getAttrs: (node) => (node.style.verticalAlign === 'super')
-      }
-    ],
-    toDOM: () => (['sup'])
-  },
-
-
   textColor: {
     attrs: {
       textColor: {

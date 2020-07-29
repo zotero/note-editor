@@ -1,0 +1,243 @@
+.ProseMirror {
+  position: relative;
+}
+
+.ProseMirror {
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+}
+
+.ProseMirror pre {
+  white-space: pre-wrap;
+}
+
+.ProseMirror li {
+  position: relative;
+}
+
+.ProseMirror-hideselection *::selection {
+  background: transparent;
+}
+
+.ProseMirror-hideselection *::-moz-selection {
+  background: transparent;
+}
+
+.ProseMirror-hideselection {
+  caret-color: transparent;
+}
+
+.ProseMirror-selectednode {
+  outline: 2px solid #8cf;
+}
+
+/* Make sure li selections wrap around markers */
+
+li.ProseMirror-selectednode {
+  outline: none;
+}
+
+li.ProseMirror-selectednode:after {
+  content: "";
+  position: absolute;
+  left: -32px;
+  right: -2px;
+  top: -2px;
+  bottom: -2px;
+  border: 2px solid #8cf;
+  pointer-events: none;
+}
+
+
+.highlight {
+  /*user-select: none;*/
+  /*cursor: pointer;*/
+  /*-webkit-user-modify: read-only;*/
+  /*-webkit-user-drag: element;*/
+  background-color: #e0e0e0;
+  cursor: pointer;
+}
+
+.citation {
+  user-select: none;
+  cursor: pointer;
+  -webkit-user-modify: read-only;
+  -webkit-user-drag: element;
+
+}
+
+.citation.selected, .citation:hover {
+  background-color: #f4f4f4;
+}
+
+.citation.ProseMirror-selectednode {
+  background-color: #f4f4f4;
+}
+
+.highlight:hover {
+  /*background-color: #f8e887;*/
+}
+
+/*.highlight.ProseMirror-selectednode {*/
+/*user-select: unset;*/
+/*cursor: unset;*/
+/*-webkit-user-modify: unset;*/
+/*-webkit-user-drag: unset;*/
+/*}*/
+
+.ProseMirror {
+  outline: none;
+}
+
+img {
+  width: 100%;
+  display: block;
+}
+
+h1 {
+  font-size: 1.6em;
+  padding-bottom: .2em;
+}
+
+h2 {
+  font-size: 1.4em;
+}
+
+h3 {
+  font-size: 1.1em;
+}
+
+h4 {
+  font-size: 1em;
+  margin-bottom: 1em;
+}
+
+h5 {
+  font-size: .9em;
+  margin-bottom: 1em;
+}
+
+h6 {
+  font-size: .8em;
+  margin-top: 1.6em;
+  margin-bottom: 1.3em;
+}
+
+blockquote {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+  margin-left: 1em;
+  padding-left: .75em;
+  border-left: 3px solid lightblue;
+}
+
+.ProseMirror > [data-indent-level='1'] {
+  margin-left: 30px;
+}
+
+.ProseMirror > [data-indent-level='2'] {
+  margin-left: 60px;
+}
+
+.ProseMirror > [data-indent-level='3'] {
+  margin-left: 90px;
+}
+
+.ProseMirror > [data-indent-level='4'] {
+  margin-left: 120px;
+}
+
+.ProseMirror > [data-indent-level='5'] {
+  margin-left: 150px;
+}
+
+.ProseMirror > [data-indent-level='6'] {
+  margin-left: 180px;
+}
+
+.find {
+  background-color: yellow;
+}
+
+.find-active {
+  background-color: orange;
+}
+
+
+.ProseMirror .tableWrapper {
+  overflow-x: auto;
+}
+
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid black;
+}
+
+.ProseMirror td, .ProseMirror th {
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+  border: 1px solid black;
+}
+
+.ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  z-index: 20;
+  background-color: #adf;
+  pointer-events: none;
+}
+
+.ProseMirror.resize-cursor {
+  cursor: ew-resize;
+  cursor: col-resize;
+}
+
+/* Give selected cells a blue overlay */
+.ProseMirror .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(200, 200, 255, 0.4);
+  pointer-events: none;
+}
+
+
+.ProseMirror-gapcursor {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+}
+
+.ProseMirror-gapcursor:after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: -2px;
+  width: 20px;
+  border-top: 1px solid black;
+  animation: ProseMirror-cursor-blink 1.1s steps(2, start) infinite;
+}
+
+@keyframes ProseMirror-cursor-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+.ProseMirror-focused .ProseMirror-gapcursor {
+  display: block;
+}

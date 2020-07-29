@@ -16,9 +16,6 @@ function main(html) {
     onUpdate(html) {
       console.log('onUpdate', html);
     },
-    onOpenUrl(url) {
-      console.log('onOpenUrl', url);
-    },
     onUpdateCitations(id, citation) {
       console.log('onUpdateCitation', id, citation);
     },
@@ -68,6 +65,9 @@ function main(html) {
     <Editor
       readOnly={false}
       editorCore={editorCore}
+      onOpenUrl={(url) => {
+        console.log('onOpenUrl', url);
+      }}
     />,
     document.getElementById('editor-container')
   );
@@ -77,7 +77,12 @@ function main(html) {
 
 let html1 = `
 <h1 style="">This is my paper draft</h1>
-<p><a href="http://wew">sdfsf</a></p>
+<p><a href="http://wewfffffffffffffffffffffffffffffffffffffff">test_link_1</a></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p><a href="http://ojoijoio">test_link_2</a></p>
 <p></p>
 <p></p>
 <p></p>
@@ -91,6 +96,32 @@ let html1 = `
 <p></p>
 <p></p>
 <p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p><p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p><p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p><p></p>
 <p></p>
 <p></p>
 <p></p>

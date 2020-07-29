@@ -1,7 +1,19 @@
 'use strict';
 
 import React, {} from 'react';
+import cx from 'classnames';
 
-function Button(props) {
-
+export default function Button({ state, icon, title }) {
+  return (
+    <div
+      className={cx('toolbar-button', { active: state.isActive })}
+      title={title}
+      onMouseDown={e => {
+        e.preventDefault();
+        state.run();
+      }}
+    >
+      <div className={cx('mce-ico', icon)}/>
+    </div>
+  );
 }

@@ -1,27 +1,34 @@
 export default {
   link: {
+    // excludes: 'textColor backgroundColor',
+    inclusive: false,
     attrs: {
       href: {},
       title: { default: null }
     },
-    inclusive: false,
     parseDOM: [{
       tag: 'a[href]', getAttrs: function getAttrs(dom) {
         return { href: dom.getAttribute('href'), title: dom.getAttribute('title') }
       }
     }],
     toDOM: function toDOM(node) {
-      var ref = node.attrs;
-      var href = ref.href;
-      var title = ref.title;
-      return ['a', { href: href, title: title }, 0]
+      return ['a', {
+        ...node.attrs
+      }, 0]
     }
   },
-  // italic: em,
-  // bold: strong,
+
 
   em: {
-    parseDOM: [{ tag: 'i' }, { tag: 'em' }, { style: 'font-style=italic' }],
+    inclusive: true,
+    parseDOM: [
+      { tag: 'i' },
+      { tag: 'em' },
+      { style: 'font-style=italic' },
+      { tag: 'cite' },
+      { tag: 'dfn' },
+      { tag: 'q' }
+    ],
     toDOM: function toDOM() {
       return ['em', 0];
     }
@@ -29,7 +36,9 @@ export default {
 
 
   strong: {
+    inclusive: true,
     parseDOM: [{ tag: 'strong' },
+      // From ProseMirror source:
       // This works around a Google Docs misbehavior where
       // pasted content will be inexplicably wrapped in `<b>`
       // tags with a font-weight normal.
@@ -42,7 +51,9 @@ export default {
         style: 'font-weight', getAttrs: function (value) {
           return /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null;
         }
-      }],
+      },
+      { tag: 'dt' }
+    ],
     toDOM: function toDOM() {
       return ['strong', 0];
     }
@@ -50,11 +61,14 @@ export default {
 
 
   code: {
-    excludes: `link textColor`,
+    excludes: `_`,
     inclusive: true,
     parseDOM: [
       { tag: 'code', preserveWhitespace: true },
       { tag: 'tt', preserveWhitespace: true },
+      { tag: 'kbd', preserveWhitespace: true },
+      { tag: 'samp', preserveWhitespace: true },
+      { tag: 'var', preserveWhitespace: true },
       {
         style: 'font-family',
         preserveWhitespace: true,
@@ -66,32 +80,32 @@ export default {
         getAttrs: value => value === 'pre' && null
       }
     ],
-    toDOM() {
-      return ['span', {
-        style: 'font-family: monospace; white-space: pre-wrap;',
-        class: 'code'
-      }];
-    }
+    toDOM: () => ['code', 0]
   },
 
 
   strikethrough: {
+    inclusive: true,
     parseDOM: [
       { tag: 's' },
       { tag: 'strike' },
       { tag: 'del' },
-      { style: 'text-decoration', getAttrs: value => value === 'line-through' && null }
+      { style: 'text-decoration=line-through' },
+      { style: 'text-decoration-line=line-through' }
     ],
-    toDOM: function toDOM() {
-      return ['s', 0]
+    toDOM() {
+      // can't use `return ['s', 0]` because the old editor doesn't support `<s>` tag
+      return ['span', { style: 'text-decoration: line-through' }, 0];
     }
   },
 
 
   underline: {
+    inclusive: true,
     parseDOM: [
       { tag: 'u' },
-      { style: 'text-decoration', getAttrs: value => value === 'underline' && null }
+      { style: 'text-decoration=underline' },
+      { style: 'text-decoration-line=underline' }
     ],
     toDOM: function toDOM() {
       return ['u', 0]
@@ -104,7 +118,9 @@ export default {
     attrs: { type: { default: 'sub' } },
     parseDOM: [
       { tag: 'sub', attrs: { type: 'sub' } },
-      { tag: 'sup', attrs: { type: 'sup' } }
+      { style: 'vertical-align=sub', attrs: { type: 'sub' } },
+      { tag: 'sup', attrs: { type: 'sup' } },
+      { style: 'vertical-align=super', attrs: { type: 'sup' } }
     ],
     toDOM(mark) {
       return [mark.attrs.type];
@@ -113,8 +129,9 @@ export default {
 
 
   textColor: {
+    inclusive: true,
     attrs: {
-      textColor: {
+      color: {
         default: ''
       }
     },
@@ -122,19 +139,20 @@ export default {
       {
         style: 'color',
         getAttrs(value) {
-          return { textColor: value };
+          return { color: value };
         }
       }
     ],
     toDOM: mark => {
-      return ['span', { style: `color: ${mark.attrs.textColor}` }, 0];
+      return ['span', { style: `color: ${mark.attrs.color}` }, 0];
     }
   },
 
 
   backgroundColor: {
+    inclusive: true,
     attrs: {
-      backgroundColor: {
+      color: {
         default: ''
       }
     },
@@ -142,12 +160,12 @@ export default {
       {
         style: 'background-color',
         getAttrs(value) {
-          return { backgroundColor: value };
+          return { color: value };
         }
       }
     ],
     toDOM: mark => {
-      return ['span', { style: `background-color: ${mark.attrs.backgroundColor}` }, 0];
+      return ['span', { style: `background-color: ${mark.attrs.color}` }, 0];
     }
   }
 };

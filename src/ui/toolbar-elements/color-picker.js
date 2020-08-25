@@ -74,7 +74,6 @@ export default function ColorPicker(props) {
   function openPopup() {
     if (rootRef.current) {
       let rect = rootRef.current.getBoundingClientRect();
-      console.log('openPopup', rect)
       let left = rect.left - (POPUP_WIDTH - rootRef.current.offsetWidth) / 2;
       let top = rect.top + rootRef.current.offsetHeight;
       if (left < 0) {
@@ -113,11 +112,11 @@ export default function ColorPicker(props) {
 
   return (
     <div ref={rootRef} className={cx('color-picker', { 'background': props.isBackground })}>
-      <div className="color-button" onClick={handleColorButtonClick}>
+      <div className="color-button" onClick={handleColorButtonClick} title={props.title}>
         <div className="mce-ico mce-i-forecolor"/>
         <div className="preview" style={{ backgroundColor: color[0] }}/>
       </div>
-      <div className="down-button" onClick={handleDownButtonClick}>
+      <div className="down-button" onClick={handleDownButtonClick} title={props.title}>
         <div className="mce-caret"/>
       </div>
       {popupPosition && <div className="popup" style={{ ...popupPosition }}>

@@ -7,7 +7,6 @@ function nodeEqualsType({ types, node }) {
 }
 
 export let trailingParagraphKey = new PluginKey('trailingParagraph');
-
 export function trailingParagraph() {
 
   let options = {

@@ -5,6 +5,7 @@ import {
 import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list'
 import { undo, redo } from 'prosemirror-history'
 import { undoInputRule } from 'prosemirror-inputrules'
+import { changeIndent } from './commands';
 
 const mac = typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false
 
@@ -87,8 +88,8 @@ export function buildKeymap(schema, mapKeys) {
   }
   if (type = schema.nodes.list_item) {
     bind('Enter', splitListItem(type))
-    bind('Shift-Tab', liftListItem(type))
-    bind('Tab', sinkListItem(type))
+    bind('Shift-Tab', changeIndent(-1))
+    bind('Tab', changeIndent(1))
   }
   if (type = schema.nodes.paragraph)
     bind('Shift-Ctrl-0', setBlockType(type))

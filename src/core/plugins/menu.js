@@ -86,14 +86,14 @@ class Menu {
     this.textColor = {
       color: getActiveColor(state),
       run(color) {
-        commands.toggleMark1(schema.marks.textColor, { textColor: color }, true)(state, dispatch);
+        commands.toggleMark1(schema.marks.textColor, { color }, true)(state, dispatch);
       }
     };
 
     this.backgroundColor = {
       color: getActiveColor(state),
       run(color) {
-        commands.toggleMark1(schema.marks.backgroundColor, { backgroundColor: color }, true)(state, dispatch);
+        commands.toggleMark1(schema.marks.backgroundColor, { color }, true)(state, dispatch);
       }
     }
 

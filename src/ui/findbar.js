@@ -62,8 +62,12 @@ function Findbar({ searchState }) {
       <div className="column-right">
         <div className="line">
           <div className="toggles">
-            <div className={cx('button', { active: searchState.caseSensitive })} onClick={handleCaseToggle}>Aa</div>
-            <div className={cx('button', { active: searchState.wholeWords })} onClick={handleWordToggle}>W</div>
+            <div className={cx('button', { active: searchState.caseSensitive })} onClick={handleCaseToggle}
+                 title="Match case">Aa
+            </div>
+            <div className={cx('button', { active: searchState.wholeWords })} onClick={handleWordToggle}
+                 title="Whole words">W
+            </div>
           </div>
           <div className="buttons">
             <div className="button" onClick={handleFindPrev}>Prev</div>

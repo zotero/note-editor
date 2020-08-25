@@ -1,8 +1,27 @@
 class CitationView {
-  constructor(node, view, getPos) {
+  constructor(node, view, getPos, options) {
+    this.provider = options.provider;
     this.dom = document.createElement('span')
     this.dom.className = 'citation';
-    this.dom.innerHTML = node.attrs.content ? '(' + node.attrs.content + ')' : '{citation}';
+    this.dom.innerHTML = '{citation}';
+    this.dom.onclick = event => {
+      event.preventDefault();
+      options.onClick(node);
+    }
+
+    this.listener = (data) => {
+      this.dom.innerHTML = data.formattedCitation ?
+        `(${data.formattedCitation})` : '{citation}';
+    }
+
+    this.provider.subscribe({
+      type: 'citation',
+      nodeId: node.attrs.nodeId,
+      data: {
+        citation: node.attrs.citation
+      },
+      listener: this.listener
+    });
   }
 
   selectNode() {
@@ -13,13 +32,13 @@ class CitationView {
     this.dom.classList.remove('selected');
   }
 
-  update(node) {
-    if (node.type.name !== 'citation') return false;
-    this.dom.innerHTML = node.attrs.content ? '(' + node.attrs.content + ')' : '{citation}';
-    return true
+  destroy() {
+    this.provider.unsubscribe(this.listener);
   }
 }
 
-export default function (node, view, getPos) {
-  return new CitationView(node, view, getPos)
+export default function (options) {
+  return function (node, view, getPos) {
+    return new CitationView(node, view, getPos, options);
+  }
 }

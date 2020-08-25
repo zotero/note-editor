@@ -30,7 +30,7 @@ export const getActiveColor = function (state) {
     return null;
   }
   return marksWithColor.length
-    ? marksWithColor[0].attrs.textColor
+    ? marksWithColor[0].attrs.color
     : 'default';
 };
 
@@ -49,6 +49,7 @@ export const randomString = function (len, chars) {
   return randomstring;
 };
 
+// TODO: Drop
 export function generateObjectKey() {
   let len = 8;
   let allowedKeyChars = '23456789ABCDEFGHIJKLMNPQRSTUVWXYZ';

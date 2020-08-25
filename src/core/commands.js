@@ -1,43 +1,27 @@
 import { TextSelection } from 'prosemirror-state'
 import { findParentNode } from 'prosemirror-utils';
 import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list'
-import { encodeObject } from './utils';
+import { encodeObject, randomString } from './utils';
 import { fromHtml } from './schema';
 
-
+// TODO: Fix. Doesn't work with `rtl`, code_block probably shouldn't be here
 export function changeIndent(dir = 1) {
   return function (state, dispatch, view) {
-    const INDENT_WIDTH = 40; // px
-
     const { selection } = state;
     const { $from, $to } = selection;
-    const { paragraph, heading, bullet_list, ordered_list, list_item } = state.schema.nodes;
+    const { paragraph, heading, bullet_list, ordered_list, list_item, code_block } = state.schema.nodes;
     const node = $to.node(1);
 
     if (node) {
-      let indent = parseInt(node.attrs.indent) || 0;
-      indent = indent / INDENT_WIDTH;
-
-      let inLimit = dir === 1 ? indent < 6 : indent >= 1;
       if (node.type === paragraph || node.type === heading) {
-        if (inLimit) {
-          const attrs = {};
-          if (node.type === heading) {
-            attrs.level = node.attrs['level'];
-          }
-
-          let px = INDENT_WIDTH * (indent + dir);
-
-          if (px > 0) {
-            attrs.indent = px + 'px';
-          }
-
-          dispatch(state.tr.setBlockType($to.pos, $to.pos, node.type, attrs));
+        let indent = node.attrs.indent;
+        if (dir === 1 ? indent < 6 : indent >= 1) {
+          indent += dir;
+          dispatch(state.tr.setBlockType($to.pos, $to.pos, node.type, { ...node.attrs, indent }));
+          return true;
         }
-        return true;
       }
-
-      if (node.type === bullet_list || node.type === ordered_list) {
+      else if (node.type === bullet_list || node.type === ordered_list) {
         if (dir > 0) {
           sinkListItem(list_item)(state, dispatch);
         }
@@ -46,7 +30,12 @@ export function changeIndent(dir = 1) {
         }
         return true;
       }
+      else if (node.type === code_block) {
+        dispatch(state.tr.insert($from.pos, state.schema.text('  ', [])));
+        return true;
+      }
     }
+
     return false;
   };
 }
@@ -79,7 +68,7 @@ export function toggleAlignment(direction) {
         if (node.type.attrs.align) {
           changes = true;
           if (node.attrs.align === direction) direction = null;
-          tr.setNodeMarkup(pos, null, { align: direction })
+          tr.setNodeMarkup(pos, null, { ...node.attrs, align: direction })
         }
       });
 
@@ -159,53 +148,74 @@ export function toggleMark1(markType, attrs, force) {
   }
 }
 
-
-export function insertCitations(citations, pos) {
-  return function (state, dispatch) {
-    let html = '';
-    for (let citation of citations) {
-      html += `<span class="citation" data-citation="${encodeObject(citation)}"></span>`;
-    }
-    dispatch(state.tr.insert(pos, fromHtml(html)));
-  }
-}
-
 export function insertAnnotationsAndCitations(list, pos) {
   return function (state, dispatch) {
+    let nodes = [];
     for (let { annotation, citation } of list) {
 
-      let savedAnnotation = {
-        uri: annotation.uri,
-        position: annotation.position
+      if (annotation) {
+        let savedAnnotation = {
+          uri: annotation.uri,
+          position: annotation.position
+        }
+
+        if (annotation.image) {
+          let rect = annotation.position.rects[0];
+          let rectWidth = rect[2] - rect[0];
+          let rectHeight = rect[3] - rect[1];
+          // Constants are from pdf.js
+          const CSS_UNITS = 96.0 / 72.0;
+          const PDFJS_DEFAULT_SCALE = 1.25;
+          let width = Math.round(rectWidth * CSS_UNITS * PDFJS_DEFAULT_SCALE);
+          let height = Math.round(rectHeight * width / rectWidth);
+
+          nodes.push(state.schema.nodes.image.create({
+            width,
+            height,
+            annotation: savedAnnotation,
+            src: annotation.image
+          }));
+        }
+
+        if (annotation.comment) {
+          nodes.push(...fromHtml(annotation.comment, true).content.content);
+        }
+
+        if (annotation.text) {
+          if (nodes.length) {
+            nodes.push(state.schema.text(' '));
+          }
+          nodes.push(state.schema.nodes.highlight.create({
+              annotation: savedAnnotation
+            },
+            [
+              state.schema.text('“'),
+              ...fromHtml(annotation.text, true).content.content,
+              state.schema.text('”')
+            ]
+          ));
+        }
+
+        if (nodes.length) {
+          nodes.push(state.schema.text(' '));
+        }
       }
 
-      let html = '';
-
-      if (annotation.image) {
-        html += `<img class="area" data-annotation="${encodeObject(savedAnnotation)}" src="${annotation.image}"/>`;
-      }
-
-      if (annotation.comment) {
-        html += `${annotation.comment}`;
-      }
-
-      if (annotation.text) {
-        html += html.length ? ' ' : '';
-        html += `<span class="highlight" data-annotation="${encodeObject(savedAnnotation)}">"${annotation.text}"</span>`;
-      }
-
-      html += html.length ? ' ' : '';
-      html += `<span class="citation" data-citation="${encodeObject(citation)}"></span>`;
-
-      if (pos) {
-        dispatch(state.tr.insert(pos, fromHtml(html)));
-      }
-      else {
-        dispatch(state.tr.replaceSelectionWith(fromHtml(html)));
+      if (citation) {
+        nodes.push(state.schema.nodes.citation.create({
+          nodeId: randomString(),
+          citation: citation
+        }));
       }
     }
-  }
 
+    if (pos) {
+      dispatch(state.tr.insert(pos, nodes).setMeta('importImages', true));
+    }
+    else {
+      dispatch(state.tr.replaceSelectionWith(nodes).setMeta('importImages', true));
+    }
+  }
 }
 
 function isList(node, schema) {
@@ -246,3 +256,33 @@ export function toggleList(listType, itemType) {
   }
 }
 
+export function updateCitation(nodeId, citation) {
+  return function (state, dispatch) {
+    state.doc.descendants((node, pos) => {
+      if (node.attrs.nodeId === nodeId) {
+        dispatch(state.tr.setNodeMarkup(pos, null, {
+          ...node.attrs,
+          citation
+        }));
+        return false;
+      }
+      return true;
+    });
+  };
+}
+
+export function attachImportedImage(nodeId, attachmentKey) {
+  return function (state, dispatch) {
+    state.doc.descendants((node, pos) => {
+      if (node.attrs.nodeId === nodeId) {
+        dispatch(state.tr.setNodeMarkup(pos, null, {
+          ...node.attrs,
+          src: null,
+          attachmentKey
+        }).setMeta('addToHistory', false));
+        return false;
+      }
+      return true;
+    });
+  };
+}

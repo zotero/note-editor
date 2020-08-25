@@ -5,7 +5,8 @@ export function highlight(options) {
     props: {
       handleDoubleClickOn: (view, pos, node, nodePos, event) => {
         if (node.type.name === 'highlight') {
-          view.dispatch(view.state.tr.setSelection(new TextSelection(view.state.tr.selection.$from, view.state.tr.selection.$from)));
+          // view.dispatch(view.state.tr.setSelection(new TextSelection(view.state.tr.selection.$from, view.state.tr.selection.$from)));
+          event.preventDefault();
           options.onDoubleClick(node);
         }
       }

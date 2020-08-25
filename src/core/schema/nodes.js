@@ -1,9 +1,12 @@
-import * as basic from 'prosemirror-schema-basic'
-import * as list from 'prosemirror-schema-list'
 import { tableNodes } from 'prosemirror-tables';
-import { DOMParser, Schema } from 'prosemirror-model'
+import { encodeObject, decodeObject, generateObjectKey, randomString } from '../utils'
 
-import { encodeObject, decodeObject, generateObjectKey } from '../utils'
+const INDENT_WIDTH = 40; // TinyMCE padding width for a single indent
+
+function getInteger(value) {
+  if (!value) return null;
+  return parseInt(value);
+}
 
 function st(styles) {
   let list = [];
@@ -12,7 +15,23 @@ function st(styles) {
       list.push(`${styleName}: ${styles[styleName]}`);
     }
   }
-  return list.join(';');
+  return list.length && list.join(';') || undefined;
+}
+
+function paddingToIndent(value) {
+  let num = parseInt(value);
+  if (num + 'px' === value && num > 0 && (num % INDENT_WIDTH === 0)) {
+    return num / INDENT_WIDTH;
+  }
+  return null;
+}
+
+function filterTextAlign(value) {
+  return ['left', 'right', 'center', 'justify'].includes(value) && value || null;
+}
+
+function filterDir(value) {
+  return value === 'rtl' && value || null;
 }
 
 export default {
@@ -21,145 +40,118 @@ export default {
   },
 
 
-  text: {
-    group: 'inline'
-  },
-
-
   paragraph: {
+    group: 'block',
+    content: '(text | hard_break | image | citation | highlight)*',
     attrs: {
       indent: { default: null },
       align: { default: null },
       dir: { default: null }
     },
-    content: 'inline*',
-    group: 'block',
     parseDOM: [
       {
         tag: 'p',
         getAttrs: (node) => ({
-          indent: node.style.paddingLeft,
-          align: node.style.textAlign,
-          dir: node.getAttribute('dir')
+          indent: paddingToIndent(node.style.paddingLeft),
+          align: filterTextAlign(node.style.textAlign),
+          dir: filterDir(node.getAttribute('dir'))
         })
-      }
+      },
+      { tag: 'dd' }
     ],
     toDOM(node) {
       const attrs = {
-        style: st({ 'text-align': node.attrs.align, 'padding-left': node.attrs.indent }),
-        dir: node.attrs.dir || undefined
+        style: st({
+          'text-align': node.attrs.align,
+          'padding-left': node.attrs.indent && node.attrs.indent * INDENT_WIDTH + 'px'
+        }),
+        dir: node.attrs.dir
       };
       return ['p', attrs, 0];
     }
   },
 
 
-  image: {
-    inline: true,
-    attrs: {
-      dataUrl: { default: null },
-      alt: { default: null },
-      width: { default: null },
-      height: { default: null },
-      attachmentKey: { default: null },
-      annotation: { default: null }
-    },
-    group: 'inline',
-    draggable: true,
-    parseDOM: [{
-      tag: 'img',
-      getAttrs(dom) {
-        return {
-          dataUrl: dom.getAttribute('src'),
-          alt: dom.getAttribute('alt'),
-          width: dom.getAttribute('width'),
-          height: dom.getAttribute('height'),
-          attachmentKey: dom.getAttribute('data-attachment-key') || generateObjectKey(),
-          annotation: decodeObject(dom.getAttribute('data-annotation'))
-        }
-      }
-    }],
-    toDOM(node) {
-      return ['img', {
-        alt: node.attrs.alt,
-        width: node.attrs.width,
-        height: node.attrs.height,
-        'data-attachment-key': node.attrs.attachmentKey,
-        'data-annotation': encodeObject(node.attrs.annotation)
-      }];
-    }
-  },
-
-
   heading: {
+    content: '(text | hard_break)*',
+    group: 'block',
+    defining: true,
     attrs: {
       level: { default: 1 },
       indent: { default: null },
       align: { default: null },
-      dir: { default: null }
+      dir: { default: null },
+      id: { default: null }
     },
-    content: 'inline*',
-    group: 'block',
-    defining: true,
     parseDOM: [
       {
         tag: 'h1',
         getAttrs: (node) => ({
           level: 1,
-          align: node.style.textAlign,
-          indent: node.style.paddingLeft,
-          dir: node.getAttribute('dir')
+          align: filterTextAlign(node.style.textAlign),
+          indent: paddingToIndent(node.style.paddingLeft),
+          dir: filterDir(node.getAttribute('dir')),
+          id: node.getAttribute('id')
         })
       },
       {
         tag: 'h2',
         getAttrs: (node) => ({
           level: 2,
-          align: node.style.textAlign,
+          align: filterTextAlign(node.style.textAlign),
           indent: node.style.paddingLeft,
-          dir: node.getAttribute('dir')
+          dir: filterDir(node.getAttribute('dir')),
+          id: node.getAttribute('id')
         })
       },
       {
         tag: 'h3',
         getAttrs: (node) => ({
           level: 3,
-          align: node.style.textAlign,
-          indent: node.style.paddingLeft,
-          dir: node.getAttribute('dir')
+          align: filterTextAlign(node.style.textAlign),
+          indent: paddingToIndent(node.style.paddingLeft),
+          dir: filterDir(node.getAttribute('dir')),
+          id: node.getAttribute('id')
         })
       },
       {
         tag: 'h4',
         getAttrs: (node) => ({
           level: 4,
-          align: node.style.textAlign,
-          indent: node.style.paddingLeft,
-          dir: node.getAttribute('dir')
+          align: filterTextAlign(node.style.textAlign),
+          indent: paddingToIndent(node.style.paddingLeft),
+          dir: filterDir(node.getAttribute('dir')),
+          id: node.getAttribute('id')
         })
       },
       {
         tag: 'h5',
         getAttrs: (node) => ({
           level: 5,
-          align: node.style.textAlign,
-          indent: node.style.paddingLeft,
-          dir: node.getAttribute('dir')
+          align: filterTextAlign(node.style.textAlign),
+          indent: paddingToIndent(node.style.paddingLeft),
+          dir: filterDir(node.getAttribute('dir')),
+          id: node.getAttribute('id')
         })
       },
       {
         tag: 'h6',
         getAttrs: (node) => ({
           level: 6,
-          align: node.style.textAlign,
-          indent: node.style.paddingLeft,
-          dir: node.getAttribute('dir')
+          align: filterTextAlign(node.style.textAlign),
+          indent: paddingToIndent(node.style.paddingLeft),
+          dir: filterDir(node.getAttribute('dir')),
+          id: node.getAttribute('id')
         })
       }],
     toDOM: function toDOM(node) {
       const attrs = {
-        style: st({ 'text-align': node.attrs.align, 'padding-left': node.attrs.indent }),
-        dir: node.attrs.dir || undefined
+        style: st({
+          'text-align': node.attrs.align,
+          'padding-left': node.attrs.indent && node.attrs.indent * INDENT_WIDTH + 'px'
+        }),
+        dir: node.attrs.dir,
+        id: node.attrs.id
       };
       return ['h' + node.attrs.level, attrs, 0]
     }
@@ -167,14 +159,14 @@ export default {
 
 
   code_block: {
+    group: 'block',
     content: 'text*',
     marks: '',
-    group: 'block',
     code: true,
     defining: true,
     parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
     toDOM: function toDOM() {
-      return ['pre', ['code', 0]];
+      return ['pre', 0];
     }
   },
 
@@ -199,17 +191,6 @@ export default {
   },
 
 
-  hard_break: {
-    inline: true,
-    group: 'inline',
-    selectable: false,
-    parseDOM: [{ tag: 'br' }, { tag: 'span.line-break' }],
-    toDOM: () => ([
-      'span', { class: 'line-break' }, ['br']
-    ])
-  },
-
-
   ordered_list: {
     attrs: { order: { default: 1 } },
     parseDOM: [{
@@ -226,22 +207,106 @@ export default {
 
 
   bullet_list: {
+    group: 'block',
+    content: 'list_item+',
     parseDOM: [{ tag: 'ul' }],
     toDOM() {
       return ['ul', 0]
-    },
-    content: 'list_item+',
-    group: 'block'
+    }
   },
 
 
   list_item: {
+    content: 'block+',
+    defining: true,
     parseDOM: [{ tag: 'li' }],
     toDOM() {
       return ['li', 0]
+    }
+  },
+
+
+  ...tableNodes({
+    tableGroup: 'block',
+    cellContent: 'block+',
+    cellAttributes: {
+      background: {
+        default: null,
+        getFromDOM(dom) {
+          return dom.style.backgroundColor || null
+        },
+        setDOMAttr(value, attrs) {
+          if (value) attrs.style = (attrs.style || '') + `background-color: ${value};`
+        }
+      }
+    }
+  }),
+
+
+  // Inline nodes
+  text: {
+    group: 'inline'
+  },
+
+
+  hard_break: {
+    inline: true,
+    group: 'inline',
+    selectable: false,
+    parseDOM: [{ tag: 'br' }, { tag: 'span.line-break' }],
+    toDOM: () => ([
+      'span', { class: 'line-break' }, ['br']
+    ])
+  },
+
+
+  image: {
+    group: 'inline',
+    inline: true,
+    draggable: true,
+    marks: 'link',
+    attrs: {
+      nodeId: { default: null },
+      src: { default: null },
+      alt: { default: null },
+      title: { default: null },
+      width: { default: null },
+      height: { default: null },
+      naturalWidth: { default: null },
+      naturalHeight: { default: null },
+      attachmentKey: { default: null },
+      annotation: { default: null }
     },
-    defining: true,
-    content: 'paragraph block*'
+    parseDOM: [{
+      tag: 'img',
+      getAttrs(dom) {
+        return {
+          nodeId: randomString(),
+          src: dom.getAttribute('src'),
+          alt: dom.getAttribute('alt'),
+          title: dom.getAttribute('title'),
+          width: getInteger(dom.getAttribute('width')),
+          height: getInteger(dom.getAttribute('height')),
+          naturalWidth: getInteger(dom.getAttribute('data-natural-width')),
+          naturalHeight: getInteger(dom.getAttribute('data-natural-height')),
+          attachmentKey: dom.getAttribute('data-attachment-key'),
+          annotation: decodeObject(dom.getAttribute('data-annotation'))
+        }
+      }
+    }],
+    toDOM(node) {
+      return ['img', {
+        src: node.attrs.attachmentKey ? null : node.attrs.src,
+        alt: node.attrs.alt,
+        title: node.attrs.title,
+        width: node.attrs.width,
+        height: node.attrs.height,
+        'data-natural-width': node.attrs.naturalWidth,
+        'data-natural-height': node.attrs.naturalHeight,
+        'data-attachment-key': node.attrs.attachmentKey,
+        'data-annotation': node.attrs.annotation && encodeObject(node.attrs.annotation)
+      }];
+    }
   },
 
 
@@ -250,48 +315,36 @@ export default {
     group: 'inline',
     draggable: true,
     atom: true,
-    content: 'text*',
-    editable: false,
-    readOnly: true,
+    selectable: true,
     attrs: {
-      id: { default: null },
-      citation: { default: null },
-      content: { default: null }
+      nodeId: { default: null },
+      citation: { default: null }
     },
-    toDOM(node) {
-      const dom = document.createElement('span');
-      dom.className = 'citation';
-      dom.setAttribute('data-citation', encodeURIComponent(JSON.stringify(node.attrs.citation)));
-      return dom;
-    },
-    parseDOM: [
-      {
-        tag: 'span.citation',
-        getAttrs(dom) {
-          let citation = { citationItems: [], properties: {} };
-          try {
-            citation = JSON.parse(decodeURIComponent(dom.getAttribute('data-citation')));
-          }
-          catch (e) {
-
-          }
-          return {
-            citation
-          }
+    parseDOM: [{
+      tag: 'span.citation',
+      getAttrs(dom) {
+        return {
+          nodeId: randomString(),
+          citation: decodeObject(dom.getAttribute('data-citation'))
+            || { citationItems: [], properties: {} }
         }
       }
-    ]
+    }
+    ],
+    toDOM(node) {
+      return ['span', {
+        class: 'citation',
+        'data-citation': encodeObject(node.attrs.citation)
+      }, '{citation}']
+    }
   },
 
 
   highlight: {
     inline: true,
     group: 'inline',
-    // draggable: true,
-    // atom: true,
     content: 'text*',
-    // editable: false,
-    // readOnly: true,
+    marks: 'em strong subsup',
     attrs: {
       annotation: { default: '' }
     },
@@ -309,22 +362,5 @@ export default {
         'data-annotation': encodeObject(node.attrs.annotation)
       }, 0]
     }
-  },
-
-
-  ...tableNodes({
-    tableGroup: 'block',
-    cellContent: 'text*',
-    cellAttributes: {
-      background: {
-        default: null,
-        getFromDOM(dom) {
-          return dom.style.backgroundColor || null
-        },
-        setDOMAttr(value, attrs) {
-          if (value) attrs.style = (attrs.style || '') + `background-color: ${value};`
-        }
-      }
-    }
-  })
+  }
 }

@@ -1,6 +1,7 @@
 import { Plugin, PluginKey, TextSelection } from 'prosemirror-state'
 import { schema } from '../schema';
 import { toggleMark } from 'prosemirror-commands';
+import { randomString } from '../utils';
 
 function textRange(node, from, to) {
   const range = document.createRange()
@@ -54,11 +55,23 @@ function coordsAtPos(view, pos, end = false) {
   }
 }
 
+function getHrefAtPos($pos) {
+  let start = $pos.parent.childAfter($pos.parentOffset);
+  if (start.node) {
+    let mark = start.node.marks.find(mark => mark.type.name === 'link');
+    if (mark) {
+      return mark.attrs.href;
+    }
+  }
+  return null;
+}
+
 class Link {
-  constructor(state) {
+  constructor(state, options) {
     this.popup = {
       isActive: false
     }
+    this.onOpenUrl = options.onOpenUrl;
   }
 
   update(state, oldState) {
@@ -100,7 +113,8 @@ class Link {
       pos: from,
       setUrl: this.setUrl.bind(this),
       removeUrl: this.removeUrl.bind(this),
-      toggle: this.toggle.bind(this)
+      toggle: this.toggle.bind(this),
+      open: this.open.bind(this)
     };
   }
 
@@ -113,6 +127,27 @@ class Link {
       if (!state.selection.empty) {
         this.popup = { ...this.popup, isActive: true };
         dispatch(state.tr);
+      }
+    }
+  }
+
+  open() {
+    if (this.popup.href) {
+      if (this.popup.href[0] === '#') {
+        let { state, dispatch } = this.view;
+        state.doc.descendants((node, pos) => {
+          if (node.type.name === 'heading' && node.attrs.id === this.popup.href.slice(1)) {
+            let { tr } = state;
+            tr.setSelection(TextSelection.between(state.doc.resolve(pos), state.doc.resolve(pos)));
+            tr.scrollIntoView();
+            dispatch(tr);
+            return false;
+          }
+          return true;
+        });
+      }
+      else {
+        this.onOpenUrl(this.popup.href);
       }
     }
   }
@@ -241,12 +276,37 @@ class Link {
 
 export let linkKey = new PluginKey('link');
 
-export function link() {
+export function link(options) {
   return new Plugin({
     key: linkKey,
+    props: {
+      handleClick: (view, pos, event) => {
+        if (event.button === 0 && (event.ctrlKey || event.metaKey)) {
+          let href = getHrefAtPos(view.state.doc.resolve(pos));
+          if (href) {
+            if (href[0] === '#') {
+              let { state, dispatch } = view;
+              state.doc.descendants((node, pos) => {
+                if (node.type.name === 'heading' && node.attrs.id === href.slice(1)) {
+                  let { tr } = state;
+                  tr.setSelection(TextSelection.between(state.doc.resolve(pos), state.doc.resolve(pos)));
+                  tr.scrollIntoView();
+                  dispatch(tr);
+                  return false;
+                }
+                return true;
+              });
+            }
+            else {
+              options.onOpenUrl(href);
+            }
+          }
+        }
+      }
+    },
     state: {
       init(config, state) {
-        return new Link(state);
+        return new Link(state, options);
       },
       apply(tr, pluginState, oldState, newState) {
         return pluginState;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, Fragment } from 'react';
 import cx from 'classnames'
 
-function LinkPopup({ parentRef, linkState, onOpenUrl }) {
+function LinkPopup({ parentRef, linkState }) {
   const [editing, setEditing] = useState(false);
   const containerRef = useRef();
   const popupRef = useRef();
@@ -61,7 +61,7 @@ function LinkPopup({ parentRef, linkState, onOpenUrl }) {
 
   function handleOpen(event) {
     event.preventDefault();
-    onOpenUrl(linkState.href);
+    linkState.open();
   }
 
   function handleEdit() {

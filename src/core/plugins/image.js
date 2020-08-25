@@ -1,101 +1,88 @@
-import { generateObjectKey } from '../utils';
 import { Plugin, PluginKey } from 'prosemirror-state';
+import { ReplaceStep } from 'prosemirror-transform';
 
-
-class Image {
-  constructor(state, options) {
-    this.onUpdateImages = options.onUpdateImages;
-    this.onRequestImage = options.onRequestImage;
-    this.loadingKeys = {};
-  }
-
-  getImageDiff(prevDoc, curDoc) {
-    let prevKeys = [];
-    prevDoc.descendants((node, pos) => {
-      if (node.type.name === 'image' && node.attrs.attachmentKey) {
-        prevKeys.push(node.attrs.attachmentKey);
-      }
-    });
-
-    let all = [];
-    let added = [];
-    curDoc.descendants((node, pos) => {
-      if (node.type.name === 'image' && node.attrs.attachmentKey) {
-        if (!prevKeys.find(key => node.attrs.attachmentKey === key)) {
-          added.push({
-            attachmentKey: node.attrs.attachmentKey,
-            dataUrl: node.attrs.dataUrl
-          });
-        }
-        all.push({ attachmentKey: node.attrs.attachmentKey })
-      }
-    });
-
-    return {
-      all,
-      added
-    };
-  }
-
-  requestImages(doc) {
-    let ids = [];
-    doc.descendants((node, pos) => {
-      if (node.type.name === 'image' && node.attrs.attachmentKey && !node.attrs.dataUrl) {
-        if (!this.loadingKeys[node.attrs.attachmentKey]) {
-          this.loadingKeys[node.attrs.attachmentKey] = true;
-          this.onRequestImage(node.attrs.attachmentKey);
-        }
-      }
-    });
-  }
-
-  updateImage(attachmentKey, dataUrl) {
-    this.view.state.doc.descendants((node, pos) => {
-      if (node.type.name === 'image' && node.attrs.attachmentKey === attachmentKey) {
-        this.view.dispatch(this.view.state.tr.setNodeMarkup(pos, null, {
-          ...node.attrs,
-          dataUrl
-        }).setMeta('addToHistory', false))
-
-        delete this.loadingKeys[attachmentKey];
-      }
-
-      return true;
-    });
-  }
-
-  update(tr, force) {
-    if (tr.steps.length || force) {
-      let imgDiff = this.getImageDiff(tr.before, tr.doc);
-      this.onUpdateImages(imgDiff);
-      this.requestImages(tr.doc);
+function getAttachmentKeys(state) {
+  let attachmentKeys = [];
+  state.tr.doc.descendants((node, pos) => {
+    if (node.type.name === 'image' && node.attrs.attachmentKey) {
+      attachmentKeys.push(node.attrs.attachmentKey);
     }
-  }
-
+  });
+  return attachmentKeys;
 }
 
 export let imageKey = new PluginKey('image');
 
 export function image(options) {
+  let prevAttachmentKeys = null;
   return new Plugin({
     key: imageKey,
-    state: {
-      init(config, state) {
-        return new Image(state, options);
-      },
-      apply(tr, pluginState, oldState, newState) {
-        pluginState.update(tr, oldState, newState);
-        return pluginState;
+    appendTransaction(transactions, oldState, newState) {
+      let newTr = newState.tr
+
+      let changed = transactions.some(tr => tr.docChanged);
+
+      if (!changed) return;
+
+      let attachmentKeys = getAttachmentKeys(newState);
+      if (changed && !prevAttachmentKeys) {
+        options.onSyncAttachmentKeys(attachmentKeys);
       }
-    },
-    view: (view) => {
-      let pluginState = imageKey.getState(view.state);
-      pluginState.view = view;
-      pluginState.update(view.state.tr, true)
-      return {}
+      else if (JSON.stringify(attachmentKeys) !== JSON.stringify(prevAttachmentKeys)) {
+        options.onSyncAttachmentKeys(attachmentKeys);
+      }
+      prevAttachmentKeys = attachmentKeys
+
+
+      let updatedDimensions = false;
+      if (changed) {
+        newState.doc.descendants((node, pos) => {
+          if (node.type.name === 'image'
+            && options.dimensionsStore.data[node.attrs.nodeId]) {
+            let [width, height] = options.dimensionsStore.data[node.attrs.nodeId];
+            newTr = newTr.setNodeMarkup(pos, null, {
+              ...node.attrs,
+              naturalWidth: width,
+              naturalHeight: height
+            });
+            updatedDimensions = true;
+          }
+        });
+
+        options.dimensionsStore.data = {};
+      }
+
+      let images = [];
+      transactions.forEach(tr => {
+        tr.steps.forEach(step => {
+          if (tr.getMeta('importImages') && step instanceof ReplaceStep && step.slice) {
+            step.getMap().forEach((oldStart, oldEnd, newStart, newEnd) => {
+              newState.doc.nodesBetween(newStart, newEnd, (parentNode, parentPos) => {
+                parentNode.forEach((node, offset) => {
+                  let absolutePos = parentPos + offset + 1;
+                  if (node.type.name === 'image' && !node.attrs.attachmentKey) {
+                    images.push({ nodeId: node.attrs.nodeId, src: node.attrs.src });
+                    newTr = newTr.setNodeMarkup(absolutePos, null, {
+                      ...node.attrs,
+                      // Unset src to make sure the image data won't be save
+                      // into the document
+                      src: null
+                    });
+                  }
+                });
+              });
+            });
+          }
+        });
+      });
+
+      if (images.length) {
+        options.onImportImages(images);
+      }
+
+      if (updatedDimensions || images.length) {
+        return newTr
+      }
     }
-    // appendTransaction(transactions, oldState, newState) {
-    //   return updateLinkOnChange(transactions, oldState, newState);
-    // }
   });
 }

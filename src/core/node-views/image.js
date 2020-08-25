@@ -1,29 +1,102 @@
 class ImageView {
-  constructor(node, view, getPos) {
-    let img = document.createElement('img');
-    img.onload = (event) => {
-      view.dispatch(view.state.tr.setNodeMarkup(getPos(), null, {
-        ...view.state.doc.nodeAt(getPos()).attrs,
-        width: event.target.naturalWidth,
-        height: event.target.naturalHeight
-      }));
+  constructor(node, view, getPos, options) {
+    if (node.attrs.attachmentKey) {
+      this.listener = (data) => {
+        this.img.onload = (event) => {
+          if (node.attrs.attachmentKey && (node.attrs.naturalWidth !== event.target.naturalWidth
+            || node.attrs.naturalHeight !== event.target.naturalHeight)) {
+            options.onDimensions(node, event.target.naturalWidth, event.target.naturalHeight);
+          }
+          this.img.parentNode.style.paddingBottom = '';
+          this.img.style.display = 'block';
+        }
+        this.img.src = data.src;
+      }
 
-      this.dom.style.paddingBottom = '';
-      img.style.display = 'block';
+      this.provider = options.provider;
+      this.provider.subscribe({
+        type: 'image',
+        nodeId: node.attrs.nodeId,
+        data: {
+          attachmentKey: node.attrs.attachmentKey
+        },
+        listener: this.listener
+      });
+
+      let imageBlock = document.createElement('div');
+      imageBlock.className = 'regular-image';
+
+      let resizedWrapper = document.createElement('div');
+      resizedWrapper.className = 'resized-wrapper';
+
+      resizedWrapper.style.width = node.attrs.width !== null ? (node.attrs.width + 'px') : '600px';//'100%';
+
+      imageBlock.appendChild(resizedWrapper);
+
+      let img = document.createElement('img');
+      img.alt = node.attrs.alt;
+      img.style.display = 'none';
+      let div = document.createElement('div');
+      div.className = 'image' + (node.attrs.annotation ? ' annotation' : '');
+      if (node.attrs.naturalHeight !== null && node.attrs.naturalWidth !== null) {
+        div.style.paddingBottom = node.attrs.naturalHeight / node.attrs.naturalWidth * 100 + '%';
+      }
+      div.appendChild(img);
+
+      resizedWrapper.appendChild(div)
+
+      div.ondblclick = event => {
+        event.preventDefault();
+        options.onDoubleClick(node);
+      }
+
+      this.dom = imageBlock;
+      this.img = img;
     }
+    else if (node.attrs.src) {
+      this.img = null;
+      let div = document.createElement('div');
+      div.className = 'external-image';
 
-    img.setAttribute('alt', node.attrs.alt);
-    img.setAttribute('src', node.attrs.dataUrl);
-    img.style.display = 'none';
+      let resizedWrapper = document.createElement('div');
+      resizedWrapper.className = 'resized-wrapper';
+      div.appendChild(resizedWrapper);
 
-    this.img = img;
+      let divLeft = document.createElement('div');
+      divLeft.className = 'image';
+      let divRight = document.createElement('div');
+      divRight.className = 'link';
 
-    let div = document.createElement('div');
-    div.style.width = '100%';
-    div.style.paddingBottom = node.attrs.height / node.attrs.width * 100 + '%';
-    div.style.backgroundColor = 'lightgray';
-    div.appendChild(img);
-    this.dom = div;
+      let img = document.createElement('img');
+      img.src = node.attrs.src;
+      divLeft.appendChild(img);
+
+      if (node.attrs.src) {
+        let a = document.createElement('a');
+        a.href = node.attrs.src;
+        a.onclick = (event) => {
+          event.preventDefault();
+          options.onOpenUrl(event.target.href);
+        }
+        a.appendChild(document.createTextNode((new URL(node.attrs.src)).host));
+        divRight.appendChild(a);
+      }
+
+      resizedWrapper.appendChild(divLeft);
+      resizedWrapper.appendChild(divRight);
+
+      this.dom = div;
+    }
+    else {
+      this.img = null;
+      let div = document.createElement('div');
+      div.className = 'import-placeholder-image';
+
+      let image = document.createElement('div');
+      image.className = 'image';
+      div.appendChild(image);
+      this.dom = div;
+    }
   }
 
   selectNode() {
@@ -34,14 +107,15 @@ class ImageView {
     this.dom.classList.remove('selected');
   }
 
-  update(node) {
-    if (node.type.name !== 'image') return false;
-    this.img.setAttribute('alt', node.attrs.alt);
-    this.img.setAttribute('src', node.attrs.dataUrl);
-    return true
+  destroy() {
+    if (this.provider) {
+      this.provider.unsubscribe(this.listener);
+    }
   }
 }
 
-export default function (node, view, getPos) {
-  return new ImageView(node, view, getPos)
+export default function (options) {
+  return function (node, view, getPos) {
+    return new ImageView(node, view, getPos, options);
+  }
 }

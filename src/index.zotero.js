@@ -1,117 +1,93 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { DOMSerializer } from 'prosemirror-model'
-
 import { randomString } from './core/utils';
-import { schema } from './core/schema';
+import { schemaVersion, schema } from './core/schema';
 import * as commands from './core/commands';
 import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
 
+let currentInstance = null;
 
 class EditorInstance {
   constructor(options) {
-    this.editorCore = null;
     this.instanceId = options.instanceId;
-    this.libraryId = options.libraryId;
-    this.readOnly = options.readOnly;
-    if (options.state) {
-      this.init(options.state);
+    this._readOnly = options.readOnly;
+    this._editorCore = null;
+    this._unsupportedSchema = false;
+
+    if (!Number.isInteger(options.schemaVersion)) {
+      throw new Error('schemaVersion is not an integer');
     }
-    else {
-      this.init(options.html);
+
+    if (options.schemaVersion > schemaVersion) {
+      this._readOnly = true;
+      this._unsupportedSchema = true;
     }
+
+    this._init(options.value);
   }
 
-  postMessage(message) {
+  _postMessage(message) {
     console.log('posting', message)
     window.postMessage({ instanceId: this.instanceId, message }, '*');
   }
 
-  init(value) {
-    this.editorCore = new EditorCore({
+  _init(value) {
+    this._editorCore = new EditorCore({
       value,
-      readOnly: this.readOnly,
-      onUpdate: (html) => {
-        console.log('onUpdate');
-        this.postMessage({
-          op: 'update',
-          noteData: {
-            state: {
-              doc: this.editorCore.view.state.doc.toJSON()
-            },
-            html: this.editorCore.getHtml() || null
-          }
-        });
+      readOnly: this._readOnly,
+      onSubscribeProvider: (subscription) => {
+        let { id, type, data } = subscription;
+        this._postMessage({ action: 'subscribeProvider', id, type, data });
       },
-      onUpdateCitations: (id, citation) => {
-        this.postMessage({ op: 'updateCitation', id, citation });
+      onUnsubscribeProvider: (subscription) => {
+        let { id, type } = subscription;
+        this._postMessage({ action: 'unsubscribeProvider', id, type });
+      },
+      onImportImages: (images) => {
+        this._postMessage({ action: 'importImages', images });
+      },
+      onSyncAttachmentKeys: (attachmentKeys) => {
+        this._postMessage({ action: 'syncAttachmentKeys', attachmentKeys });
+      },
+      onOpenUrl: (url) => {
+        this._postMessage({ action: 'openUrl', url });
+      },
+      onUpdate: (html) => {
+        this._postMessage({ action: 'update', noteData: this._editorCore.getData() });
       },
       onInsertObject: (type, data, pos) => {
-        console.log('onInsertObject', type, data, pos);
-        this.postMessage({ op: 'insertObject', type, data, pos });
+        this._postMessage({ action: 'insertObject', type, data, pos });
       },
-      onNavigate: (annotation) => {
-        console.log('onNavigate', annotation)
-        this.postMessage({ op: 'navigate', uri: annotation.uri, position: annotation.position });
-
+      onOpenAnnotation: (annotation) => {
+        this._postMessage({ action: 'openAnnotation', uri: annotation.uri, position: annotation.position });
       },
-      onOpenCitationPopup: (id, citation) => {
-        console.log('onOpenCitationPopup', id, citation);
-        this.postMessage({ op: 'quickFormat', id, citation });
+      onOpenCitationPopup: (nodeId, citation) => {
+        this._postMessage({ action: 'openCitationPopup', nodeId, citation });
       },
-      onUpdateImages: (data) => {
-        console.log('onUpdateImages', data)
-        this.postMessage({ op: 'updateImages', ...data });
-      },
-      onRequestImage: (attachmentKey) => {
-        console.log('onRequestImage', attachmentKey)
-        this.postMessage({ op: 'requestImage', attachmentKey });
-      },
-      onGetFormattedCitations: (citations) => {
-        console.log('onGetFormattedCitations', citations);
-        this.postMessage({ op: 'getFormattedCitations', citations });
+      onOpenContextMenu: (pos, node, x, y) => {
+        this._postMessage({ action: 'popup', x, y, pos, items: this._getContextMenuItems(node) });
       }
     });
-
     ReactDOM.render(
       <Editor
-        readOnly={this.readOnly}
-        editorCore={this.editorCore}
-        onOpenUrl={(url) => {
-          console.log('onOpenUrl', url);
-          this.postMessage({ op: 'openURL', url });
-        }}
+        readOnly={this._readOnly}
+        showUpdateNotice={this._unsupportedSchema}
+        editorCore={this._editorCore}
       />,
       document.getElementById('editor-container')
     );
-
-    window.addEventListener('message', this.listener);
-    window.addEventListener('mousedown', this.handleMouseDown);
-
-    this.postMessage({ op: 'initialized' });
+    window.addEventListener('message', this._listener);
+    this._postMessage({ action: 'initialized' });
   }
 
   uninit() {
-    window.removeEventListener('message', this.listener);
-    window.removeEventListener('mousedown', this.handleMouseDown);
+    window.removeEventListener('message', this._listener);
     ReactDOM.unmountComponentAtNode(document.getElementById('editor-container'));
   }
 
-  handleMouseDown = (event) => {
-    // If right button
-    if (event.button === 2) {
-      currentInstance.postMessage({
-        op: 'popup',
-        x: event.screenX,
-        y: event.screenY,
-        items: this.getContextMenuItems()
-      });
-    }
-  }
-
-  listener = (event) => {
+  _listener = (event) => {
     console.log('Worker: Message received from the main script');
     console.log(event);
 
@@ -120,110 +96,140 @@ class EditorInstance {
     }
 
     let message = event.data.message;
-
-    if (message.op === 'setFormattedCitations') {
-      this.editorCore.setFormattedCitations(message.formattedCitations);
-    }
-    else if (message.op === 'setCitation') {
-      this.editorCore.updateCitation(message.id, message.citation, message.formattedCitation);
-    }
-    else if (message.op === 'updateImage') {
-      this.editorCore.updateImage(message.attachmentKey, message.dataUrl);
-    }
-    else if (message.op === 'contextMenuAction') {
-      this.handleContextMenuAction(message.ctxAction, message.payload);
-    }
-    else if (message.op === 'insertCitations') {
-      this.editorCore.insertCitations(message.citations, message.pos);
-    }
-    else if (message.op === 'insertAnnotationsAndCitations') {
-      this.editorCore.insertAnnotationsAndCitations(message.list, message.pos);
+    switch (message.action) {
+      case 'notifyProvider': {
+        let { id, type, data } = message;
+        this._editorCore.provider.notify(id, type, data);
+        return;
+      }
+      case 'setCitation': {
+        let { nodeId, citation } = message;
+        this._editorCore.updateCitation(nodeId, citation);
+        return;
+      }
+      case 'attachImportedImage': {
+        let { nodeId, attachmentKey } = message;
+        this._editorCore.attachImportedImage(nodeId, attachmentKey);
+        return;
+      }
+      case 'contextMenuAction': {
+        let { ctxAction, pos } = message;
+        this._handleContextMenuAction(ctxAction, pos);
+        return;
+      }
+      case 'insertAnnotationsAndCitations': {
+        let { list, pos } = message;
+        this._editorCore.insertAnnotationsAndCitations(list, pos);
+        return;
+      }
+      case 'focus': {
+        this._editorCore.focus();
+        return;
+      }
     }
   }
 
-  handleContextMenuAction(cmd) {
-    console.log('contextMenuCmd', cmd);
-    if (cmd === 'navigate') {
-      if (this.editorCore.lastMouseDownNode.classList.contains('highlight')) {
-        let uri = this.editorCore.lastMouseDownNode.getAttribute('data-item-uri');
-        let annotation = JSON.parse(decodeURIComponent(this.editorCore.lastMouseDownNode.getAttribute('data-annotation')));
-        this.postMessage({ op: 'navigate', navigateItemURI: uri, annotation });
-      }
-    }
-    else if (cmd === 'showInLibrary') {
-      if (this.editorCore.lastMouseDownNode && this.editorCore.lastMouseDownNode.classList.contains('highlight')) {
-        let uri = this.editorCore.lastMouseDownNode.getAttribute('data-item-uri');
-        if (uri) {
-          this.postMessage({ op: 'showInLibrary', itemURI: uri });
+  _handleContextMenuAction(action, pos) {
+    let $pos = this._editorCore.view.state.doc.resolve(pos);
+    let node = $pos.node();
+    switch (action) {
+      case 'navigate': {
+        if (node.type.name === 'highlight') {
+          let annotation = node.attrs.annotation;
+          this._postMessage({ action: 'openAnnotation', uri: annotation.uri, position: annotation.position });
         }
+        return;
       }
-    }
-    else if (cmd === 'cut') {
-      zoteroExecCommand(document, 'cut', false, null);
-    }
-    else if (cmd === 'copy') {
-      zoteroExecCommand(document, 'copy', false, null);
-    }
-    else if (cmd === 'paste') {
-      zoteroExecCommand(document, 'paste', false, null);
-    }
-    else if (cmd === 'insertCitation') {
-      let citation = {
-        citationItems: [],
-        properties: {}
-      };
+      case 'showInLibrary': {
+        if (node.type.name === 'highlight') {
+          let annotation = node.attrs.annotation;
+          this._postMessage({ action: 'showInLibrary', uri: annotation.uri });
+        }
+        return;
+      }
+      case 'openBackup': {
+        this._postMessage({ action: 'openBackup' });
+        return;
+      }
+      case 'cut': {
+        zoteroExecCommand(document, 'cut', false, null);
+        return;
+      }
+      case 'copy': {
+        zoteroExecCommand(document, 'copy', false, null);
+        return;
+      }
+      case 'paste': {
+        zoteroExecCommand(document, 'paste', false, null);
+        return;
+      }
+      case 'insertCitation': {
+        let citation = {
+          citationItems: [],
+          properties: {}
+        };
 
-      let id = randomString();
-      let citationNode = schema.nodes.citation.create({ id, citation });
-      this.editorCore.view.dispatch(this.editorCore.view.state.tr.insert(this.editorCore.view.state.selection.from, citationNode));
-      this.postMessage({ op: 'quickFormat', id, citation });
-    }
-    else if (cmd === 'toggleDir') {
-      commands.toggleDir(window.rtl ? 'ltr' : 'rtl')(this.editorCore.view.state, this.editorCore.view.dispatch);
+        let nodeId = randomString();
+        let citationNode = schema.nodes.citation.create({ nodeId, citation });
+        let { state, dispatch } = this._editorCore.view;
+        dispatch(state.tr.insert(pos, citationNode));
+        this._postMessage({ action: 'openCitationPopup', nodeId, citation });
+        return;
+      }
+      case 'toggleDir': {
+        let { state, dispatch } = this._editorCore.view;
+        commands.toggleDir(window.rtl ? 'ltr' : 'rtl')(state, dispatch);
+        return;
+      }
     }
   }
 
-  getContextMenuItems() {
+  _getContextMenuItems(node) {
     let items = [];
 
-    let selection = currentInstance.editorCore.view.state.doc.cut(currentInstance.editorCore.view.state.selection.from, currentInstance.editorCore.view.state.selection.to)
-    if (selection.content.size) {
+    if (!this._readOnly && this._editorCore.hasSelection()) {
       items.push(['cut', 'Cut']);
+    }
+
+    if (this._editorCore.hasSelection()) {
       items.push(['copy', 'Copy']);
     }
 
-    items.push(['paste', 'Paste']);
+    if (!this._readOnly) {
+      items.push(['paste', 'Paste']);
+    }
 
-
-    if (
-      // editorCore.lastMouseDownNode.classList.contains('citation') ||
-      currentInstance.editorCore.lastMouseDownNode.classList.contains('highlight')
-    ) {
+    if (node.type.name === 'highlight') {
       items.push(['showInLibrary', 'Show Item in Library']);
     }
 
-    if (currentInstance.editorCore.lastMouseDownNode.classList.contains('highlight')) {
+    if (node.type.name === 'highlight') {
       items.push(['navigate', 'Show Annotation in PDF']);
     }
 
+    // if (node.type.name === 'image') {
+    //   items.push(['editImage', 'Edit Image']);
+    // }
 
-    if (!selection.content.size) {
+    if (!this._readOnly && !this._editorCore.hasSelection()) {
       items.push(['insertCitation', 'Insert Citation']);
     }
 
-    if (window.rtl) {
-      items.push(['toggleDir', 'Left to Right']);
+    if (!this._readOnly) {
+      // TODO: Make sure this is only shown for appropriate nodes and direction
+      if (window.rtl) {
+        items.push(['toggleDir', 'Left to Right']);
+      }
+      else {
+        items.push(['toggleDir', 'Right to Left']);
+      }
     }
-    else {
-      items.push(['toggleDir', 'Right to Left']);
-    }
+
+    items.push(['openBackup', 'View the backed-up note']);
 
     return items;
   }
-
 }
-
-let currentInstance = null;
 
 window.addEventListener('message', function (e) {
   // console.log('Editor: Message received from the main script');
@@ -231,16 +237,17 @@ window.addEventListener('message', function (e) {
   let message = e.data.message;
   let instanceId = e.data.instanceId;
 
-  if (message.op === 'init') {
+  if (message.action === 'init') {
+    console.log('Initializing new instance', message);
     if (currentInstance) {
       currentInstance.uninit();
     }
+    let { value, schemaVersion, readOnly } = message;
     currentInstance = new EditorInstance({
       instanceId,
-      html: message.html,
-      state: message.state,
-      libraryId: message.libraryId,
-      readOnly: message.readOnly
+      value,
+      schemaVersion,
+      readOnly
     });
   }
 });
@@ -262,24 +269,7 @@ window.getDataSync = () => {
   if (!currentInstance.editorCore.docChanged) {
     return null;
   }
-
-  return {
-    state: {
-      doc: currentInstance.editorCore.view.state.doc.toJSON()
-    },
-    html: currentInstance.editorCore.getHtml() || null
-  };
-}
-
-window.setHTML = (html) => {
-  console.log('Setting HTML', html);
-  // init(html, null);
-}
-
-window.setState = (state) => {
-  console.log('Setting state', state);
-  state = JSON.parse(state);
-  // init(null, state);
+  return currentInstance.editorCore.getData();
 }
 
 window.isReady = true;

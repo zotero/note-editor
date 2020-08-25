@@ -31,7 +31,7 @@
 }
 
 .ProseMirror-selectednode {
-  outline: 2px solid #8cf;
+  outline: none;
 }
 
 /* Make sure li selections wrap around markers */
@@ -57,15 +57,15 @@ li.ProseMirror-selectednode:after {
   /*cursor: pointer;*/
   /*-webkit-user-modify: read-only;*/
   /*-webkit-user-drag: element;*/
-  background-color: #e0e0e0;
-  cursor: pointer;
+  background-color: #ffff00;
+  cursor: default;
 }
 
 .citation {
-  user-select: none;
-  cursor: pointer;
-  -webkit-user-modify: read-only;
-  -webkit-user-drag: element;
+  //user-select: none;
+  cursor: default;
+  //-webkit-user-modify: read-only;
+  //-webkit-user-drag: element;
 
 }
 
@@ -241,3 +241,124 @@ blockquote {
 .ProseMirror-focused .ProseMirror-gapcursor {
   display: block;
 }
+
+
+.ProseMirror {
+
+
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+
+  * {
+    caret-color: currentColor;
+  }
+
+  pre {
+    padding: 0.7rem 1rem;
+    border-radius: 5px;
+    background: #f1f1f1;
+    //color: $color-white;
+
+    font-size: 0.8rem;
+    overflow-x: auto;
+
+    code {
+      display: block;
+    }
+  }
+
+  p code {
+    padding: 0.2rem 0.4rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    background: #f1f1f1;
+  }
+
+  ul,
+  ol {
+    padding-left: 2rem;
+  }
+
+  li > p,
+  li > ol,
+  li > ul {
+    margin: 0;
+  }
+
+  table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+
+    td, th {
+      min-width: 1em;
+      //border: 2px solid $color-grey;
+      padding: 3px 5px;
+      vertical-align: top;
+      box-sizing: border-box;
+      position: relative;
+
+      > * {
+        margin-bottom: 0;
+      }
+    }
+
+    th {
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .selectedCell:after {
+      z-index: 2;
+      position: absolute;
+      content: "";
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background: rgba(200, 200, 255, 0.4);
+      pointer-events: none;
+    }
+
+    .column-resize-handle {
+      position: absolute;
+      right: -2px;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      z-index: 20;
+      background-color: #adf;
+      pointer-events: none;
+    }
+  }
+
+  .tableWrapper {
+    margin: 1em 0;
+    overflow-x: auto;
+  }
+
+  .resize-cursor {
+    cursor: ew-resize;
+    cursor: col-resize;
+  }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

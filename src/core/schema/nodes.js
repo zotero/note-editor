@@ -1,14 +1,19 @@
 import { tableNodes } from 'prosemirror-tables';
 import { encodeObject, decodeObject, generateObjectKey, randomString } from '../utils'
 
-const INDENT_WIDTH = 40; // TinyMCE padding width for a single indent
+export const MAX_INDENT = 10;
 
 function getInteger(value) {
-  if (!value) return null;
-  return parseInt(value);
+  if (value) {
+    value = parseInt(value);
+    if (!isNaN(value)) {
+      return value;
+    }
+  }
+  return null;
 }
 
-function st(styles) {
+function style(styles) {
   let list = [];
   for (let styleName in styles) {
     if (styles[styleName]) {
@@ -18,20 +23,37 @@ function st(styles) {
   return list.length && list.join(';') || undefined;
 }
 
-function paddingToIndent(value) {
-  let num = parseInt(value);
-  if (num + 'px' === value && num > 0 && (num % INDENT_WIDTH === 0)) {
-    return num / INDENT_WIDTH;
+function getIndent(node) {
+  let indent = node.getAttribute('data-indent');
+  if (indent) {
+    indent = parseInt(indent);
+    if (Number.isInteger(indent) && indent <= MAX_INDENT) {
+      return indent;
+    }
+  }
+  else {
+    const INDENT_WIDTH = 40; // TinyMCE padding width for a single indent
+    let value = node.style.paddingLeft || node.style.paddingRight;
+    let num = parseInt(value);
+    if (num + 'px' === value && num > 0 && (num % INDENT_WIDTH === 0)) {
+      return num / INDENT_WIDTH;
+    }
   }
   return null;
 }
 
-function filterTextAlign(value) {
+function getAlign(value) {
   return ['left', 'right', 'center', 'justify'].includes(value) && value || null;
 }
 
-function filterDir(value) {
-  return value === 'rtl' && value || null;
+function getDir(value) {
+  if (value) {
+    value = value.toLowerCase();
+    if (['ltr', 'rtl'].includes(value)) {
+      return value;
+    }
+  }
+  return null;
 }
 
 export default {
@@ -40,9 +62,10 @@ export default {
   },
 
 
+  // Block nodes
   paragraph: {
     group: 'block',
-    content: '(text | hard_break | image | citation | highlight)*',
+    content: '(text | hardBreak | image | citation | highlight)*',
     attrs: {
       indent: { default: null },
       align: { default: null },
@@ -51,29 +74,25 @@ export default {
     parseDOM: [
       {
         tag: 'p',
-        getAttrs: (node) => ({
-          indent: paddingToIndent(node.style.paddingLeft),
-          align: filterTextAlign(node.style.textAlign),
-          dir: filterDir(node.getAttribute('dir'))
+        getAttrs: (dom) => ({
+          indent: getIndent(dom),
+          align: getAlign(dom.style.textAlign),
+          dir: getDir(dom.getAttribute('dir'))
         })
       },
       { tag: 'dd' }
     ],
-    toDOM(node) {
-      const attrs = {
-        style: st({
-          'text-align': node.attrs.align,
-          'padding-left': node.attrs.indent && node.attrs.indent * INDENT_WIDTH + 'px'
-        }),
-        dir: node.attrs.dir
-      };
-      return ['p', attrs, 0];
-    }
+    toDOM: (node) => ['p', {
+      style: style({ 'text-align': node.attrs.align }),
+      dir: node.attrs.dir,
+      'data-indent': node.attrs.indent
+    }, 0]
+
   },
 
 
   heading: {
-    content: '(text | hard_break)*',
+    content: '(text | hardBreak)*',
     group: 'block',
     defining: true,
     attrs: {
@@ -84,90 +103,43 @@ export default {
       id: { default: null }
     },
     parseDOM: [
-      {
-        tag: 'h1',
-        getAttrs: (node) => ({
-          level: 1,
-          align: filterTextAlign(node.style.textAlign),
-          indent: paddingToIndent(node.style.paddingLeft),
-          dir: filterDir(node.getAttribute('dir')),
-          id: node.getAttribute('id')
+      ...[1, 2, 3, 4, 5, 6].map(level => ({
+        tag: 'h' + level,
+        getAttrs: (dom) => ({
+          level,
+          id: dom.getAttribute('id'),
+          dir: getDir(dom.getAttribute('dir')),
+          indent: getIndent(dom),
+          align: getAlign(dom.style.textAlign)
         })
-      },
-      {
-        tag: 'h2',
-        getAttrs: (node) => ({
-          level: 2,
-          align: filterTextAlign(node.style.textAlign),
-          indent: node.style.paddingLeft,
-          dir: filterDir(node.getAttribute('dir')),
-          id: node.getAttribute('id')
-        })
-      },
-      {
-        tag: 'h3',
-        getAttrs: (node) => ({
-          level: 3,
-          align: filterTextAlign(node.style.textAlign),
-          indent: paddingToIndent(node.style.paddingLeft),
-          dir: filterDir(node.getAttribute('dir')),
-          id: node.getAttribute('id')
-        })
-      },
-      {
-        tag: 'h4',
-        getAttrs: (node) => ({
-          level: 4,
-          align: filterTextAlign(node.style.textAlign),
-          indent: paddingToIndent(node.style.paddingLeft),
-          dir: filterDir(node.getAttribute('dir')),
-          id: node.getAttribute('id')
-        })
-      },
-      {
-        tag: 'h5',
-        getAttrs: (node) => ({
-          level: 5,
-          align: filterTextAlign(node.style.textAlign),
-          indent: paddingToIndent(node.style.paddingLeft),
-          dir: filterDir(node.getAttribute('dir')),
-          id: node.getAttribute('id')
-        })
-      },
-      {
-        tag: 'h6',
-        getAttrs: (node) => ({
-          level: 6,
-          align: filterTextAlign(node.style.textAlign),
-          indent: paddingToIndent(node.style.paddingLeft),
-          dir: filterDir(node.getAttribute('dir')),
-          id: node.getAttribute('id')
-        })
-      }],
-    toDOM: function toDOM(node) {
-      const attrs = {
-        style: st({
-          'text-align': node.attrs.align,
-          'padding-left': node.attrs.indent && node.attrs.indent * INDENT_WIDTH + 'px'
-        }),
-        dir: node.attrs.dir,
-        id: node.attrs.id
-      };
-      return ['h' + node.attrs.level, attrs, 0]
-    }
+      }))
+    ],
+    toDOM: (node) => ['h' + node.attrs.level, {
+      id: node.attrs.id,
+      dir: node.attrs.dir,
+      'data-indent': node.attrs.indent,
+      style: style({ 'text-align': node.attrs.align })
+    }, 0]
   },
 
 
-  code_block: {
+  // Additional constraints are applied through transformations
+  // codeBlock can only have plain text
+  codeBlock: {
     group: 'block',
     content: 'text*',
     marks: '',
     code: true,
     defining: true,
-    parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
-    toDOM: function toDOM() {
-      return ['pre', 0];
-    }
+    attrs: { dir: { default: null } },
+    parseDOM: [{
+      tag: 'pre',
+      preserveWhitespace: 'full',
+      getAttrs: (dom) => ({
+        dir: getDir(dom.getAttribute('dir'))
+      })
+    }],
+    toDOM: (node) => ['pre', { dir: node.attrs.dir }, 0]
   },
 
 
@@ -176,53 +148,46 @@ export default {
     group: 'block',
     defining: true,
     parseDOM: [{ tag: 'blockquote' }],
-    toDOM: function toDOM() {
-      return ['blockquote', 0];
-    }
+    toDOM: () => ['blockquote', 0]
   },
 
 
-  horizontal_rule: {
+  horizontalRule: {
     group: 'block',
     parseDOM: [{ tag: 'hr' }],
-    toDOM() {
-      return ['hr']
-    }
+    toDOM: () => ['hr']
   },
 
 
-  ordered_list: {
+  orderedList: {
     attrs: { order: { default: 1 } },
     parseDOM: [{
-      tag: 'ol', getAttrs: function getAttrs(dom) {
-        return { order: dom.hasAttribute('start') ? +dom.getAttribute('start') : 1 }
-      }
+      tag: 'ol',
+      getAttrs: (dom) => ({
+        order: dom.hasAttribute('start') ? +dom.getAttribute('start') : 1
+      })
     }],
-    toDOM: function toDOM(node) {
+    toDOM(node) {
       return node.attrs.order == 1 ? ['ol', 0] : ['ol', { start: node.attrs.order }, 0]
     },
-    content: 'list_item+',
+    content: 'listItem+',
     group: 'block'
   },
 
 
-  bullet_list: {
+  bulletList: {
     group: 'block',
-    content: 'list_item+',
+    content: 'listItem+',
     parseDOM: [{ tag: 'ul' }],
-    toDOM() {
-      return ['ul', 0]
-    }
+    toDOM: () => ['ul', 0]
   },
 
 
-  list_item: {
+  listItem: {
     content: 'block+',
     defining: true,
     parseDOM: [{ tag: 'li' }],
-    toDOM() {
-      return ['li', 0]
-    }
+    toDOM: () => ['li', 0]
   },
 
 
@@ -249,14 +214,12 @@ export default {
   },
 
 
-  hard_break: {
+  hardBreak: {
     inline: true,
     group: 'inline',
     selectable: false,
-    parseDOM: [{ tag: 'br' }, { tag: 'span.line-break' }],
-    toDOM: () => ([
-      'span', { class: 'line-break' }, ['br']
-    ])
+    parseDOM: [{ tag: 'br' }],
+    toDOM: () => ['br']
   },
 
 
@@ -279,34 +242,30 @@ export default {
     },
     parseDOM: [{
       tag: 'img',
-      getAttrs(dom) {
-        return {
-          nodeId: randomString(),
-          src: dom.getAttribute('src'),
-          alt: dom.getAttribute('alt'),
-          title: dom.getAttribute('title'),
-          width: getInteger(dom.getAttribute('width')),
-          height: getInteger(dom.getAttribute('height')),
-          naturalWidth: getInteger(dom.getAttribute('data-natural-width')),
-          naturalHeight: getInteger(dom.getAttribute('data-natural-height')),
-          attachmentKey: dom.getAttribute('data-attachment-key'),
-          annotation: decodeObject(dom.getAttribute('data-annotation'))
-        }
-      }
+      getAttrs: (dom) => ({
+        nodeId: randomString(),
+        src: dom.getAttribute('src'),
+        alt: dom.getAttribute('alt'),
+        title: dom.getAttribute('title'),
+        width: getInteger(dom.getAttribute('width')),
+        height: getInteger(dom.getAttribute('height')),
+        naturalWidth: getInteger(dom.getAttribute('data-natural-width')),
+        naturalHeight: getInteger(dom.getAttribute('data-natural-height')),
+        attachmentKey: dom.getAttribute('data-attachment-key'),
+        annotation: decodeObject(dom.getAttribute('data-annotation'))
+      })
     }],
-    toDOM(node) {
-      return ['img', {
-        src: node.attrs.attachmentKey ? null : node.attrs.src,
-        alt: node.attrs.alt,
-        title: node.attrs.title,
-        width: node.attrs.width,
-        height: node.attrs.height,
-        'data-natural-width': node.attrs.naturalWidth,
-        'data-natural-height': node.attrs.naturalHeight,
-        'data-attachment-key': node.attrs.attachmentKey,
-        'data-annotation': node.attrs.annotation && encodeObject(node.attrs.annotation)
-      }];
-    }
+    toDOM: (node) => ['img', {
+      src: node.attrs.attachmentKey ? null : node.attrs.src,
+      alt: node.attrs.alt,
+      title: node.attrs.title,
+      width: node.attrs.width,
+      height: node.attrs.height,
+      'data-natural-width': node.attrs.naturalWidth,
+      'data-natural-height': node.attrs.naturalHeight,
+      'data-attachment-key': node.attrs.attachmentKey,
+      'data-annotation': node.attrs.annotation && encodeObject(node.attrs.annotation)
+    }]
   },
 
 
@@ -322,21 +281,17 @@ export default {
     },
     parseDOM: [{
       tag: 'span.citation',
-      getAttrs(dom) {
-        return {
-          nodeId: randomString(),
-          citation: decodeObject(dom.getAttribute('data-citation'))
-            || { citationItems: [], properties: {} }
-        }
-      }
+      getAttrs: (dom) => ({
+        nodeId: randomString(),
+        citation: decodeObject(dom.getAttribute('data-citation'))
+          || { citationItems: [], properties: {} }
+      })
     }
     ],
-    toDOM(node) {
-      return ['span', {
-        class: 'citation',
-        'data-citation': encodeObject(node.attrs.citation)
-      }, '{citation}']
-    }
+    toDOM: (node) => ['span', {
+      class: 'citation',
+      'data-citation': encodeObject(node.attrs.citation)
+    }, '{citation}']
   },
 
 
@@ -350,17 +305,13 @@ export default {
     },
     parseDOM: [{
       tag: 'span.highlight',
-      getAttrs(dom) {
-        return {
-          annotation: decodeObject(dom.getAttribute('data-annotation'))
-        }
-      }
+      getAttrs: (dom) => ({
+        annotation: decodeObject(dom.getAttribute('data-annotation'))
+      })
     }],
-    toDOM(node) {
-      return ['span', {
-        class: 'highlight',
-        'data-annotation': encodeObject(node.attrs.annotation)
-      }, 0]
-    }
+    toDOM: (node) => ['span', {
+      class: 'highlight',
+      'data-annotation': encodeObject(node.attrs.annotation)
+    }, 0]
   }
 }

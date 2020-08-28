@@ -134,28 +134,44 @@ blockquote {
   border-left: 3px solid lightblue;
 }
 
-.ProseMirror > [data-indent-level='1'] {
+.ProseMirror > [data-indent='1'] {
   margin-left: 30px;
 }
 
-.ProseMirror > [data-indent-level='2'] {
+.ProseMirror > [data-indent='2'] {
   margin-left: 60px;
 }
 
-.ProseMirror > [data-indent-level='3'] {
+.ProseMirror > [data-indent='3'] {
   margin-left: 90px;
 }
 
-.ProseMirror > [data-indent-level='4'] {
+.ProseMirror > [data-indent='4'] {
   margin-left: 120px;
 }
 
-.ProseMirror > [data-indent-level='5'] {
+.ProseMirror > [data-indent='5'] {
   margin-left: 150px;
 }
 
-.ProseMirror > [data-indent-level='6'] {
+.ProseMirror > [data-indent='6'] {
   margin-left: 180px;
+}
+
+.ProseMirror > [data-indent='7'] {
+  margin-left: 210px;
+}
+
+.ProseMirror > [data-indent='8'] {
+  margin-left: 240px;
+}
+
+.ProseMirror > [data-indent='9'] {
+  margin-left: 270px;
+}
+
+.ProseMirror > [data-indent='10'] {
+  margin-left: 300px;
 }
 
 .find {

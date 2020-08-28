@@ -1,4 +1,4 @@
-# Zotero Note Editor (REWRITE IN PROGRESS)
+# Zotero Note Editor
 
 ## Build
 Clone the repository:

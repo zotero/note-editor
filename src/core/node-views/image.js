@@ -29,7 +29,13 @@ class ImageView {
       let resizedWrapper = document.createElement('div');
       resizedWrapper.className = 'resized-wrapper';
 
-      resizedWrapper.style.width = node.attrs.width !== null ? (node.attrs.width + 'px') : '600px';//'100%';
+      let maxWidth = 600;
+
+      if (node.attrs.naturalWidth && node.attrs.naturalWidth < 600) {
+        maxWidth = node.attrs.naturalWidth;
+      }
+
+      resizedWrapper.style.width = node.attrs.width !== null ? (node.attrs.width + 'px') : maxWidth + 'px';//'100%';
 
       imageBlock.appendChild(resizedWrapper);
 

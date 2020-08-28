@@ -78,7 +78,7 @@ class Menu {
     this.state = newState;
     this.strong = this.buildToggle(schema.marks.strong);
     this.em = this.buildToggle(schema.marks.em)
-    this.strikethrough = this.buildToggle(schema.marks.strikethrough)
+    this.strike = this.buildToggle(schema.marks.strike)
     this.underline = this.buildToggle(schema.marks.underline)
     this.subscript = this.buildToggle(schema.marks.subsup, { type: 'sub' })
     this.superscript = this.buildToggle(schema.marks.subsup, { type: 'sup' })
@@ -106,7 +106,7 @@ class Menu {
 
     this.blocks = {
       paragraph: this.buildBlock(schema.nodes.paragraph),
-      code: this.buildBlock(schema.nodes.code_block),
+      code: this.buildBlock(schema.nodes.codeBlock),
       heading1: this.buildBlock(schema.nodes.heading, { level: 1 }),
       heading2: this.buildBlock(schema.nodes.heading, { level: 2 }),
       heading3: this.buildBlock(schema.nodes.heading, { level: 3 }),
@@ -151,16 +151,16 @@ class Menu {
     }
 
     this.bulletList = {
-      isActive: nodeIsActive(state, schema.nodes.bullet_list),
+      isActive: nodeIsActive(state, schema.nodes.bulletList),
       run() {
-        commands.toggleList(schema.nodes.bullet_list, schema.nodes.list_item)(state, dispatch);
+        commands.toggleList(schema.nodes.bulletList, schema.nodes.listItem)(state, dispatch);
       }
     }
 
     this.orderedList = {
-      isActive: nodeIsActive(state, schema.nodes.ordered_list),
+      isActive: nodeIsActive(state, schema.nodes.orderedList),
       run() {
-        commands.toggleList(schema.nodes.ordered_list, schema.nodes.list_item)(state, dispatch);
+        commands.toggleList(schema.nodes.orderedList, schema.nodes.listItem)(state, dispatch);
       }
     }
 
@@ -175,6 +175,20 @@ class Menu {
       isActive: false,
       run() {
         commands.changeIndent(-1)(state, dispatch)
+      }
+    }
+
+    this.ltr = {
+      isActive: commands.hasAttr(state, 'dir', 'ltr'),
+      run() {
+        commands.toggleDir('ltr')(state, dispatch)
+      }
+    }
+
+    this.rtl = {
+      isActive: commands.hasAttr(state, 'dir', 'rtl'),
+      run() {
+        commands.toggleDir('rtl')(state, dispatch)
       }
     }
   }

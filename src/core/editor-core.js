@@ -9,7 +9,7 @@ import { debounce, decodeObject, encodeObject, generateObjectKey, randomString }
 
 
 import nodeViews from './node-views'
-import { attachImportedImage, insertAnnotationsAndCitations, insertCitations, updateCitation } from './commands';
+import { attachImportedImage, insertAnnotationsAndCitations, setCitation } from './commands';
 import { columnResizing, tableEditing } from 'prosemirror-tables';
 
 import { dropCursor } from 'prosemirror-dropcursor';
@@ -162,7 +162,9 @@ class EditorCore {
             let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
             if (pos) {
               let $pos = view.state.doc.resolve(pos.pos);
-              options.onOpenContextMenu($pos.pos, $pos.node(), event.screenX, event.screenY);
+              setTimeout(() => {
+                options.onOpenContextMenu($pos.pos, $pos.node(), event.screenX, event.screenY);
+              }, 0);
             }
           }
         }
@@ -183,8 +185,8 @@ class EditorCore {
     }
   }
 
-  updateCitation(nodeId, citation) {
-    updateCitation(nodeId, citation)(this.view.state, this.view.dispatch);
+  setCitation(nodeId, citation) {
+    setCitation(nodeId, citation)(this.view.state, this.view.dispatch);
   }
 
   attachImportedImage(nodeId, attachmentKey) {
@@ -211,7 +213,11 @@ class EditorCore {
     this.view.focus();
   }
 
-  getData() {
+  getData(onlyChanged) {
+    if (onlyChanged && !this.docChanged) {
+      return null;
+    }
+
     return {
       schemaVersion,
       state: {

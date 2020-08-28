@@ -4,12 +4,12 @@ import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirr
 import { encodeObject, randomString } from './utils';
 import { fromHtml } from './schema';
 
-// TODO: Fix. Doesn't work with `rtl`, code_block probably shouldn't be here
+// TODO: Fix. Doesn't work with `rtl`, codeBlock probably shouldn't be here
 export function changeIndent(dir = 1) {
   return function (state, dispatch, view) {
     const { selection } = state;
     const { $from, $to } = selection;
-    const { paragraph, heading, bullet_list, ordered_list, list_item, code_block } = state.schema.nodes;
+    const { paragraph, heading, bulletList, orderedList, listItem, codeBlock } = state.schema.nodes;
     const node = $to.node(1);
 
     if (node) {
@@ -21,16 +21,16 @@ export function changeIndent(dir = 1) {
           return true;
         }
       }
-      else if (node.type === bullet_list || node.type === ordered_list) {
+      else if (node.type === bulletList || node.type === orderedList) {
         if (dir > 0) {
-          sinkListItem(list_item)(state, dispatch);
+          sinkListItem(listItem)(state, dispatch);
         }
         else if (dir < 0) {
-          liftListItem(list_item)(state, dispatch);
+          liftListItem(listItem)(state, dispatch);
         }
         return true;
       }
-      else if (node.type === code_block) {
+      else if (node.type === codeBlock) {
         dispatch(state.tr.insert($from.pos, state.schema.text('  ', [])));
         return true;
       }
@@ -78,7 +78,6 @@ export function toggleAlignment(direction) {
     return true
   }
 }
-
 
 export function toggleDir(dir) {
   return function (state, dispatch) {
@@ -219,8 +218,8 @@ export function insertAnnotationsAndCitations(list, pos) {
 }
 
 function isList(node, schema) {
-  return (node.type === schema.nodes.bullet_list
-    || node.type === schema.nodes.ordered_list)
+  return (node.type === schema.nodes.bulletList
+    || node.type === schema.nodes.orderedList)
 }
 
 export function toggleList(listType, itemType) {
@@ -256,7 +255,7 @@ export function toggleList(listType, itemType) {
   }
 }
 
-export function updateCitation(nodeId, citation) {
+export function setCitation(nodeId, citation) {
   return function (state, dispatch) {
     state.doc.descendants((node, pos) => {
       if (node.attrs.nodeId === nodeId) {

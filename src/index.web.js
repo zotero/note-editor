@@ -131,6 +131,8 @@ function main(html) {
     }
   });
 
+  document.body.dir = 'ltr';
+
   ReactDOM.render(
     <Editor
       showUpdateNotice={true}
@@ -152,7 +154,7 @@ let html1 = `
 <h4>Heading 4</h4>
 <h5>Heading 5</h5>
 <h6>Heading 6</h6>
-<pre>Preformatted/code block (text formatting is not supported here)
+<pre dir="rtl">Preformatted/code block (text formatting is not supported here)
 1
 2
 3
@@ -234,7 +236,7 @@ let html1 = `
 <li><p><strong>strong</strong></p></li>
 <li><p><em>emphasis</em></p></li>
 <li><p><u>underline</u></p></li>
-<li><p><s>strikethrough</s></p></li>
+<li><p><s>strike</s></p></li>
 <li><p>O<sub>2</sub></p></li>
 <li><p>X<sup>2</sup></p></li>
 <li><p><code>inline</code> code</p></li>

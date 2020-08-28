@@ -30,7 +30,7 @@ function Toolbar({ menuState, linkState, searchState }) {
           <Button state={menuState.strong} icon="mce-i-bold" title="Bold"/>
           <Button state={menuState.em} icon="mce-i-italic" title="Italic"/>
           <Button state={menuState.underline} icon="mce-i-underline" title="Underline"/>
-          <Button state={menuState.strikethrough} icon="mce-i-strikethrough" title="Strikethrough"/>
+          <Button state={menuState.strike} icon="mce-i-strikethrough" title="Strikethrough"/>
         </Group>
         <Group>
           <Button state={menuState.subscript} icon="mce-i-subscript" title="Subscript"/>

@@ -13,6 +13,7 @@ class EditorInstance {
   constructor(options) {
     this.instanceId = options.instanceId;
     this._readOnly = options.readOnly;
+    this._dir = options.dir;
     this._editorCore = null;
     this._unsupportedSchema = false;
 
@@ -26,6 +27,10 @@ class EditorInstance {
     }
 
     this._init(options.value);
+  }
+
+  getDataSync() {
+    return this._editorCore.getData(true);
   }
 
   _postMessage(message) {
@@ -51,14 +56,14 @@ class EditorInstance {
       onSyncAttachmentKeys: (attachmentKeys) => {
         this._postMessage({ action: 'syncAttachmentKeys', attachmentKeys });
       },
-      onOpenUrl: (url) => {
-        this._postMessage({ action: 'openUrl', url });
-      },
       onUpdate: (html) => {
         this._postMessage({ action: 'update', noteData: this._editorCore.getData() });
       },
       onInsertObject: (type, data, pos) => {
         this._postMessage({ action: 'insertObject', type, data, pos });
+      },
+      onOpenUrl: (url) => {
+        this._postMessage({ action: 'openUrl', url });
       },
       onOpenAnnotation: (annotation) => {
         this._postMessage({ action: 'openAnnotation', uri: annotation.uri, position: annotation.position });
@@ -67,9 +72,12 @@ class EditorInstance {
         this._postMessage({ action: 'openCitationPopup', nodeId, citation });
       },
       onOpenContextMenu: (pos, node, x, y) => {
-        this._postMessage({ action: 'popup', x, y, pos, items: this._getContextMenuItems(node) });
+        this._postMessage({ action: 'openContextMenu', x, y, pos, items: this._getContextMenuItems(node) });
       }
     });
+
+    document.body.dir = this._dir;
+
     ReactDOM.render(
       <Editor
         readOnly={this._readOnly}
@@ -78,16 +86,16 @@ class EditorInstance {
       />,
       document.getElementById('editor-container')
     );
-    window.addEventListener('message', this._listener);
+    window.addEventListener('message', this._messageHandler);
     this._postMessage({ action: 'initialized' });
   }
 
   uninit() {
-    window.removeEventListener('message', this._listener);
+    window.removeEventListener('message', this._messageHandler);
     ReactDOM.unmountComponentAtNode(document.getElementById('editor-container'));
   }
 
-  _listener = (event) => {
+  _messageHandler = (event) => {
     console.log('Worker: Message received from the main script');
     console.log(event);
 
@@ -104,7 +112,7 @@ class EditorInstance {
       }
       case 'setCitation': {
         let { nodeId, citation } = message;
-        this._editorCore.updateCitation(nodeId, citation);
+        this._editorCore.setCitation(nodeId, citation);
         return;
       }
       case 'attachImportedImage': {
@@ -177,8 +185,12 @@ class EditorInstance {
         return;
       }
       case 'toggleDir': {
-        let { state, dispatch } = this._editorCore.view;
-        commands.toggleDir(window.rtl ? 'ltr' : 'rtl')(state, dispatch);
+        if (this._dir === 'ltr') {
+          this._editorCore.pluginState.menu.rtl.run();
+        }
+        else if (this._dir === 'rtl') {
+          this._editorCore.pluginState.menu.ltr.run();
+        }
         return;
       }
     }
@@ -216,16 +228,24 @@ class EditorInstance {
     }
 
     if (!this._readOnly) {
-      // TODO: Make sure this is only shown for appropriate nodes and direction
-      if (window.rtl) {
-        items.push(['toggleDir', 'Left to Right']);
+      let toggleDir;
+      if (this._dir === 'ltr') {
+        toggleDir = this._editorCore.pluginState.menu.rtl.isActive ? 'ltr' : 'rtl'
       }
-      else {
+      else if (this._dir === 'rtl') {
+        toggleDir = this._editorCore.pluginState.menu.ltr.isActive ? 'rtl' : 'ltr'
+      }
+
+      if (toggleDir === 'rtl') {
         items.push(['toggleDir', 'Right to Left']);
+      }
+      else if (toggleDir === 'ltr') {
+        items.push(['toggleDir', 'Left to Right']);
       }
     }
 
-    items.push(['openBackup', 'View the backed-up note']);
+    // TODO: Do not suggest backup preview for the new notes
+    items.push(['openBackup', 'View note backup']);
 
     return items;
   }
@@ -238,38 +258,24 @@ window.addEventListener('message', function (e) {
   let instanceId = e.data.instanceId;
 
   if (message.action === 'init') {
-    console.log('Initializing new instance', message);
+    console.log('Initializing a new instance', message);
     if (currentInstance) {
       currentInstance.uninit();
     }
-    let { value, schemaVersion, readOnly } = message;
+    let { value, schemaVersion, readOnly, dir } = message;
     currentInstance = new EditorInstance({
       instanceId,
       value,
       schemaVersion,
-      readOnly
+      readOnly,
+      dir
     });
   }
 });
 
-
-window.setDir = (dir) => {
-  return;
-  if (dir === 'rtl') {
-    document.getElementById('editor').setAttribute('dir', 'rtl');
-    window.rtl = true;
-  }
-  else {
-    document.getElementById('editor').removeAttribute('dir');
-    window.rtl = false;
-  }
-}
-
 window.getDataSync = () => {
-  if (!currentInstance.editorCore.docChanged) {
-    return null;
+  if (currentInstance) {
+    return currentInstance.getDataSync();
   }
-  return currentInstance.editorCore.getData();
+  return null;
 }
-
-window.isReady = true;

@@ -40,6 +40,7 @@ function transformSlice(schema, slice) {
 }
 
 // TODO: Fix drop/paste into inline code
+// TODO: Limit pasted images width to the default value
 export function dropPaste(options) {
   return new Plugin({
     props: {

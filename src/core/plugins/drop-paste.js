@@ -62,8 +62,8 @@ export function dropPaste(options) {
         return false;
       },
       handleDrop(view, event, slice, moved) {
-        let text = event.dataTransfer.getData('text/plain');
-        let html = event.dataTransfer.getData('text/html');
+        let text = event.dataTransfer.getData('text/plain') || window.droppedData && window.droppedData['text/plain'];
+        let html = event.dataTransfer.getData('text/html') || window.droppedData && window.droppedData['text/html'];
         let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
         let data;
         if (data = event.dataTransfer.getData('zotero/annotation')) {

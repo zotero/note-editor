@@ -9,6 +9,38 @@ import EditorCore from './core/editor-core';
 
 let currentInstance = null;
 
+// A workaround for broken dataTransfer.getData() when running in an XUL iframe.
+// Allows ProseMirror to properly handle drop event
+Element.prototype.addEventListenerPrev = Element.prototype.addEventListener;
+Element.prototype.addEventListener = function (name, fn) {
+  if (name === 'drop') {
+    this.addEventListenerPrev('drop', function (event) {
+        let dataTransfer = event.dataTransfer;
+        Object.defineProperty(event, 'dataTransfer', {
+          configurable: true,
+          get() {
+            return new Proxy(dataTransfer, {
+              get(target, propKey) {
+                let propValue = target[propKey];
+                if (propKey === 'getData') {
+                  return function (name) {
+                    return window.droppedData[name];
+                  }
+                }
+                if (typeof propValue !== 'function') {
+                  return propValue;
+                }
+              }
+            });
+          }
+        });
+        fn(event);
+      }
+    );
+  }
+  return this.addEventListenerPrev(name, fn);
+}
+
 class EditorInstance {
   constructor(options) {
     this.instanceId = options.instanceId;

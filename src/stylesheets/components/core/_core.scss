@@ -134,43 +134,43 @@ blockquote {
   border-left: 3px solid lightblue;
 }
 
-.ProseMirror > [data-indent='1'] {
+.ProseMirror [data-indent='1'] {
   margin-left: 30px;
 }
 
-.ProseMirror > [data-indent='2'] {
+.ProseMirror [data-indent='2'] {
   margin-left: 60px;
 }
 
-.ProseMirror > [data-indent='3'] {
+.ProseMirror [data-indent='3'] {
   margin-left: 90px;
 }
 
-.ProseMirror > [data-indent='4'] {
+.ProseMirror [data-indent='4'] {
   margin-left: 120px;
 }
 
-.ProseMirror > [data-indent='5'] {
+.ProseMirror [data-indent='5'] {
   margin-left: 150px;
 }
 
-.ProseMirror > [data-indent='6'] {
+.ProseMirror [data-indent='6'] {
   margin-left: 180px;
 }
 
-.ProseMirror > [data-indent='7'] {
+.ProseMirror [data-indent='7'] {
   margin-left: 210px;
 }
 
-.ProseMirror > [data-indent='8'] {
+.ProseMirror [data-indent='8'] {
   margin-left: 240px;
 }
 
-.ProseMirror > [data-indent='9'] {
+.ProseMirror [data-indent='9'] {
   margin-left: 270px;
 }
 
-.ProseMirror > [data-indent='10'] {
+.ProseMirror [data-indent='10'] {
   margin-left: 300px;
 }
 
@@ -276,7 +276,7 @@ blockquote {
     background: #f1f1f1;
     //color: $color-white;
 
-    font-size: 0.8rem;
+    font-size: 0.9em;
     overflow-x: auto;
 
     code {
@@ -287,7 +287,7 @@ blockquote {
   p code {
     padding: 0.2rem 0.4rem;
     border-radius: 5px;
-    font-size: 0.8rem;
+    font-size: 0.9em;
     background: #f1f1f1;
   }
 

@@ -2,42 +2,94 @@ import { TextSelection } from 'prosemirror-state'
 import { findParentNode } from 'prosemirror-utils';
 import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list'
 import { encodeObject, randomString } from './utils';
-import { fromHtml } from './schema';
+import { fromHtml, schema } from './schema';
 
-// TODO: Fix. Doesn't work with `rtl`, codeBlock probably shouldn't be here
-export function changeIndent(dir = 1) {
+function getClosestListItemNode($pos) {
+  let depth = $pos.depth;
+  while (depth > 0) {
+    let node = $pos.node(depth);
+    if (node.type === schema.nodes.listItem) {
+      return node;
+    }
+    depth--;
+  }
+}
+
+export function changeIndent(dir = 1, tab) {
   return function (state, dispatch, view) {
     const { selection } = state;
     const { $from, $to } = selection;
-    const { paragraph, heading, bulletList, orderedList, listItem, codeBlock } = state.schema.nodes;
-    const node = $to.node(1);
+    const { bulletList, orderedList, listItem } = state.schema.nodes;
+    // const node = $to.node();
 
+    let node = getClosestListItemNode($from);
     if (node) {
-      if (node.type === paragraph || node.type === heading) {
-        let indent = node.attrs.indent;
-        if (dir === 1 ? indent < 6 : indent >= 1) {
-          indent += dir;
-          dispatch(state.tr.setBlockType($to.pos, $to.pos, node.type, { ...node.attrs, indent }));
-          return true;
+      if (dir > 0) {
+        sinkListItem(listItem)(state, dispatch);
+      }
+      else if (dir < 0) {
+        liftListItem(listItem)(state, dispatch);
+      }
+      return true;
+    }
+
+    if (tab && dir > 0) {
+      dispatch(state.tr.replaceSelectionWith(state.schema.text('  ', [])));
+      return true;
+    }
+    else {
+      let range = $from.blockRange($to);
+      let allSupportIndent = true;
+      let nodes = [];
+      let pos = range.start + 1;
+      for (let i = range.startIndex; i < range.endIndex; i++) {
+        let node = range.parent.child(i);
+        nodes.push([pos, node]);
+        pos += node.nodeSize;
+        if (!node.type.attrs.indent) {
+          allSupportIndent = false;
         }
+      }
+
+      let { tr } = state;
+
+      if (allSupportIndent) {
+        for (let [pos, node] of nodes) {
+          let indent = node.attrs.indent || 0;
+          if (dir === 1 ? indent < 6 : indent >= 1) {
+            indent += dir;
+            if (indent === 0) {
+              indent = null;
+            }
+            console.log('setting in', indent)
+            tr.setBlockType(pos, pos, node.type, { ...node.attrs, indent });
+          }
+        }
+
+        if (nodes.length) {
+          dispatch(tr);
+        }
+      }
+
+    }
+
+    console.log('ff', $from, $to, $to.node())
+    if (node) {
+      if (node.type.attrs.indent) {
+
       }
       else if (node.type === bulletList || node.type === orderedList) {
-        if (dir > 0) {
-          sinkListItem(listItem)(state, dispatch);
-        }
-        else if (dir < 0) {
-          liftListItem(listItem)(state, dispatch);
-        }
-        return true;
+
       }
-      else if (node.type === codeBlock) {
-        dispatch(state.tr.insert($from.pos, state.schema.text('  ', [])));
-        return true;
-      }
+      // else if (node.type === codeBlock) {
+      //   dispatch(state.tr.replaceSelectionWith($from.pos, state.schema.text('  ', [])));
+      //   return true;
+      // }
     }
 
     return false;
-  };
+  }
+    ;
 }
 
 

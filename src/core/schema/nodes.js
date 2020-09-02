@@ -1,5 +1,5 @@
 import { tableNodes } from 'prosemirror-tables';
-import { encodeObject, decodeObject, generateObjectKey, randomString } from '../utils'
+import { encodeObject, decodeObject, randomString } from '../utils'
 
 export const MAX_INDENT = 10;
 
@@ -27,7 +27,7 @@ function getIndent(node) {
   let indent = node.getAttribute('data-indent');
   if (indent) {
     indent = parseInt(indent);
-    if (Number.isInteger(indent) && indent <= MAX_INDENT) {
+    if (Number.isInteger(indent) && indent >= 1 && indent <= MAX_INDENT) {
       return indent;
     }
   }
@@ -87,7 +87,6 @@ export default {
       dir: node.attrs.dir,
       'data-indent': node.attrs.indent
     }, 0]
-
   },
 
 
@@ -102,18 +101,16 @@ export default {
       dir: { default: null },
       id: { default: null }
     },
-    parseDOM: [
-      ...[1, 2, 3, 4, 5, 6].map(level => ({
-        tag: 'h' + level,
-        getAttrs: (dom) => ({
-          level,
-          id: dom.getAttribute('id'),
-          dir: getDir(dom.getAttribute('dir')),
-          indent: getIndent(dom),
-          align: getAlign(dom.style.textAlign)
-        })
-      }))
-    ],
+    parseDOM: [1, 2, 3, 4, 5, 6].map(level => ({
+      tag: 'h' + level,
+      getAttrs: (dom) => ({
+        level,
+        id: dom.getAttribute('id'),
+        dir: getDir(dom.getAttribute('dir')),
+        indent: getIndent(dom),
+        align: getAlign(dom.style.textAlign)
+      })
+    })),
     toDOM: (node) => ['h' + node.attrs.level, {
       id: node.attrs.id,
       dir: node.attrs.dir,
@@ -123,23 +120,28 @@ export default {
   },
 
 
-  // Additional constraints are applied through transformations
-  // codeBlock can only have plain text
   codeBlock: {
     group: 'block',
     content: 'text*',
-    marks: '',
+    marks: 'strong em underline strike subsup textColor backgroundColor link',
     code: true,
     defining: true,
-    attrs: { dir: { default: null } },
+    attrs: {
+      dir: { default: null },
+      indent: { default: null }
+    },
     parseDOM: [{
       tag: 'pre',
       preserveWhitespace: 'full',
       getAttrs: (dom) => ({
-        dir: getDir(dom.getAttribute('dir'))
+        dir: getDir(dom.getAttribute('dir')),
+        indent: getIndent(dom)
       })
     }],
-    toDOM: (node) => ['pre', { dir: node.attrs.dir }, 0]
+    toDOM: (node) => ['pre', {
+      dir: node.attrs.dir,
+      'data-indent': node.attrs.indent
+    }, 0]
   },
 
 
@@ -160,6 +162,8 @@ export default {
 
 
   orderedList: {
+    group: 'block',
+    content: 'listItem+',
     attrs: { order: { default: 1 } },
     parseDOM: [{
       tag: 'ol',
@@ -167,11 +171,7 @@ export default {
         order: dom.hasAttribute('start') ? +dom.getAttribute('start') : 1
       })
     }],
-    toDOM(node) {
-      return node.attrs.order == 1 ? ['ol', 0] : ['ol', { start: node.attrs.order }, 0]
-    },
-    content: 'listItem+',
-    group: 'block'
+    toDOM: (node) => (node.attrs.order === 1 ? ['ol', 0] : ['ol', { start: node.attrs.order }, 0])
   },
 
 

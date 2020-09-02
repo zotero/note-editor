@@ -21,7 +21,7 @@ function Editor(props) {
   return (
     <div className="editor">
       <Toolbar menuState={editorState.menu} linkState={editorState.link} searchState={editorState.search}/>
-      {editorState.search.active && <Findbar searchState={editorState.search}/>}
+      <Findbar searchState={editorState.search} active={editorState.search.active}/>
       {props.showUpdateNotice &&
       <Noticebar>Editor is in read-only mode. Please update Zotero to use the newest features</Noticebar>}
       <div className="editor-core" ref={editorRef}>

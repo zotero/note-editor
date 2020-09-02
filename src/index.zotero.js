@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 
 import { randomString } from './core/utils';
 import { schemaVersion, schema } from './core/schema';
-import * as commands from './core/commands';
 import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
 
@@ -58,11 +57,18 @@ class EditorInstance {
       this._unsupportedSchema = true;
     }
 
+    this._setFont(options.font);
     this._init(options.value);
   }
 
   getDataSync() {
     return this._editorCore.getData(true);
+  }
+
+  _setFont(font) {
+    let root = document.documentElement;
+    root.style.setProperty('--font-family', font.fontFamily);
+    root.style.setProperty('--font-size', font.fontSize + 'px');
   }
 
   _postMessage(message) {
@@ -104,7 +110,7 @@ class EditorInstance {
         this._postMessage({ action: 'openCitationPopup', nodeId, citation });
       },
       onOpenContextMenu: (pos, node, x, y) => {
-        this._postMessage({ action: 'openContextMenu', x, y, pos, items: this._getContextMenuItems(node) });
+        this._postMessage({ action: 'openContextMenu', x, y, pos, itemGroups: this._getContextMenuItemGroups(node) });
       }
     });
 
@@ -166,6 +172,11 @@ class EditorInstance {
         this._editorCore.focus();
         return;
       }
+      case 'updateFont': {
+        let { font } = message;
+        this._setFont(font);
+        return;
+      }
     }
   }
 
@@ -173,7 +184,7 @@ class EditorInstance {
     let $pos = this._editorCore.view.state.doc.resolve(pos);
     let node = $pos.node();
     switch (action) {
-      case 'navigate': {
+      case 'openAnnotation': {
         if (node.type.name === 'highlight') {
           let annotation = node.attrs.annotation;
           this._postMessage({ action: 'openAnnotation', uri: annotation.uri, position: annotation.position });
@@ -216,70 +227,81 @@ class EditorInstance {
         this._postMessage({ action: 'openCitationPopup', nodeId, citation });
         return;
       }
-      case 'toggleDir': {
-        if (this._dir === 'ltr') {
-          this._editorCore.pluginState.menu.rtl.run();
-        }
-        else if (this._dir === 'rtl') {
-          this._editorCore.pluginState.menu.ltr.run();
-        }
+      case 'rtl': {
+        this._editorCore.pluginState.menu.rtl.run();
+        return;
+      }
+      case 'ltr': {
+        this._editorCore.pluginState.menu.ltr.run();
         return;
       }
     }
   }
 
-  _getContextMenuItems(node) {
-    let items = [];
+  _getContextMenuItemGroups(node) {
+    let groups = [
+      [
+        {
+          name: 'cut',
+          label: 'Cut',
+          enabled: !this._readOnly && this._editorCore.hasSelection(),
+          persistent: true
+        },
+        {
+          name: 'copy',
+          label: 'Copy',
+          enabled: this._editorCore.hasSelection(),
+          persistent: true
+        },
+        {
+          name: 'paste',
+          label: 'Paste',
+          enabled: !this._readOnly,
+          persistent: true
+        }
+      ],
+      [
+        {
+          name: 'showInLibrary',
+          label: 'Show Item in Library',
+          enabled: node.type.name === 'highlight'
+        },
+        {
+          name: 'openAnnotation',
+          label: 'Show Annotation in PDF',
+          enabled: node.type.name === 'highlight'
+        },
+        {
+          name: 'insertCitation',
+          label: 'Insert Citation',
+          enabled: !this._readOnly && !this._editorCore.hasSelection()
+        },
+        {
+          name: 'rtl',
+          label: 'Right to Left',
+          enabled: this._dir === 'ltr' && !this._editorCore.pluginState.menu.rtl.isActive
+            || this._dir === 'rtl' && this._editorCore.pluginState.menu.ltr.isActive
+        },
+        {
+          name: 'ltr',
+          label: 'Left to Right',
+          enabled: this._dir === 'ltr' && this._editorCore.pluginState.menu.rtl.isActive
+            || this._dir === 'rtl' && !this._editorCore.pluginState.menu.ltr.isActive
+        }
+      ],
+      [
+        {
+          name: 'openBackup',
+          label: 'View note backup',
+          // TODO: Do not suggest backup preview for the new notes
+          enabled: true
+        }
+      ]
+    ];
 
-    if (!this._readOnly && this._editorCore.hasSelection()) {
-      items.push(['cut', 'Cut']);
-    }
-
-    if (this._editorCore.hasSelection()) {
-      items.push(['copy', 'Copy']);
-    }
-
-    if (!this._readOnly) {
-      items.push(['paste', 'Paste']);
-    }
-
-    if (node.type.name === 'highlight') {
-      items.push(['showInLibrary', 'Show Item in Library']);
-    }
-
-    if (node.type.name === 'highlight') {
-      items.push(['navigate', 'Show Annotation in PDF']);
-    }
-
-    // if (node.type.name === 'image') {
-    //   items.push(['editImage', 'Edit Image']);
-    // }
-
-    if (!this._readOnly && !this._editorCore.hasSelection()) {
-      items.push(['insertCitation', 'Insert Citation']);
-    }
-
-    if (!this._readOnly) {
-      let toggleDir;
-      if (this._dir === 'ltr') {
-        toggleDir = this._editorCore.pluginState.menu.rtl.isActive ? 'ltr' : 'rtl'
-      }
-      else if (this._dir === 'rtl') {
-        toggleDir = this._editorCore.pluginState.menu.ltr.isActive ? 'rtl' : 'ltr'
-      }
-
-      if (toggleDir === 'rtl') {
-        items.push(['toggleDir', 'Right to Left']);
-      }
-      else if (toggleDir === 'ltr') {
-        items.push(['toggleDir', 'Left to Right']);
-      }
-    }
-
-    // TODO: Do not suggest backup preview for the new notes
-    items.push(['openBackup', 'View note backup']);
-
-    return items;
+    return groups.map(items =>
+      items.filter(item => item.enabled || item.persistent)
+    ).filter(items => items.length);
   }
 }
 
@@ -294,13 +316,14 @@ window.addEventListener('message', function (e) {
     if (currentInstance) {
       currentInstance.uninit();
     }
-    let { value, schemaVersion, readOnly, dir } = message;
+    let { value, schemaVersion, readOnly, dir, font } = message;
     currentInstance = new EditorInstance({
       instanceId,
       value,
       schemaVersion,
       readOnly,
-      dir
+      dir,
+      font
     });
   }
 });

@@ -105,7 +105,7 @@ export default function ColorPicker(props) {
 
   function handleColorClear() {
     // setIsShowingPopup(false);
-    props.color.run(null);
+    props.state.run(null);
     setColor(COLORS[DEFAULT_COLOR_INDEX]);
     setPopupPosition(null);
   }

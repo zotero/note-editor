@@ -1,5 +1,6 @@
 import { Plugin } from 'prosemirror-state';
 import { Fragment, Slice } from 'prosemirror-model';
+import { schema } from '../schema';
 
 const IMAGE_MIME_TYPES = [
   'image/jpeg',
@@ -39,6 +40,34 @@ function transformSlice(schema, slice) {
   }
 }
 
+async function insertImages(view, pos, files) {
+  let { state, dispatch } = view;
+  let nodes = [];
+  let promises = [];
+  for (let file of files) {
+    if (IMAGE_MIME_TYPES.includes(file.type)) {
+      promises.push(new Promise((resolve) => {
+        let reader = new FileReader();
+        reader.onload = function () {
+          let dataUrl = this.result;
+          nodes.push(schema.nodes.image.create({
+            src: dataUrl
+          }));
+          resolve();
+        }
+        reader.onerror = () => {
+          resolve();
+        }
+        reader.readAsDataURL(file);
+      }))
+    }
+  }
+  await Promise.all(promises);
+  if (nodes.length) {
+    dispatch(state.tr.insert(pos, nodes).setMeta('importImages', true));
+  }
+}
+
 // TODO: Fix drop/paste into inline code
 // TODO: Limit pasted images width to the default value
 export function dropPaste(options) {
@@ -50,7 +79,6 @@ export function dropPaste(options) {
           options.onInsertObject('zotero/annotation', data);
           return true;
         }
-
         let text = event.clipboardData.getData('text/plain');
         let html = event.clipboardData.getData('text/html');
         if (!event.shiftKey && html) {
@@ -66,7 +94,11 @@ export function dropPaste(options) {
         let html = event.dataTransfer.getData('text/html') || window.droppedData && window.droppedData['text/html'];
         let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
         let data;
-        if (data = event.dataTransfer.getData('zotero/annotation')) {
+        if (event.dataTransfer.files.length) {
+          insertImages(view, pos.pos, event.dataTransfer.files);
+          return true;
+        }
+        else if (data = event.dataTransfer.getData('zotero/annotation')) {
           options.onInsertObject('zotero/annotation', data, pos.pos);
           return true
         }
@@ -74,7 +106,6 @@ export function dropPaste(options) {
           options.onInsertObject('zotero/item', data, pos.pos);
           return true;
         }
-
         if (!moved && html) {
           let { state, dispatch } = view;
           slice = transformSlice(view.state.schema, slice);

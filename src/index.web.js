@@ -5,9 +5,22 @@ import Editor from './ui/editor'
 import EditorCore from './core/editor-core';
 
 import { imageStore, citationStore } from './index.web.data';
-import { generateObjectKey } from './core/utils';
+
 
 var beautify = require('js-beautify').html;
+
+// Zotero item key
+export function generateObjectKey() {
+  let len = 8;
+  let allowedKeyChars = '23456789ABCDEFGHIJKLMNPQRSTUVWXYZ';
+
+  var randomstring = '';
+  for (var i = 0; i < len; i++) {
+    var rnum = Math.floor(Math.random() * allowedKeyChars.length);
+    randomstring += allowedKeyChars.substring(rnum, rnum + 1);
+  }
+  return randomstring;
+}
 
 // Notice: This fails to fetch the image if the host has
 // CORS restrictions
@@ -37,6 +50,14 @@ async function importImage(src) {
 }
 
 function main(html) {
+  let font = {
+    fontFamily: 'Lucida Grande, Tahoma, Verdana, Helvetica, sans-serif',
+    fontSize: 14
+  };
+
+  let root = document.documentElement;
+  root.style.setProperty('--font-family', font.fontFamily);
+  root.style.setProperty('--font-size', font.fontSize + 'px');
 
   ReactDOM.unmountComponentAtNode(document.getElementById('editor-container'));
 
@@ -148,13 +169,15 @@ function main(html) {
 let html1 = `
 <h1>Nodes:</h1>
 <p><code><img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/><strong>werwerwe</strong><a href="sd">sfwere</a></code></p>
-<h1>Heading 1</h1>
+<p>Paragraph - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code></p>
+<h1>Heading 1 - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code></h1>
 <h2>Heading 2</h2>
 <h3>Heading 3</h3>
 <h4>Heading 4</h4>
 <h5>Heading 5</h5>
 <h6>Heading 6</h6>
-<pre dir="rtl">Preformatted/code block (text formatting is not supported here)
+
+<pre dir="rtl">Preformatted/code block - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code>
 1
 2
 3
@@ -330,3 +353,9 @@ main(html1);
 // main(html2);
 //
 // }, 3000);
+window.addEventListener('drop', (event) => {
+  console.log('tttt', event, event.dataTransfer)
+  console.log('tttt1', event.dataTransfer.getData('text/plain'))
+  console.log('tttt2', event.dataTransfer.getData('text/html'))
+  console.log('tttt3', event.dataTransfer.getData('Text'))
+})

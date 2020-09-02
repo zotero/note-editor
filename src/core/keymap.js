@@ -88,8 +88,8 @@ export function buildKeymap(schema, mapKeys) {
   }
   if (type = schema.nodes.listItem) {
     bind('Enter', splitListItem(type))
-    bind('Shift-Tab', changeIndent(-1))
-    bind('Tab', changeIndent(1))
+    bind('Shift-Tab', changeIndent(-1, true))
+    bind('Tab', changeIndent(1, true))
   }
   if (type = schema.nodes.paragraph)
     bind('Shift-Ctrl-0', setBlockType(type))

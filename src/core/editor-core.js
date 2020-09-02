@@ -5,7 +5,7 @@ import { schema, toHtml, buildClipboardSerializer, schemaVersion } from './schem
 import { DOMSerializer } from 'prosemirror-model'
 import { TextSelection } from 'prosemirror-state'
 import { DOMParser as DOMParser2, Pos, Node } from 'prosemirror-model'
-import { debounce, decodeObject, encodeObject, generateObjectKey, randomString } from './utils'
+import { debounce, decodeObject, encodeObject, randomString } from './utils'
 
 
 import nodeViews from './node-views'

@@ -1,39 +1,4 @@
 export default {
-  link: {
-    // excludes: 'textColor backgroundColor',
-    inclusive: false,
-    attrs: {
-      href: {},
-      title: { default: null }
-    },
-    parseDOM: [{
-      tag: 'a[href]',
-      getAttrs: (dom) => ({
-        href: dom.getAttribute('href'),
-        title: dom.getAttribute('title')
-      })
-    }],
-    toDOM: (mark) => ['a', {
-      ...mark.attrs,
-      rel: 'noopener noreferrer nofollow'
-    }, 0]
-  },
-
-
-  em: {
-    inclusive: true,
-    parseDOM: [
-      { tag: 'i' },
-      { tag: 'em' },
-      { style: 'font-style=italic' },
-      { tag: 'cite' },
-      { tag: 'dfn' },
-      { tag: 'q' }
-    ],
-    toDOM: () => ['em', 0]
-  },
-
-
   strong: {
     inclusive: true,
     parseDOM: [
@@ -56,23 +21,28 @@ export default {
   },
 
 
-  code: {
-    excludes: `_`,
+  em: {
     inclusive: true,
     parseDOM: [
-      { tag: 'code', preserveWhitespace: true },
-      { tag: 'tt', preserveWhitespace: true },
-      { tag: 'kbd', preserveWhitespace: true },
-      { tag: 'samp', preserveWhitespace: true },
-      { tag: 'var', preserveWhitespace: true },
-      {
-        style: 'font-family',
-        preserveWhitespace: true,
-        getAttrs: (value) => (value.toLowerCase().indexOf('monospace') > -1) && null
-      },
-      { style: 'white-space=pre', preserveWhitespace: true }
+      { tag: 'i' },
+      { tag: 'em' },
+      { style: 'font-style=italic' },
+      { tag: 'cite' },
+      { tag: 'dfn' },
+      { tag: 'q' }
     ],
-    toDOM: () => ['code', 0]
+    toDOM: () => ['em', 0]
+  },
+
+
+  underline: {
+    inclusive: true,
+    parseDOM: [
+      { tag: 'u' },
+      { style: 'text-decoration=underline' },
+      { style: 'text-decoration-line=underline' }
+    ],
+    toDOM: () => ['u', 0]
   },
 
 
@@ -85,19 +55,8 @@ export default {
       { style: 'text-decoration=line-through' },
       { style: 'text-decoration-line=line-through' }
     ],
-    // can't use `return ['s', 0]` because the old editor doesn't support `<s>` tag
+    // Unfortunately Zotero TinyMCE doesn't support <s>
     toDOM: () => ['span', { style: 'text-decoration: line-through' }, 0]
-  },
-
-
-  underline: {
-    inclusive: true,
-    parseDOM: [
-      { tag: 'u' },
-      { style: 'text-decoration=underline' },
-      { style: 'text-decoration-line=underline' }
-    ],
-    toDOM: () => ['u', 0]
   },
 
 
@@ -133,5 +92,47 @@ export default {
       getAttrs: (value) => ({ color: value })
     }],
     toDOM: (mark) => ['span', { style: `background-color: ${mark.attrs.color}` }, 0]
+  },
+
+
+  link: {
+    // excludes: 'textColor backgroundColor',
+    inclusive: false,
+    attrs: {
+      href: {},
+      title: { default: null }
+    },
+    parseDOM: [{
+      tag: 'a[href]',
+      getAttrs: (dom) => ({
+        href: dom.getAttribute('href'),
+        title: dom.getAttribute('title')
+      })
+    }],
+    toDOM: (mark) => ['a', {
+      ...mark.attrs,
+      rel: 'noopener noreferrer nofollow'
+    }, 0]
+  },
+
+
+  // Additional constraints are applied through transformations
+  code: {
+    excludes: `_`,
+    inclusive: true,
+    parseDOM: [
+      { tag: 'code', preserveWhitespace: true },
+      { tag: 'tt', preserveWhitespace: true },
+      { tag: 'kbd', preserveWhitespace: true },
+      { tag: 'samp', preserveWhitespace: true },
+      { tag: 'var', preserveWhitespace: true },
+      {
+        style: 'font-family',
+        preserveWhitespace: true,
+        getAttrs: (value) => (value.toLowerCase().indexOf('monospace') > -1) && null
+      },
+      { style: 'white-space=pre', preserveWhitespace: true }
+    ],
+    toDOM: () => ['code', 0]
   }
 };

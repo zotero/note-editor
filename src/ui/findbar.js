@@ -1,10 +1,19 @@
 'use strict';
 import cx from 'classnames';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-function Findbar({ searchState }) {
+function Findbar({ searchState, active }) {
   const [findValue, setFindValue] = useState('');
   const [replaceValue, setReplaceValue] = useState('');
+  const searchInputRef = useRef();
+
+  useEffect(() => {
+    if (active) {
+      setTimeout(() => {
+        searchInputRef.current.focus();
+      }, 100);
+    }
+  }, [active])
 
   function handleMouseDown(event) {
     if (event.target.nodeName !== 'INPUT') {
@@ -48,15 +57,28 @@ function Findbar({ searchState }) {
     setReplaceValue(event.target.value);
   }
 
-  return (
+  function handleFindInputKeyDown(event) {
+    if (event.key === 'Escape') {
+      searchState.setActive(false);
+    }
+  }
+
+  function handleReplaceInputKeyDown(event) {
+    if (event.key === 'Escape') {
+      searchState.setActive(false);
+    }
+  }
+
+  return active && (
     <div className="findbar" onMouseDown={handleMouseDown}>
       <div className="column-left">
         <div className="line">
-          <input type="text" placeholder="Search…" value={searchState.searchTerm || ''}
-                 onChange={handleFindInputChange}/>
+          <input ref={searchInputRef} type="text" placeholder="Search…" value={searchState.searchTerm || ''}
+                 onChange={handleFindInputChange} onKeyDown={handleFindInputKeyDown}/>
         </div>
         <div className="line">
-          <input type="text" placeholder="Replace…" value={replaceValue} onChange={handleReplaceInputChange}/>
+          <input type="text" placeholder="Replace…" value={replaceValue}
+                 onChange={handleReplaceInputChange} onKeyDown={handleFindInputKeyDown}/>
         </div>
       </div>
       <div className="column-right">

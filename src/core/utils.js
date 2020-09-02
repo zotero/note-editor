@@ -49,19 +49,6 @@ export const randomString = function (len, chars) {
   return randomstring;
 };
 
-// TODO: Drop
-export function generateObjectKey() {
-  let len = 8;
-  let allowedKeyChars = '23456789ABCDEFGHIJKLMNPQRSTUVWXYZ';
-
-  var randomstring = '';
-  for (var i = 0; i < len; i++) {
-    var rnum = Math.floor(Math.random() * allowedKeyChars.length);
-    randomstring += allowedKeyChars.substring(rnum, rnum + 1);
-  }
-  return randomstring;
-}
-
 export function encodeObject(value) {
   return encodeURIComponent(JSON.stringify(value));
 }

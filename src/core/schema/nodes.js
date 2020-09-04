@@ -1,7 +1,10 @@
 import { tableNodes } from 'prosemirror-tables';
 import { encodeObject, decodeObject, randomString } from '../utils'
 
-export const MAX_INDENT = 10;
+// Schema does not limit the indent level for the compatibility with
+// the old notes, although the UI doesn't allow to set higher than
+// MAX_INDENT values. Also CSS doesn't support higher levels as well
+export const MAX_INDENT = 7;
 
 function getInteger(value) {
   if (value) {
@@ -27,7 +30,7 @@ function getIndent(node) {
   let indent = node.getAttribute('data-indent');
   if (indent) {
     indent = parseInt(indent);
-    if (Number.isInteger(indent) && indent >= 1 && indent <= MAX_INDENT) {
+    if (Number.isInteger(indent) && indent >= 1) {
       return indent;
     }
   }
@@ -183,6 +186,7 @@ export default {
   },
 
 
+  // When joining list items two paragraphs appear
   listItem: {
     content: 'block+',
     defining: true,
@@ -231,7 +235,7 @@ export default {
     attrs: {
       nodeId: { default: null },
       src: { default: null },
-      alt: { default: null },
+      alt: { default: '' }, // It's recommended to always have alt attribute
       title: { default: null },
       width: { default: null },
       height: { default: null },
@@ -245,7 +249,7 @@ export default {
       getAttrs: (dom) => ({
         nodeId: randomString(),
         src: dom.getAttribute('src'),
-        alt: dom.getAttribute('alt'),
+        alt: dom.getAttribute('alt') || '',
         title: dom.getAttribute('title'),
         width: getInteger(dom.getAttribute('width')),
         height: getInteger(dom.getAttribute('height')),

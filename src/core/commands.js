@@ -1,7 +1,7 @@
 import { TextSelection } from 'prosemirror-state'
 import { findParentNode } from 'prosemirror-utils';
 import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list'
-import { encodeObject, randomString } from './utils';
+import { encodeObject, randomString, SetAttrsStep } from './utils';
 import { fromHtml, schema } from './schema';
 
 function getClosestListItemNode($pos) {
@@ -56,7 +56,7 @@ export function changeIndent(dir = 1, tab) {
       if (allSupportIndent) {
         for (let [pos, node] of nodes) {
           let indent = node.attrs.indent || 0;
-          if (dir === 1 ? indent < 6 : indent >= 1) {
+          if (dir === 1 ? indent < 7 : indent >= 1) {
             indent += dir;
             if (indent === 0) {
               indent = null;
@@ -311,10 +311,15 @@ export function setCitation(nodeId, citation) {
   return function (state, dispatch) {
     state.doc.descendants((node, pos) => {
       if (node.attrs.nodeId === nodeId) {
-        dispatch(state.tr.setNodeMarkup(pos, null, {
-          ...node.attrs,
-          citation
-        }));
+        if (citation.citationItems.length) {
+          dispatch(state.tr.setNodeMarkup(pos, null, {
+            ...node.attrs,
+            citation
+          }));
+        }
+        else {
+          dispatch(state.tr.delete(pos, pos + node.nodeSize));
+        }
         return false;
       }
       return true;
@@ -326,11 +331,11 @@ export function attachImportedImage(nodeId, attachmentKey) {
   return function (state, dispatch) {
     state.doc.descendants((node, pos) => {
       if (node.attrs.nodeId === nodeId) {
-        dispatch(state.tr.setNodeMarkup(pos, null, {
+        dispatch(state.tr.step(new SetAttrsStep(pos, {
           ...node.attrs,
           src: null,
           attachmentKey
-        }).setMeta('addToHistory', false));
+        })).setMeta('addToHistory', false));
         return false;
       }
       return true;

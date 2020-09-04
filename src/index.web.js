@@ -7,7 +7,9 @@ import EditorCore from './core/editor-core';
 import { imageStore, citationStore } from './index.web.data';
 
 
-var beautify = require('js-beautify').html;
+let beautify = require('js-beautify').html;
+
+let deletedImages = {};
 
 // Zotero item key
 export function generateObjectKey() {
@@ -89,10 +91,17 @@ function main(html) {
               src: imageStore[subscriber.data.attachmentKey]
             });
           }
+          else if (deletedImages[subscriber.data.attachmentKey]) {
+            imageStore[subscriber.data.attachmentKey] = deletedImages[subscriber.data.attachmentKey];
+            editorCore.provider.notify(subscriber.id, 'image', {
+              src: imageStore[subscriber.data.attachmentKey]
+            });
+          }
         }, 0);
       }
     },
-    onUnsubscribeProvider(data) {
+    onUnsubscribeProvider(subscription) {
+      console.log('onUnsubscribeProvider', subscription);
     },
     async onImportImages(images) {
       console.log('onImportImages', images)
@@ -103,6 +112,13 @@ function main(html) {
     },
     onSyncAttachmentKeys(attachmentKeys) {
       console.log('onSyncAttachmentKeys', attachmentKeys);
+      for (let key in imageStore) {
+        if (!attachmentKeys.includes(key)) {
+          console.log(`deleting ${key} from imageStore`);
+          deletedImages[key] = imageStore[key];
+          delete imageStore[key];
+        }
+      }
     },
     onOpenUrl(url) {
       console.log('onOpenUrl(core)', url);
@@ -145,7 +161,11 @@ function main(html) {
     },
     onOpenCitationPopup(id, citation) {
       console.log('onOpenCitationPopup', id, citation);
+
       alert('Open quick format citation dialog ' + id + ' ' + JSON.stringify(citation));
+      citation = JSON.parse(JSON.stringify(citation));
+      citation.citationItems = [];
+      editorCore.setCitation(id, citation);
     },
     onOpenContextMenu: (pos, node, x, y) => {
       console.log('onOpenContextMenu', pos, node, x, y)
@@ -275,6 +295,8 @@ let html1 = `
 <p style="padding-left: 120px">indent 3</p>
 <p style="padding-left: 160px">indent 4</p>
 <p style="padding-left: 200px">indent 5</p>
+<p data-indent="100">indent 100</p>
+<p style="padding-left: 4000px">indent 100</p>
 <p></p>
 <p></p>
 <p></p>

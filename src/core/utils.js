@@ -96,4 +96,44 @@ export default function nodeIsActive(state, type, attrs = {}) {
   return node.node.hasMarkup(type, { ...node.node.attrs, ...attrs })
 }
 
+// TODO: Move this somewhere else
+const { Fragment, Slice } = require('prosemirror-model')
+const { Step, StepResult } = require('prosemirror-transform')
 
+// https://discuss.prosemirror.net/t/preventing-image-placeholder-replacement-from-being-undone/1394
+export class SetAttrsStep extends Step {
+  // :: (number, Object | null)
+  constructor(pos, attrs) {
+    super()
+    this.pos = pos
+    this.attrs = attrs
+  }
+
+  apply(doc) {
+    let target = doc.nodeAt(this.pos)
+    if (!target) return StepResult.fail('No node at given position')
+    let newNode = target.type.create(this.attrs, Fragment.emtpy, target.marks)
+    let slice = new Slice(Fragment.from(newNode), 0, target.isLeaf ? 0 : 1)
+    return StepResult.fromReplace(doc, this.pos, this.pos + 1, slice)
+  }
+
+  invert(doc) {
+    let target = doc.nodeAt(this.pos)
+    return new SetAttrsStep(this.pos, target ? target.attrs : null)
+  }
+
+  map(mapping) {
+    let pos = mapping.mapResult(this.pos, 1)
+    return pos.deleted ? null : new SetAttrsStep(pos.pos, this.attrs)
+  }
+
+  toJSON() {
+    return { stepType: 'setAttrs', pos: this.pos, attrs: this.attrs }
+  }
+
+  static fromJSON(schema, json) {
+    if (typeof json.pos != 'number' || (json.attrs != null && typeof json.attrs != 'object'))
+      throw new RangeError('Invalid input for SetAttrsStep.fromJSON')
+    return new SetAttrsStep(json.pos, json.attrs)
+  }
+}

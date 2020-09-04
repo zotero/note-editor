@@ -1,5 +1,6 @@
 import { Plugin, PluginKey } from 'prosemirror-state';
 import { ReplaceStep } from 'prosemirror-transform';
+import { SetAttrsStep } from '../utils';
 
 function getAttachmentKeys(state) {
   let attachmentKeys = [];
@@ -40,11 +41,11 @@ export function image(options) {
           if (node.type.name === 'image'
             && options.dimensionsStore.data[node.attrs.nodeId]) {
             let [width, height] = options.dimensionsStore.data[node.attrs.nodeId];
-            newTr = newTr.setNodeMarkup(pos, null, {
+            newTr = newTr.step(new SetAttrsStep(pos, {
               ...node.attrs,
               naturalWidth: width,
               naturalHeight: height
-            });
+            })).setMeta('addToHistory', false);
             updatedDimensions = true;
           }
         });
@@ -62,12 +63,12 @@ export function image(options) {
                   let absolutePos = parentPos + offset + 1;
                   if (node.type.name === 'image' && !node.attrs.attachmentKey) {
                     images.push({ nodeId: node.attrs.nodeId, src: node.attrs.src });
-                    newTr = newTr.setNodeMarkup(absolutePos, null, {
+                    newTr = newTr.step(new SetAttrsStep(absolutePos, {
                       ...node.attrs,
                       // Unset src to make sure the image data won't be save
                       // into the document
                       src: null
-                    });
+                    })).setMeta('addToHistory', false);
                   }
                 });
               });

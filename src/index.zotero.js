@@ -45,6 +45,7 @@ class EditorInstance {
     this.instanceId = options.instanceId;
     this._readOnly = options.readOnly;
     this._dir = options.dir;
+    this._hasBackup = options.hasBackup;
     this._editorCore = null;
     this._unsupportedSchema = false;
 
@@ -81,8 +82,9 @@ class EditorInstance {
       value,
       readOnly: this._readOnly,
       onSubscribeProvider: (subscription) => {
-        let { id, type, data } = subscription;
-        this._postMessage({ action: 'subscribeProvider', id, type, data });
+        let { id, type, nodeId, data } = subscription;
+        subscription = { id, type, nodeId, data };
+        this._postMessage({ action: 'subscribeProvider', subscription });
       },
       onUnsubscribeProvider: (subscription) => {
         let { id, type } = subscription;
@@ -293,8 +295,7 @@ class EditorInstance {
         {
           name: 'openBackup',
           label: 'View note backup',
-          // TODO: Do not suggest backup preview for the new notes
-          enabled: true
+          enabled: this._hasBackup
         }
       ]
     ];
@@ -316,14 +317,15 @@ window.addEventListener('message', function (e) {
     if (currentInstance) {
       currentInstance.uninit();
     }
-    let { value, schemaVersion, readOnly, dir, font } = message;
+    let { value, schemaVersion, readOnly, dir, font, hasBackup } = message;
     currentInstance = new EditorInstance({
       instanceId,
       value,
       schemaVersion,
       readOnly,
       dir,
-      font
+      font,
+      hasBackup
     });
   }
 });

@@ -44,7 +44,7 @@ class EditorInstance {
   constructor(options) {
     this.instanceId = options.instanceId;
     this._readOnly = options.readOnly;
-    this._dir = options.dir;
+    this._dir = window.dir = options.dir;
     this._hasBackup = options.hasBackup;
     this._editorCore = null;
     this._unsupportedSchema = false;

@@ -70,6 +70,9 @@ async function insertImages(view, pos, files) {
 
 // TODO: Fix drop/paste into inline code
 // TODO: Limit pasted images width to the default value
+// NOTICE: Sometimes copying HTML from Chrome to the editor (no matter if
+// it's running in Zotero or original FF) hangs for less than a second, and
+// returns an empty value for `getData('text/html')`. Seems like a browser bug
 export function dropPaste(options) {
   return new Plugin({
     props: {

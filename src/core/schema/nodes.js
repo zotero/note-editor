@@ -23,33 +23,42 @@ function style(styles) {
       list.push(`${styleName}: ${styles[styleName]}`);
     }
   }
-  return list.length && list.join(';') || undefined;
+  return list.length && list.join(';') || null;
 }
 
-function getIndent(node) {
-  let indent = node.getAttribute('data-indent');
+// `padding-left` / `padding-right` style attributes are converted to `data-indent'
+function getIndent(dom) {
+  const INDENT_WIDTH = 40; // TinyMCE padding width for a single indent
+  let value = dom.style.paddingLeft || dom.style.paddingRight;
+  let num = parseInt(value);
+  if (num + 'px' === value && num > 0 && (num % INDENT_WIDTH === 0)) {
+    return num / INDENT_WIDTH;
+  }
+
+  let indent = dom.getAttribute('data-indent');
   if (indent) {
     indent = parseInt(indent);
     if (Number.isInteger(indent) && indent >= 1) {
       return indent;
     }
   }
-  else {
-    const INDENT_WIDTH = 40; // TinyMCE padding width for a single indent
-    let value = node.style.paddingLeft || node.style.paddingRight;
-    let num = parseInt(value);
-    if (num + 'px' === value && num > 0 && (num % INDENT_WIDTH === 0)) {
-      return num / INDENT_WIDTH;
+
+  return null;
+}
+
+function getAlign(dom) {
+  let value = dom.style.textAlign;
+  if (value) {
+    value = value.toLowerCase();
+    if (['left', 'right', 'center', 'justify'].includes(value)) {
+      return value;
     }
   }
   return null;
 }
 
-function getAlign(value) {
-  return ['left', 'right', 'center', 'justify'].includes(value) && value || null;
-}
-
-function getDir(value) {
+function getDir(dom) {
+  let value = dom.dir;
   if (value) {
     value = value.toLowerCase();
     if (['ltr', 'rtl'].includes(value)) {
@@ -57,6 +66,20 @@ function getDir(value) {
     }
   }
   return null;
+}
+
+function backCompIndent(node) {
+  const INDENT_WIDTH = 40;
+  if (node.attrs.indent) {
+    let dir = node.attrs.dir || window.dir;
+    if (dir === 'rtl') {
+      return { 'padding-right': node.attrs.indent * INDENT_WIDTH + 'px' }
+    }
+    else {
+      return { 'padding-left': node.attrs.indent * INDENT_WIDTH + 'px' }
+    }
+  }
+  return {};
 }
 
 export default {
@@ -79,14 +102,14 @@ export default {
         tag: 'p',
         getAttrs: (dom) => ({
           indent: getIndent(dom),
-          align: getAlign(dom.style.textAlign),
-          dir: getDir(dom.getAttribute('dir'))
+          align: getAlign(dom),
+          dir: getDir(dom)
         })
       },
       { tag: 'dd' }
     ],
     toDOM: (node) => ['p', {
-      style: style({ 'text-align': node.attrs.align }),
+      style: style({ 'text-align': node.attrs.align, ...backCompIndent(node) }),
       dir: node.attrs.dir,
       'data-indent': node.attrs.indent
     }, 0]
@@ -109,16 +132,16 @@ export default {
       getAttrs: (dom) => ({
         level,
         id: dom.getAttribute('id'),
-        dir: getDir(dom.getAttribute('dir')),
+        dir: getDir(dom),
         indent: getIndent(dom),
-        align: getAlign(dom.style.textAlign)
+        align: getAlign(dom)
       })
     })),
     toDOM: (node) => ['h' + node.attrs.level, {
+      style: style({ 'text-align': node.attrs.align, ...backCompIndent(node) }),
       id: node.attrs.id,
       dir: node.attrs.dir,
-      'data-indent': node.attrs.indent,
-      style: style({ 'text-align': node.attrs.align })
+      'data-indent': node.attrs.indent
     }, 0]
   },
 
@@ -137,11 +160,12 @@ export default {
       tag: 'pre',
       preserveWhitespace: 'full',
       getAttrs: (dom) => ({
-        dir: getDir(dom.getAttribute('dir')),
+        dir: getDir(dom),
         indent: getIndent(dom)
       })
     }],
     toDOM: (node) => ['pre', {
+      style: style({ ...backCompIndent(node) }),
       dir: node.attrs.dir,
       'data-indent': node.attrs.indent
     }, 0]
@@ -202,7 +226,7 @@ export default {
       background: {
         default: null,
         getFromDOM(dom) {
-          return dom.style.backgroundColor || null
+          return dom.style.backgroundColor || null;
         },
         setDOMAttr(value, attrs) {
           if (value) attrs.style = (attrs.style || '') + `background-color: ${value};`
@@ -231,7 +255,6 @@ export default {
     group: 'inline',
     inline: true,
     draggable: true,
-    marks: 'link',
     attrs: {
       nodeId: { default: null },
       src: { default: null },
@@ -303,7 +326,7 @@ export default {
     inline: true,
     group: 'inline',
     content: 'text*',
-    marks: 'em strong subsup',
+    marks: 'em strong subsup', // The same as in pdf-reader
     attrs: {
       annotation: { default: '' }
     },

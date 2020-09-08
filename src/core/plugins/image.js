@@ -62,11 +62,12 @@ export function image(options) {
                 parentNode.forEach((node, offset) => {
                   let absolutePos = parentPos + offset + 1;
                   if (node.type.name === 'image' && !node.attrs.attachmentKey) {
+
                     images.push({ nodeId: node.attrs.nodeId, src: node.attrs.src });
                     newTr = newTr.step(new SetAttrsStep(absolutePos, {
                       ...node.attrs,
-                      // Unset src to make sure the image data won't be save
-                      // into the document
+                      // Unset src to make sure src (URL or data URL) is not saved,
+                      // although, on failure this can produce "dead" images with an empty tag
                       src: null
                     })).setMeta('addToHistory', false);
                   }

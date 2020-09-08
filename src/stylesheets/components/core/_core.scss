@@ -134,45 +134,41 @@ blockquote {
   border-left: 3px solid lightblue;
 }
 
-.ProseMirror [data-indent='1'] {
-  margin-left: 30px;
+// Override inline padding which is only used for the
+// back-compatibility with the TinyMCE
+p, h1, h2, h3, h4, h5, h6 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
-.ProseMirror [data-indent='2'] {
-  margin-left: 60px;
+pre {
+  padding: 0.7rem 1rem !important;
 }
 
-.ProseMirror [data-indent='3'] {
-  margin-left: 90px;
+$max-indent-level: 7;
+$indent-width: 30;
+
+@for $i from 1 through $max-indent-level {
+  [data-indent='#{$i}']:not([dir]) {
+    margin-left: ($indent-width * $i) + px;
+  }
 }
 
-.ProseMirror [data-indent='4'] {
-  margin-left: 120px;
+/* rtl:begin:ignore */
+@for $i from 1 through $max-indent-level {
+  [dir='ltr'][data-indent='#{$i}'] {
+    margin-left: ($indent-width * $i) + px;
+  }
 }
 
-.ProseMirror [data-indent='5'] {
-  margin-left: 150px;
+@for $i from 1 through $max-indent-level {
+  [dir='rtl'][data-indent='#{$i}'] {
+    margin-right: ($indent-width * $i) + px;
+  }
 }
 
-.ProseMirror [data-indent='6'] {
-  margin-left: 180px;
-}
+/* rtl:end:ignore */
 
-.ProseMirror [data-indent='7'] {
-  margin-left: 210px;
-}
-
-.ProseMirror [data-indent='8'] {
-  margin-left: 240px;
-}
-
-.ProseMirror [data-indent='9'] {
-  margin-left: 270px;
-}
-
-.ProseMirror [data-indent='10'] {
-  margin-left: 300px;
-}
 
 .find {
   background-color: yellow;

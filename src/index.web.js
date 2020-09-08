@@ -52,6 +52,9 @@ async function importImage(src) {
 }
 
 function main(html) {
+
+  window.dir = 'ltr';
+
   let font = {
     fontFamily: 'Lucida Grande, Tahoma, Verdana, Helvetica, sans-serif',
     fontSize: 14
@@ -161,11 +164,7 @@ function main(html) {
     },
     onOpenCitationPopup(id, citation) {
       console.log('onOpenCitationPopup', id, citation);
-
       alert('Open quick format citation dialog ' + id + ' ' + JSON.stringify(citation));
-      citation = JSON.parse(JSON.stringify(citation));
-      citation.citationItems = [];
-      editorCore.setCitation(id, citation);
     },
     onOpenContextMenu: (pos, node, x, y) => {
       console.log('onOpenContextMenu', pos, node, x, y)
@@ -188,7 +187,8 @@ function main(html) {
 
 let html1 = `
 <h1>Nodes:</h1>
-<p><code><img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/><strong>werwerwe</strong><a href="sd">sfwere</a></code></p>
+<p><a href="werwer">Link starts <img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/>link ends</a></p>
+<p><code>Inline code starts <img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/><strong>strong</strong> <a href="test">link</a> inline code ends</code></p>
 <p>Paragraph - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code></p>
 <h1>Heading 1 - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code></h1>
 <h2>Heading 2</h2>

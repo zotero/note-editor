@@ -143,7 +143,7 @@ export function toggleDir(dir) {
         if (node.type.attrs.dir) {
           changes = true;
           if (node.attrs.dir === dir) dir = null;
-          tr.setNodeMarkup(pos, null, { dir })
+          tr.setNodeMarkup(pos, null, { ...node.attrs, dir })
         }
       });
 

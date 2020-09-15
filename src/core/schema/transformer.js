@@ -1,7 +1,18 @@
-export function transformHtml(html) {
+export function digestHtml(html) {
+  let metadata = {
+    schemaVersion: 0
+  };
   let doc = document.implementation.createHTMLDocument('');
   let container = doc.body;
   container.innerHTML = html;
+
+  let metadataNode = doc.querySelector('body > div[data-schema-version]');
+  if (metadataNode) {
+    let value = parseInt(metadataNode.getAttribute('data-schema-version'));
+    if (Number.isInteger(value) && value > 0) {
+      metadata.schemaVersion = value;
+    }
+  }
 
   function createLink(url) {
     let a = doc.createElement('a');
@@ -37,7 +48,7 @@ export function transformHtml(html) {
 
   walk(container);
 
-  return container.innerHTML;
+  return { html: container.innerHTML, metadata };
 }
 
 // Additional transformations that can't be described with schema alone

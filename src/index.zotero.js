@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { randomString } from './core/utils';
-import { schemaVersion, schema } from './core/schema';
+import { schema } from './core/schema';
 import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
 
@@ -47,16 +47,6 @@ class EditorInstance {
     this._dir = window.dir = options.dir;
     this._hasBackup = options.hasBackup;
     this._editorCore = null;
-    this._unsupportedSchema = false;
-
-    if (!Number.isInteger(options.schemaVersion)) {
-      throw new Error('schemaVersion is not an integer');
-    }
-
-    if (options.schemaVersion > schemaVersion) {
-      this._readOnly = true;
-      this._unsupportedSchema = true;
-    }
 
     this._setFont(options.font);
     this._init(options.value);
@@ -118,10 +108,14 @@ class EditorInstance {
 
     document.body.dir = this._dir;
 
+    if (this._editorCore.unsupportedSchema) {
+      this._readOnly = true;
+    }
+
     ReactDOM.render(
       <Editor
         readOnly={this._readOnly}
-        showUpdateNotice={this._unsupportedSchema}
+        showUpdateNotice={this._editorCore.unsupportedSchema}
         editorCore={this._editorCore}
       />,
       document.getElementById('editor-container')
@@ -317,11 +311,10 @@ window.addEventListener('message', function (e) {
     if (currentInstance) {
       currentInstance.uninit();
     }
-    let { value, schemaVersion, readOnly, dir, font, hasBackup } = message;
+    let { value, readOnly, dir, font, hasBackup } = message;
     currentInstance = new EditorInstance({
       instanceId,
       value,
-      schemaVersion,
       readOnly,
       dir,
       font,

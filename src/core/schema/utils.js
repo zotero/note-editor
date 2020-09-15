@@ -23,7 +23,8 @@ export function buildToHtml(schema) {
       }
       node.parentNode.insertBefore(document.createTextNode('\n'), node.nextSibling);
     }
-    return tmp.innerHTML.trim();
+    let html = tmp.innerHTML.trim();
+    return `<div data-schema-version="${schema.version}">${html}</div>`;
   }
 }
 

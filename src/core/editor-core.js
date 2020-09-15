@@ -1,7 +1,7 @@
 import applyDevTools from 'prosemirror-dev-tools';
 import { EditorState, Plugin } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
-import { schema, toHtml, buildClipboardSerializer, schemaVersion } from './schema'
+import { schema, toHtml, buildClipboardSerializer } from './schema'
 import { DOMSerializer } from 'prosemirror-model'
 import { TextSelection } from 'prosemirror-state'
 import { DOMParser as DOMParser2, Pos, Node } from 'prosemirror-model'
@@ -28,7 +28,7 @@ import { highlight } from './plugins/highlight';
 import { trailingParagraph } from './plugins/trailing-paragraph';
 import { nodeId } from './plugins/node-id';
 import Provider from './provider';
-import { schemaTransform, transformHtml } from './schema/transformer';
+import { schemaTransform, digestHtml } from './schema/transformer';
 import { readOnly } from './plugins/read-only';
 import { transform } from './plugins/schema-transform';
 import { dropPaste } from './plugins/drop-paste';
@@ -38,6 +38,7 @@ class EditorCore {
     this.readOnly = options.readOnly;
     this.docChanged = false;
     this.dimensionsStore = { data: {} };
+    this.unsupportedSchema = false;
 
     this.provider = new Provider({
       onSubscribe: options.onSubscribeProvider,
@@ -62,7 +63,13 @@ class EditorCore {
 
 
     if (typeof options.value === 'string') {
-      options.value = transformHtml(options.value);
+      let { html, metadata } = digestHtml(options.value);
+      options.value = html;
+      if (metadata.schemaVersion > schema.version) {
+        this.unsupportedSchema = true;
+        this.readOnly = true;
+      }
+      console.log({ metadata })
       doc = DOMParser2.fromSchema(schema).parse((new DOMParser().parseFromString(options.value, 'text/html').body));
     }
     else if (typeof options.value === 'object') {
@@ -219,7 +226,6 @@ class EditorCore {
     }
 
     return {
-      schemaVersion,
       state: {
         doc: this.view.state.doc.toJSON()
       },

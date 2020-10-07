@@ -228,14 +228,8 @@ export function insertAnnotationsAndCitations(list, pos) {
           }));
         }
 
-        if (annotation.comment) {
-          nodes.push(...fromHtml(annotation.comment, true).content.content);
-        }
 
         if (annotation.text) {
-          if (nodes.length) {
-            nodes.push(state.schema.text(' '));
-          }
           nodes.push(state.schema.nodes.highlight.create({
               annotation: savedAnnotation
             },
@@ -258,10 +252,28 @@ export function insertAnnotationsAndCitations(list, pos) {
           citation: citation
         }));
       }
+
+      if (annotation.comment) {
+        if (nodes.length) {
+          nodes.push(state.schema.text(' '));
+        }
+        nodes.push(...fromHtml(annotation.comment, true).content.content);
+      }
+
     }
 
-    if (pos) {
-      dispatch(state.tr.insert(pos, nodes).setMeta('importImages', true));
+    if (Number.isInteger(pos)) {
+      let negative = false;
+      if (pos < 0) {
+        negative = true;
+        pos = state.tr.doc.content.size;
+      }
+      let { tr } = state;
+      tr = tr.insert(pos, nodes).setMeta('importImages', true);
+      if (negative) {
+        tr = tr.setSelection(new TextSelection(tr.doc.resolve(tr.doc.content.size))).scrollIntoView()
+      }
+      dispatch(tr);
     }
     else {
       dispatch(state.tr.replaceSelectionWith(nodes).setMeta('importImages', true));

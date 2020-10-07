@@ -1,8 +1,13 @@
-.ProseMirror {
+
+.hidden {
+  display: none;
+}
+
+.primary-editor{
   position: relative;
 }
 
-.ProseMirror {
+.primary-editor{
   word-break: break-all;
   word-wrap: break-word;
   white-space: pre-wrap;
@@ -10,11 +15,11 @@
   font-variant-ligatures: none;
 }
 
-.ProseMirror pre {
+.primary-editorpre {
   white-space: pre-wrap;
 }
 
-.ProseMirror li {
+.primary-editorli {
   position: relative;
 }
 
@@ -57,8 +62,23 @@ li.ProseMirror-selectednode:after {
   /*cursor: pointer;*/
   /*-webkit-user-modify: read-only;*/
   /*-webkit-user-drag: element;*/
-  background-color: #ffff00;
+  background-color: #f1f1f1;
+  //border-bottom: 1px dotted gray;
   cursor: default;
+
+
+  &:hover {
+    background-color: #e1e1e1;
+    //border-bottom-width: 0;
+    //color: gray;
+    //border-bottom: 1px dotted black;
+  }
+
+  &.editing {
+    cursor: text;
+    border-bottom: 1px dotted gray;
+    background-color: transparent;
+  }
 }
 
 .citation {
@@ -88,7 +108,7 @@ li.ProseMirror-selectednode:after {
 /*-webkit-user-drag: unset;*/
 /*}*/
 
-.ProseMirror {
+.primary-editor{
   outline: none;
 }
 
@@ -179,11 +199,11 @@ $indent-width: 30;
 }
 
 
-.ProseMirror .tableWrapper {
+.primary-editor.tableWrapper {
   overflow-x: auto;
 }
 
-.ProseMirror table {
+.primary-editortable {
   border-collapse: collapse;
   table-layout: fixed;
   width: 100%;
@@ -191,14 +211,14 @@ $indent-width: 30;
   border: 1px solid black;
 }
 
-.ProseMirror td, .ProseMirror th {
+.primary-editortd, .primary-editorth {
   vertical-align: top;
   box-sizing: border-box;
   position: relative;
   border: 1px solid black;
 }
 
-.ProseMirror .column-resize-handle {
+.primary-editor.column-resize-handle {
   position: absolute;
   right: -2px;
   top: 0;
@@ -215,7 +235,7 @@ $indent-width: 30;
 }
 
 /* Give selected cells a blue overlay */
-.ProseMirror .selectedCell:after {
+.primary-editor.selectedCell:after {
   z-index: 2;
   position: absolute;
   content: "";
@@ -255,7 +275,7 @@ $indent-width: 30;
 }
 
 
-.ProseMirror {
+.primary-editor{
 
 
   overflow-wrap: break-word;
@@ -263,7 +283,7 @@ $indent-width: 30;
   word-break: break-word;
 
   * {
-    caret-color: currentColor;
+    //caret-color: currentColor;
   }
 
   pre {
@@ -360,10 +380,15 @@ $indent-width: 30;
 
 }
 
+.ProseMirror .empty-node::before {
+  position: absolute;
+  color: #aaa;
+  cursor: text;
+}
 
-
-
-
+.ProseMirror .empty-node:first-child::before {
+  content: attr(data-placeholder)
+}
 
 
 

@@ -44,6 +44,7 @@ class EditorInstance {
   constructor(options) {
     this.instanceId = options.instanceId;
     this._readOnly = options.readOnly;
+    this._placeholder = options.placeholder;
     this._dir = window.dir = options.dir;
     this._hasBackup = options.hasBackup;
     this._editorCore = null;
@@ -71,6 +72,7 @@ class EditorInstance {
     this._editorCore = new EditorCore({
       value,
       readOnly: this._readOnly,
+      placeholder: this._placeholder,
       onSubscribeProvider: (subscription) => {
         let { id, type, nodeId, data } = subscription;
         subscription = { id, type, nodeId, data };
@@ -180,6 +182,13 @@ class EditorInstance {
     let $pos = this._editorCore.view.state.doc.resolve(pos);
     let node = $pos.node();
     switch (action) {
+      case 'editHighlight': {
+        let nodeView = this._editorCore.getNodeView(pos);
+        if (nodeView) {
+          nodeView.open();
+        }
+        return;
+      }
       case 'openAnnotation': {
         if (node.type.name === 'highlight') {
           let annotation = node.attrs.annotation;
@@ -258,13 +267,18 @@ class EditorInstance {
       ],
       [
         {
+          name: 'editHighlight',
+          label: 'Edit',
+          enabled: node.type.name === 'highlight'
+        },
+        {
           name: 'showInLibrary',
-          label: 'Show Item in Library',
+          label: 'Show in Library',
           enabled: node.type.name === 'highlight'
         },
         {
           name: 'openAnnotation',
-          label: 'Show Annotation in PDF',
+          label: 'Show in PDF',
           enabled: node.type.name === 'highlight'
         },
         {
@@ -311,11 +325,12 @@ window.addEventListener('message', function (e) {
     if (currentInstance) {
       currentInstance.uninit();
     }
-    let { value, readOnly, dir, font, hasBackup } = message;
+    let { value, readOnly, placeholder, dir, font, hasBackup } = message;
     currentInstance = new EditorInstance({
       instanceId,
       value,
       readOnly,
+      placeholder,
       dir,
       font,
       hasBackup

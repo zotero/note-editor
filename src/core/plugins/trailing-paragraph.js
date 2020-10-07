@@ -2,6 +2,8 @@ import { Plugin } from 'prosemirror-state/src';
 import { schema } from '../schema';
 import { PluginKey } from 'prosemirror-state';
 
+// TODO: Do other transformations as well i.e. insert space between highlights, citations
+
 function nodeEqualsType({ types, node }) {
   return (Array.isArray(types) && types.includes(node.type)) || node.type === types
 }

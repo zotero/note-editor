@@ -24,7 +24,6 @@ import { history } from 'prosemirror-history';
 import { buildKeymap } from './keymap';
 import { baseKeymap } from 'prosemirror-commands';
 import { buildInputRules } from './input-rules';
-import { highlight } from './plugins/highlight';
 import { trailingParagraph } from './plugins/trailing-paragraph';
 import { nodeId } from './plugins/node-id';
 import Provider from './provider';
@@ -32,6 +31,10 @@ import { schemaTransform, digestHtml } from './schema/transformer';
 import { readOnly } from './plugins/read-only';
 import { transform } from './plugins/schema-transform';
 import { dropPaste } from './plugins/drop-paste';
+import { placeholder } from './plugins/placeholder';
+
+// TODO: Avoid resetting cursor and losing the recently typed and unsaved
+//  text when a newly synced note is set
 
 class EditorCore {
   constructor(options) {
@@ -39,6 +42,7 @@ class EditorCore {
     this.docChanged = false;
     this.dimensionsStore = { data: {} };
     this.unsupportedSchema = false;
+    this.nodeViews = [];
 
     this.provider = new Provider({
       onSubscribe: options.onSubscribeProvider,
@@ -48,6 +52,8 @@ class EditorCore {
     let clipboardSerializer = buildClipboardSerializer(this.provider, schema);
 
     let prevHTML = null;
+    // TODO: Have a debounce maximum wait time, to prevent not saving
+    //  it too long and therefore losing more text
     let updateNote = debounce(() => {
       if (this.readOnly) {
         return;
@@ -89,7 +95,8 @@ class EditorCore {
     this.view = new EditorView(null, {
       editable: () => !this.readOnly,
       attributes: {
-        // 'spellcheck': false
+        // 'spellcheck': false,
+        class: 'primary-editor'
       },
       state: EditorState.create({
         doc,
@@ -103,13 +110,6 @@ class EditorCore {
           buildInputRules(schema),
           keymap(buildKeymap(schema)),
           keymap(baseKeymap),
-          highlight({
-            onDoubleClick: (node) => {
-              if (node.attrs.annotation) {
-                options.onOpenAnnotation(node.attrs.annotation);
-              }
-            }
-          }),
           image({
             dimensionsStore: this.dimensionsStore,
             onSyncAttachmentKeys: options.onSyncAttachmentKeys,
@@ -123,6 +123,9 @@ class EditorCore {
             onOpenUrl: options.onOpenUrl.bind(this)
           }),
           trailingParagraph(),
+          placeholder({
+            text: options.placeholder
+          }),
           // columnResizing(),
           tableEditing(),
           history()
@@ -149,6 +152,19 @@ class EditorCore {
             if (!node.attrs.nodeId) return;
             options.onOpenCitationPopup(node.attrs.nodeId, node.attrs.citation);
           }
+        }),
+        highlight: nodeViews.highlight({
+          onConstruct: (view) => {
+            this.nodeViews.push(view);
+          },
+          onDestruct: (view) => {
+            this.nodeViews = this.nodeViews.filter(x => x !== view);
+          },
+          onClick: (node) => {
+            if (node.attrs.annotation) {
+              options.onOpenAnnotation(node.attrs.annotation);
+            }
+          }
         })
       },
       dispatchTransaction(transaction) {
@@ -166,11 +182,19 @@ class EditorCore {
       handleDOMEvents: {
         mousedown: (view, event) => {
           if (event.button === 2) {
-            let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
+          let pos = view.posAtDOM(event.target);
+          let node = view.state.doc.nodeAt(pos);
+
+          //   let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
             if (pos) {
-              let $pos = view.state.doc.resolve(pos.pos);
+
+              let $pos = view.state.doc.resolve(pos);
+              if (node.isText) {
+                node = $pos.node()
+              }
+
               setTimeout(() => {
-                options.onOpenContextMenu($pos.pos, $pos.node(), event.screenX, event.screenY);
+                options.onOpenContextMenu($pos.pos, node, event.screenX, event.screenY);
               }, 0);
             }
           }
@@ -179,7 +203,7 @@ class EditorCore {
     });
 
     // DevTools might freeze the editor and throw random errors
-    // applyDevTools(this.view);
+    applyDevTools(this.view);
     this.view.editorCore = this;
     this.updatePluginState(this.view.state);
   }
@@ -190,6 +214,13 @@ class EditorCore {
       link: linkKey.getState(state),
       search: searchKey.getState(state)
     }
+  }
+
+  getNodeView(pos) {
+    return this.nodeViews.find(nodeView => {
+      let nodeViewPos = nodeView.getPos();
+      return pos >= nodeViewPos && pos < nodeViewPos + nodeView.node.content.size + 1
+    });
   }
 
   setCitation(nodeId, citation) {

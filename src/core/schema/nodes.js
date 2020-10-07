@@ -325,7 +325,9 @@ export default {
   highlight: {
     inline: true,
     group: 'inline',
+    atom: true,
     content: 'text*',
+    draggable: true,
     marks: 'em strong subsup', // The same as in pdf-reader
     attrs: {
       annotation: { default: '' }

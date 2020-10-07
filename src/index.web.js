@@ -5,6 +5,7 @@ import Editor from './ui/editor'
 import EditorCore from './core/editor-core';
 
 import { imageStore, citationStore } from './index.web.data';
+import { TextSelection } from 'prosemirror-state';
 
 
 let beautify = require('js-beautify').html;
@@ -71,6 +72,7 @@ function main(html) {
     container: null,
     value: html,
     readOnly: false,
+    placeholder: 'This is a placeholder',
     onSubscribeProvider(subscriber) {
       console.log('onSubscribeProvider', subscriber);
       if (subscriber.type === 'citation') {
@@ -168,6 +170,7 @@ function main(html) {
     },
     onOpenContextMenu: (pos, node, x, y) => {
       console.log('onOpenContextMenu', pos, node, x, y)
+      console.log('nodeView', editorCore.getNodeView(pos))
     }
   });
 
@@ -196,6 +199,9 @@ let html1 = `
 <h4>Heading 4</h4>
 <h5>Heading 5</h5>
 <h6>Heading 6</h6>
+
+<p><span class="highlight" data-annotation="%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2FNK36R7GU%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B45.695%2C466.519%2C284.774%2C474.8%5D%2C%5B33.732%2C456.342%2C284.708%2C464.312%5D%2C%5B33.732%2C445.911%2C284.735%2C453.881%5D%5D%7D%7D">"Treatment effects were reported as risk ratio (RR) with 95% <b>confidence interval (CI)</b> for adverse events or mean difference (MD) with 95% CI for length of intubation and duration of ICU and hospital stay. "</span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2FSW46XL4F%22%2C%22backupText%22%3A%22Liu%20et%20al.%2C%202017%22%2C%22locator%22%3A%22192%22%7D%5D%2C%22properties%22%3A%7B%7D%7D"></span></p>
+
 
 <pre dir="rtl">Preformatted/code block - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code>
 1
@@ -369,15 +375,8 @@ let html1 = `
 
 main(html1);
 
-// setTimeout(() => {
-//
-// let html2 = `<p>test</p>`
-// main(html2);
-//
-// }, 3000);
-window.addEventListener('drop', (event) => {
-  console.log('tttt', event, event.dataTransfer)
-  console.log('tttt1', event.dataTransfer.getData('text/plain'))
-  console.log('tttt2', event.dataTransfer.getData('text/html'))
-  console.log('tttt3', event.dataTransfer.getData('Text'))
-})
+setTimeout(() => {
+
+editorCore.view.dispatch(editorCore.view.state.tr.setSelection(new TextSelection(editorCore.view.state.doc.resolve(editorCore.view.state.doc.content.size))).scrollIntoView());
+
+}, 3000);

@@ -33,8 +33,10 @@ export function digestHtml(html) {
       if (node.nodeType === Node.ELEMENT_NODE) {
         if (node.style) {
           if (node.style.backgroundImage) {
-            let url = node.style.backgroundImage.match(/url\(["']?([^"']*)["']?\)/)[1];
-            node.parentElement.insertBefore(createImage(url), node);
+            let matched = node.style.backgroundImage.match(/url\(["']?([^"']*)["']?\)/);
+            if (matched) {
+              node.parentElement.insertBefore(createImage(matched[1]), node);
+            }
           }
         }
 

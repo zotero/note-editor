@@ -4,10 +4,6 @@ class CitationView {
     this.dom = document.createElement('span')
     this.dom.className = 'citation';
     this.dom.innerHTML = '{citation}';
-    this.dom.onclick = event => {
-      event.preventDefault();
-      options.onClick(node);
-    }
 
     this.listener = (data) => {
       this.dom.innerHTML = data.formattedCitation ?

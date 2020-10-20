@@ -32,6 +32,8 @@ import { readOnly } from './plugins/read-only';
 import { transform } from './plugins/schema-transform';
 import { dropPaste } from './plugins/drop-paste';
 import { placeholder } from './plugins/placeholder';
+import { highlight, highlightKey } from './plugins/highlight'
+import { citation, citationKey } from './plugins/citation';
 
 // TODO: Avoid resetting cursor and losing the recently typed and unsaved
 //  text when a newly synced note is set
@@ -95,7 +97,7 @@ class EditorCore {
     this.view = new EditorView(null, {
       editable: () => !this.readOnly,
       attributes: {
-        // 'spellcheck': false,
+        'spellcheck': false,
         class: 'primary-editor'
       },
       state: EditorState.create({
@@ -122,7 +124,23 @@ class EditorCore {
           link({
             onOpenUrl: options.onOpenUrl.bind(this)
           }),
+          highlight({
+            onOpen: (annotation) => {
+              options.onOpenAnnotation(annotation);
+            },
+            onGenerateCitation: options.onGenerateCitation
+          }),
+          citation({
+            onOpen: (node) => {
+              options.onOpenCitation(node.attrs.citation);
+            },
+            onEdit: (node) => {
+              if (!node.attrs.nodeId) return;
+              options.onOpenCitationPopup(node.attrs.nodeId, node.attrs.citation);
+            }
+          }),
           trailingParagraph(),
+          // inlineFix(),
           placeholder({
             text: options.placeholder
           }),
@@ -147,24 +165,7 @@ class EditorCore {
           }
         }),
         citation: nodeViews.citation({
-          provider: this.provider,
-          onClick: (node) => {
-            if (!node.attrs.nodeId) return;
-            options.onOpenCitationPopup(node.attrs.nodeId, node.attrs.citation);
-          }
-        }),
-        highlight: nodeViews.highlight({
-          onConstruct: (view) => {
-            this.nodeViews.push(view);
-          },
-          onDestruct: (view) => {
-            this.nodeViews = this.nodeViews.filter(x => x !== view);
-          },
-          onClick: (node) => {
-            if (node.attrs.annotation) {
-              options.onOpenAnnotation(node.attrs.annotation);
-            }
-          }
+          provider: this.provider
         })
       },
       dispatchTransaction(transaction) {
@@ -203,7 +204,7 @@ class EditorCore {
     });
 
     // DevTools might freeze the editor and throw random errors
-    applyDevTools(this.view);
+    // applyDevTools(this.view);
     this.view.editorCore = this;
     this.updatePluginState(this.view.state);
   }
@@ -212,7 +213,9 @@ class EditorCore {
     this.pluginState = {
       menu: menuKey.getState(state),
       link: linkKey.getState(state),
-      search: searchKey.getState(state)
+      search: searchKey.getState(state),
+      highlight: highlightKey.getState(state),
+      citation: citationKey.getState(state)
     }
   }
 

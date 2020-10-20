@@ -4,6 +4,6 @@ export let imageStore = {
 }
 
 export let citationStore = {
-  '{"citationItems":[{"uri":"http://zotero.org/users/1234567/items/5JM6M9R4","backupText":"Hui et al., 2005","locator":"1177"}],"properties":{}}': 'Hui et al., 2005, p. 1177',
-  '{"citationItems":[{"uri":"http://zotero.org/users/1234567/items/SW46XL4F","backupText":"Liu et al., 2017","locator":"192"}],"properties":{}}': 'Liu et al., 2017, p. 192'
+  '{"citationItems":[{"uris":["http://zotero.org/users/3820982/items/RSBTC6WA"],"locator":"5"}],"properties":{}}': 'Hui et al., 2005, p. 1177',
+  '{"citationItems":[{"uris":["http://zotero.org/users/1234567/items/SW46XL4F"],"locator":"192"}],"properties":{}}': 'Liu et al., 2017, p. 192'
 }

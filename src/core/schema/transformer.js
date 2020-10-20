@@ -59,7 +59,8 @@ export function schemaTransform(state) {
   let updated = false;
   state.doc.descendants((node, pos) => {
     // Do not allow to be wrapped in any mark
-    if (['image', 'citation', 'highlight'].includes(node.type.name) && node.marks.length) {
+    // TODO: Highlight as well?
+    if (['image', 'citation'].includes(node.type.name) && node.marks.length) {
       tr.setNodeMarkup(pos, null, node.attrs, []);
       updated = true;
     }

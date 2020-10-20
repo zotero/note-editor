@@ -61,7 +61,6 @@ export function changeIndent(dir = 1, tab) {
             if (indent === 0) {
               indent = null;
             }
-            console.log('setting in', indent)
             tr.setBlockType(pos, pos, node.type, { ...node.attrs, indent });
           }
         }
@@ -73,7 +72,6 @@ export function changeIndent(dir = 1, tab) {
 
     }
 
-    console.log('ff', $from, $to, $to.node())
     if (node) {
       if (node.type.attrs.indent) {
 
@@ -206,8 +204,11 @@ export function insertAnnotationsAndCitations(list, pos) {
 
       if (annotation) {
         let savedAnnotation = {
+          citationItem: annotation.citationItem,
+          parentURI: annotation.parentURI,
           uri: annotation.uri,
-          position: annotation.position
+          position: annotation.position,
+          text: annotation.text
         }
 
         if (annotation.image) {
@@ -253,7 +254,7 @@ export function insertAnnotationsAndCitations(list, pos) {
         }));
       }
 
-      if (annotation.comment) {
+      if (annotation && annotation.comment) {
         if (nodes.length) {
           nodes.push(state.schema.text(' '));
         }

@@ -62,22 +62,16 @@ li.ProseMirror-selectednode:after {
   /*cursor: pointer;*/
   /*-webkit-user-modify: read-only;*/
   /*-webkit-user-drag: element;*/
-  background-color: #f1f1f1;
+  //background-color: #f1f1f1;
   //border-bottom: 1px dotted gray;
-  cursor: default;
+  //cursor: default;
 
 
   &:hover {
-    background-color: #e1e1e1;
+    //background-color: #f1f1f1;
     //border-bottom-width: 0;
     //color: gray;
     //border-bottom: 1px dotted black;
-  }
-
-  &.editing {
-    cursor: text;
-    border-bottom: 1px dotted gray;
-    background-color: transparent;
   }
 }
 

@@ -6,6 +6,8 @@ import Toolbar from './toolbar';
 import Findbar from './findbar';
 import LinkPopup from './link-popup';
 import Noticebar from './noticebar';
+import HighlightPopup from './highlight-popup';
+import CitationPopup from './citation-popup';
 
 function Editor(props) {
   const editorRef = useRef(null);
@@ -26,7 +28,10 @@ function Editor(props) {
       <Noticebar>Editor is in read-only mode. Please update Zotero to use the newest features</Noticebar>}
       <div className="editor-core" ref={editorRef}>
         <div className="relative-container">{editorState.link &&
-        <LinkPopup parentRef={editorRef} linkState={editorState.link.popup}/>}</div>
+        <LinkPopup parentRef={editorRef} linkState={editorState.link.popup}/>}
+        {editorState.highlight && <HighlightPopup parentRef={editorRef} pluginState={editorState.highlight.popup}/>}
+        {editorState.citation && <CitationPopup parentRef={editorRef} pluginState={editorState.citation.popup}/>}
+        </div>
       </div>
     </div>
   );

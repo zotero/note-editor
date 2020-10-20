@@ -1,0 +1,28 @@
+
+.highlight-popup {
+  position: absolute;
+  z-index: 100;
+  display: flex;
+  font-size: 12px;
+  background-color: white;
+  border: 1px solid #d9d9d9;
+  padding: 3px 3px 3px 0;
+
+  .button {
+    cursor: default;
+    display: flex;
+    align-items: center;
+    padding: 0 3px;
+    margin-left: 3px;
+    border: 1px solid #c5c5c5;
+    height: 100%;
+    text-align: center;
+
+    &:hover {
+      background: #555c66;
+      color: white;
+      border-color: transparent;
+    }
+
+  }
+}

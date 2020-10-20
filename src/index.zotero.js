@@ -91,6 +91,9 @@ class EditorInstance {
       onUpdate: (html) => {
         this._postMessage({ action: 'update', noteData: this._editorCore.getData() });
       },
+      onGenerateCitation: (annotation, pos) => {
+        this._postMessage({ action: 'generateCitation', annotation, pos });
+      },
       onInsertObject: (type, data, pos) => {
         this._postMessage({ action: 'insertObject', type, data, pos });
       },
@@ -99,6 +102,9 @@ class EditorInstance {
       },
       onOpenAnnotation: (annotation) => {
         this._postMessage({ action: 'openAnnotation', uri: annotation.uri, position: annotation.position });
+      },
+      onOpenCitation: (citation) => {
+        this._postMessage({ action: 'openCitation', citation });
       },
       onOpenCitationPopup: (nodeId, citation) => {
         this._postMessage({ action: 'openCitationPopup', nodeId, citation });

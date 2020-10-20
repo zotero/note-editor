@@ -137,6 +137,21 @@ function main(html) {
       document.getElementById('dev').innerText = d;
       PR.prettyPrint();
     },
+    onGenerateCitation: (annotation, pos) => {
+      console.log('generateCitation', annotation, pos);
+
+      // let citation = {
+      //   citationItems: [
+      //     {
+      //       uri: 'uri1',
+      //       backupText: 'a citation'
+      //     }
+      //   ],
+      //   properties: {}
+      // };
+      //
+      // editorCore.insertCitations([citation], pos);
+    },
     onInsertObject(type, data, pos) {
       console.log('onInsertObject', type, data, pos);
       if (type === 'zotero/item') {
@@ -163,6 +178,10 @@ function main(html) {
     onOpenAnnotation(annotation) {
       console.log('onOpenAnnotation', annotation)
       alert('Opening annotation: ' + JSON.stringify(annotation));
+    },
+    onOpenCitation(citation) {
+      console.log('onOpenCitation', citation);
+      alert('Opening citation: ' + JSON.stringify(citation));
     },
     onOpenCitationPopup(id, citation) {
       console.log('onOpenCitationPopup', id, citation);
@@ -200,7 +219,13 @@ let html1 = `
 <h5>Heading 5</h5>
 <h6>Heading 6</h6>
 
-<p><span class="highlight" data-annotation="%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2FNK36R7GU%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B45.695%2C466.519%2C284.774%2C474.8%5D%2C%5B33.732%2C456.342%2C284.708%2C464.312%5D%2C%5B33.732%2C445.911%2C284.735%2C453.881%5D%5D%7D%7D">"Treatment effects were reported as risk ratio (RR) with 95% <b>confidence interval (CI)</b> for adverse events or mean difference (MD) with 95% CI for length of intubation and duration of ICU and hospital stay. "</span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2FSW46XL4F%22%2C%22backupText%22%3A%22Liu%20et%20al.%2C%202017%22%2C%22locator%22%3A%22192%22%7D%5D%2C%22properties%22%3A%7B%7D%7D"></span></p>
+<p><span class="highlight" data-annotation="%7B%22parentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F3820982%2Fitems%2FRSBTC6WA%22%2C%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F3820982%2Fitems%2FPH3XGS7W%22%2C%22position%22%3A%7B%22pageIndex%22%3A4%2C%22rects%22%3A%5B%5B320.40026855%2C344.76534922848003%2C544.8284741526363%2C355.92280274877004%5D%2C%5B306.24053955%2C331.56332285848003%2C544.2454691574964%2C343.1658668218%5D%2C%5B306.24005126%2C318.60375864848004%2C454.4506083824394%2C329.76121216877004%5D%5D%7D%7D">“The Z’ factor is a useful tool for evaluating bioassay qualities[17]. In general, a Z’ value above 0.5 suggests that an assay is robust enough for HTS.”</span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F3820982%2Fitems%2FRSBTC6WA%22%5D%2C%22locator%22%3A%225%22%7D%5D%2C%22properties%22%3A%7B%7D%7D">{citation}</span></p>
+
+
+<p><span class="highlight" data-annotation="%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2FNK36R7GU%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B45.695%2C466.519%2C284.774%2C474.8%5D%2C%5B33.732%2C456.342%2C284.708%2C464.312%5D%2C%5B33.732%2C445.911%2C284.735%2C453.881%5D%5D%7D%2C%22text%22%3A%22Treatment%20effects%20were%20reported%20as%20risk%20ratio%20(RR)%20with%2095%25%20%3Cb%3Econfidence%20interval%20(CI)%3C%2Fb%3E%20for%20adverse%20events%20or%20mean%20difference%20(MD)%20with%2095%25%20CI%20for%20length%20of%20intubation%20and%20duration%20of%20ICU%20and%20hospital%20stay.%20%22%7D">“Treatment effects were reported as risk ratio (RR) with 95% <b>confidence interval (CI)</b> for adverse events or mean difference (MD) with 95% CI for length of intubation and duration of ICU and hospital stay. ”</span></p>
+
+
+<p><span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2FSW46XL4F%22%5D%2C%22locator%22%3A%22192%22%7D%5D%2C%22properties%22%3A%7B%7D%7D"></span></p>
 
 
 <pre dir="rtl">Preformatted/code block - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code>
@@ -373,10 +398,12 @@ let html1 = `
 
 `;
 
+
+
 main(html1);
 
-setTimeout(() => {
-
-editorCore.view.dispatch(editorCore.view.state.tr.setSelection(new TextSelection(editorCore.view.state.doc.resolve(editorCore.view.state.doc.content.size))).scrollIntoView());
-
-}, 3000);
+// setTimeout(() => {
+//
+// editorCore.view.dispatch(editorCore.view.state.tr.setSelection(new TextSelection(editorCore.view.state.doc.resolve(editorCore.view.state.doc.content.size))).scrollIntoView());
+//
+// }, 3000);

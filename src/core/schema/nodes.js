@@ -299,6 +299,7 @@ export default {
   citation: {
     inline: true,
     group: 'inline',
+    content: 'text*',
     draggable: true,
     atom: true,
     selectable: true,
@@ -318,7 +319,7 @@ export default {
     toDOM: (node) => ['span', {
       class: 'citation',
       'data-citation': encodeObject(node.attrs.citation)
-    }, '{citation}']
+    }, 0]
   },
 
 

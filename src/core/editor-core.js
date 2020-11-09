@@ -183,21 +183,29 @@ class EditorCore {
       handleDOMEvents: {
         mousedown: (view, event) => {
           if (event.button === 2) {
-          let pos = view.posAtDOM(event.target);
-          let node = view.state.doc.nodeAt(pos);
+            // let pos = view.posAtDOM(event.target);
+            //
+            //
+            // // let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
+            // if (pos) {
+            //   let $pos = view.state.doc.resolve(pos);
+            //   let node = view.state.doc.nodeAt(pos);
+            //   if (!node) {
+            //     node = $pos.parent;
+            //   }
+            //   if (node.isText) {
+            //     node = $pos.node()
+            //   }
 
-          //   let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
-            if (pos) {
-
-              let $pos = view.state.doc.resolve(pos);
-              if (node.isText) {
-                node = $pos.node()
+            setTimeout(() => {
+              const { $from } = view.state.selection;
+              let node = view.state.doc.nodeAt($from.pos);
+              if (!node) {
+                node = $from.parent;
               }
+              options.onOpenContextMenu($from.pos, node, event.screenX, event.screenY);
+            }, 0);
 
-              setTimeout(() => {
-                options.onOpenContextMenu($pos.pos, node, event.screenX, event.screenY);
-              }, 0);
-            }
           }
         }
       }
@@ -226,8 +234,8 @@ class EditorCore {
     });
   }
 
-  setCitation(nodeId, citation) {
-    setCitation(nodeId, citation)(this.view.state, this.view.dispatch);
+  setCitation(nodeId, citation, formattedCitation) {
+    setCitation(nodeId, citation, formattedCitation)(this.view.state, this.view.dispatch);
   }
 
   attachImportedImage(nodeId, attachmentKey) {

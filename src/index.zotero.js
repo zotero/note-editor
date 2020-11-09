@@ -91,8 +91,8 @@ class EditorInstance {
       onUpdate: (html) => {
         this._postMessage({ action: 'update', noteData: this._editorCore.getData() });
       },
-      onGenerateCitation: (annotation, pos) => {
-        this._postMessage({ action: 'generateCitation', annotation, pos });
+      onGenerateCitation: (citation, pos) => {
+        this._postMessage({ action: 'generateCitation', citation, pos });
       },
       onInsertObject: (type, data, pos) => {
         this._postMessage({ action: 'insertObject', type, data, pos });
@@ -153,8 +153,8 @@ class EditorInstance {
         return;
       }
       case 'setCitation': {
-        let { nodeId, citation } = message;
-        this._editorCore.setCitation(nodeId, citation);
+        let { nodeId, citation, formattedCitation } = message;
+        this._editorCore.setCitation(nodeId, citation, formattedCitation);
         return;
       }
       case 'attachImportedImage': {

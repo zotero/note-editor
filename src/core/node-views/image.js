@@ -84,7 +84,13 @@ class ImageView {
           event.preventDefault();
           options.onOpenUrl(event.target.href);
         }
-        a.appendChild(document.createTextNode((new URL(node.attrs.src)).host));
+        let host = 'unknown';
+        try {
+          host = (new URL(node.attrs.src)).host;
+        } catch(e) {
+
+        }
+        a.appendChild(document.createTextNode(host));
         divRight.appendChild(a);
       }
 

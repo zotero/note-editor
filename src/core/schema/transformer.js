@@ -34,7 +34,7 @@ export function digestHtml(html) {
         if (node.style) {
           if (node.style.backgroundImage) {
             let matched = node.style.backgroundImage.match(/url\(["']?([^"']*)["']?\)/);
-            if (matched) {
+            if (matched && /^(https?|data):/.test(matched[1])) {
               node.parentElement.insertBefore(createImage(matched[1]), node);
             }
           }

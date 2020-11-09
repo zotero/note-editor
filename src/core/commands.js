@@ -200,7 +200,7 @@ export function toggleMark1(markType, attrs, force) {
 export function insertAnnotationsAndCitations(list, pos) {
   return function (state, dispatch) {
     let nodes = [];
-    for (let { annotation, citation } of list) {
+    for (let { annotation, citation, formattedCitation } of list) {
 
       if (annotation) {
         let savedAnnotation = {
@@ -251,7 +251,10 @@ export function insertAnnotationsAndCitations(list, pos) {
         nodes.push(state.schema.nodes.citation.create({
           nodeId: randomString(),
           citation: citation
-        }));
+        },
+        [
+          state.schema.text('(' + formattedCitation + ')')
+        ]));
       }
 
       if (annotation && annotation.comment) {
@@ -320,15 +323,21 @@ export function toggleList(listType, itemType) {
   }
 }
 
-export function setCitation(nodeId, citation) {
+export function setCitation(nodeId, citation, formattedCitation) {
   return function (state, dispatch) {
     state.doc.descendants((node, pos) => {
       if (node.attrs.nodeId === nodeId) {
         if (citation.citationItems.length) {
-          dispatch(state.tr.setNodeMarkup(pos, null, {
-            ...node.attrs,
-            citation
-          }));
+
+          let citationNode = state.schema.nodes.citation.create({
+              ...node.attrs,
+              citation
+            },
+            [
+              state.schema.text('(' + formattedCitation + ')')
+            ]
+          )
+          dispatch(state.tr.replaceWith(pos, pos + node.nodeSize, citationNode));
         }
         else {
           dispatch(state.tr.delete(pos, pos + node.nodeSize));

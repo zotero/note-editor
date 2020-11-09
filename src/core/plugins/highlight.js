@@ -188,23 +188,19 @@ class Highlight {
   }
 
   addCitation() {
+    // TODO: The way how this works is too complicated
     let { state, dispatch } = this.view;
     let { tr } = state;
     let { $from } = state.selection;
     let node = $from.parent;
     let pos = $from.pos - $from.parentOffset + node.nodeSize - 1;
 
-    let nodes = [];
-    nodes.push(state.schema.text(' '));
-    nodes.push(state.schema.nodes.citation.create({
-      nodeId: randomString(),
-      citation: {
-        citationItems: [node.attrs.annotation.citationItem],
-        properties: {}
-      }
-    }));
-
-    dispatch(tr.insert(pos, nodes));
+    let citation = {
+      citationItems: [node.attrs.annotation.citationItem],
+      properties: {}
+    }
+    dispatch(tr.insert(pos, [state.schema.text(' ')]));
+    this.options.onGenerateCitation(citation, pos + 1);
   }
 
   citationHasUri(citation, uri) {
@@ -308,6 +304,10 @@ export function highlight(options) {
           tr.steps.forEach(step => {
             if (step instanceof ReplaceStep && step.slice) {
               step.getMap().forEach((oldStart, oldEnd, newStart, newEnd) => {
+                // TODO: Investigate this potentially buggy part
+                if (oldStart >= oldState.doc.content.size) {
+                  return;
+                }
                 let $pos = oldState.doc.resolve(oldStart);
                 if ($pos.parent.type.name === 'highlight') {
                   if ($pos.parentOffset === 0) {

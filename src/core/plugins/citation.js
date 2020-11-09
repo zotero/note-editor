@@ -66,7 +66,7 @@ function getNode(state) {
   state.doc.nodesBetween($from.pos, $to.pos, (parentNode, parentPos) => {
     parentNode.forEach((node, offset, index) => {
       let absolutePos = parentPos + offset + 1;
-      if ($from.pos === absolutePos && $to.pos === absolutePos + 1 && node.type.name === 'citation') {
+      if ($from.pos === absolutePos && $to.pos === absolutePos + node.nodeSize && node.type.name === 'citation') {
         nodes.push({ pos: absolutePos, node, parent: parentNode, index });
       }
     });

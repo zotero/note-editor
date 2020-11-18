@@ -1,6 +1,164 @@
 import { Plugin, PluginKey } from 'prosemirror-state';
-import { ReplaceStep } from 'prosemirror-transform';
+import { ReplaceAroundStep, ReplaceStep } from 'prosemirror-transform';
 import { SetAttrsStep } from '../utils';
+import { highlightKey } from './highlight';
+import { Slice } from 'prosemirror-model';
+
+function getNode(state) {
+
+  const { $from, $to, $cursor } = state.selection;
+
+  let nodes = [];
+  state.doc.nodesBetween($from.pos, $to.pos, (parentNode, parentPos) => {
+    parentNode.forEach((node, offset, index) => {
+      let absolutePos = parentPos + offset + 1;
+      if (node.type.name === 'image') {
+        console.log($from.pos, $to.pos, absolutePos)
+        if ($from.pos === absolutePos && $to.pos === absolutePos + node.nodeSize) {
+          nodes.push({ pos: absolutePos, node, parent: parentNode, index });
+        }
+      }
+    });
+  });
+  if (nodes.length === 1) {
+    return nodes[0];
+  }
+  return null;
+}
+
+class Image {
+  constructor(state, options) {
+    this.options = options;
+    this.popup = {
+      isActive: false
+    }
+    // this.onOpenUrl = options.onOpenUrl;
+  }
+
+  update(state, oldState) {
+    if (!this.view) {
+      this.popup = { ...this.popup, isActive: false };
+      return;
+    }
+
+    let node = getNode(state);
+    console.log('no', node);
+    let pos;
+    let index;
+    let parent;
+    if (node) {
+      pos = node.pos;
+      index = node.index;
+      parent = node.parent;
+      node = node.node;
+    }
+
+    if (node) {
+      let { from, to } = state.selection;
+
+      // TODO: Should be within the bounds of the highlight
+
+      // These are in screen coordinates
+      // We can't use EditorView.cordsAtPos here because it can't handle linebreaks correctly
+      // See: https://github.com/ProseMirror/prosemirror-view/pull/47
+      let start = this.view.coordsAtPos(from);
+      let end = this.view.coordsAtPos(to);
+      let isMultiline = start.top !== end.top;
+      let left = isMultiline ? start.left : start.left + (end.left - start.left) / 2;
+
+      let dom = this.view.nodeDOM(pos);
+      let rect = dom.getBoundingClientRect()
+
+      let next = this.view.state.doc.resolve(pos);
+
+      let citation = null;
+      // for (let i = index + 1; i < parent.childCount; i++) {
+      //   let child = parent.child(i);
+      //   if (child.type.name === 'citation') {
+      //     if (this.citationHasUri(child.attrs.citation, node.attrs.annotation.parentURI)
+      //       || this.citationHasUri(child.attrs.citation, node.attrs.annotation.uri)
+      //     ) {
+      //       citation = child;
+      //     }
+      //     break;
+      //   }
+      //   else if (child.type.name === 'text') {
+      //     if (child.text.trim().length) {
+      //       break;
+      //     }
+      //   }
+      //   else {
+      //     break;
+      //   }
+      // }
+
+      this.popup = {
+        isActive: true,
+        left,
+        top: start.top,
+        bottom: end.bottom,
+        isMultiline,
+        pos: from,
+        rect,
+        enableAddCitation: !citation,
+        open: this.open.bind(this),
+        unlink: this.unlink.bind(this),
+        addCitation: this.addCitation.bind(this)
+      };
+      return;
+    }
+
+    this.popup = {
+      isActive: false
+    };
+  }
+
+  open() {
+    let { $from } = this.view.state.selection;
+    let { node } = getNode(this.view.state);
+    if (node.attrs.annotation) {
+      this.options.onOpen(node.attrs.annotation);
+    }
+  }
+
+  unlink() {
+    let { state, dispatch } = this.view;
+    let { $from } = state.selection;
+    let pos = $from.pos - $from.parentOffset - 1;
+    let node = $from.parent;
+    let tr = state.tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0))
+    dispatch(tr);
+  }
+
+  addCitation() {
+    // TODO: The way how this works is too complicated
+    let { state, dispatch } = this.view;
+    let { tr } = state;
+    let { $to } = state.selection;
+    let { node } = getNode(state);
+    let pos = $to.pos;
+
+    let citation = {
+      citationItems: [node.attrs.annotation.citationItem],
+      properties: {}
+    }
+    dispatch(tr.insert(pos, [state.schema.text(' ')]));
+    this.options.onGenerateCitation(citation, pos + 1);
+  }
+
+  citationHasUri(citation, uri) {
+    for (let citationItem of citation.citationItems) {
+      if (citationItem.uris.includes(uri)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  destroy() {
+    this.popup = { ...this.popup, isActive: false };
+  }
+}
 
 function getAttachmentKeys(state) {
   let attachmentKeys = [];
@@ -18,6 +176,26 @@ export function image(options) {
   let prevAttachmentKeys = null;
   return new Plugin({
     key: imageKey,
+    state: {
+      init(config, state) {
+        return new Image(state, options);
+      },
+      apply(tr, pluginState, oldState, newState) {
+        return pluginState;
+      }
+    },
+    view: (view) => {
+      let pluginState = imageKey.getState(view.state);
+      pluginState.view = view;
+      return {
+        update(view, lastState) {
+          pluginState.update(view.state, lastState);
+        },
+        destroy() {
+          pluginState.destroy();
+        }
+      }
+    },
     appendTransaction(transactions, oldState, newState) {
       let newTr = newState.tr
 

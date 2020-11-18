@@ -112,11 +112,6 @@ class EditorCore {
           buildInputRules(schema),
           keymap(buildKeymap(schema)),
           keymap(baseKeymap),
-          image({
-            dimensionsStore: this.dimensionsStore,
-            onSyncAttachmentKeys: options.onSyncAttachmentKeys,
-            onImportImages: options.onImportImages
-          }),
           dropCursor(),
           gapCursor(),
           menu(),
@@ -125,9 +120,14 @@ class EditorCore {
             onOpenUrl: options.onOpenUrl.bind(this)
           }),
           highlight({
-            onOpen: (annotation) => {
-              options.onOpenAnnotation(annotation);
-            },
+            onOpen: options.onOpenAnnotation,
+            onGenerateCitation: options.onGenerateCitation
+          }),
+          image({
+            dimensionsStore: this.dimensionsStore,
+            onSyncAttachmentKeys: options.onSyncAttachmentKeys,
+            onImportImages: options.onImportImages,
+            onOpen: options.onOpenAnnotation,
             onGenerateCitation: options.onGenerateCitation
           }),
           citation({
@@ -223,6 +223,7 @@ class EditorCore {
       link: linkKey.getState(state),
       search: searchKey.getState(state),
       highlight: highlightKey.getState(state),
+      image: imageKey.getState(state),
       citation: citationKey.getState(state)
     }
   }

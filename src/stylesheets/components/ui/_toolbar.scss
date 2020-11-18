@@ -5,20 +5,43 @@
   font-size: 14px;
   border-bottom: 1px solid #d9d9d9;
   cursor: default;
+  display: flex;
 
-  .line {
-    display: flex;
-    height: 28px;
-    padding-left: 2px;
-  }
-
-  .group {
+  .return-button {
     display: flex;
     align-items: center;
+    padding: 0 4px;
+    border-right: 1px solid #d9d9d9;
+    font-weight: bold;
 
-    &:not(:first-child) {
-      border-left: 1px solid #d9d9d9;
+    &:hover {
+      background: #555c66;
+      color: white;
+    }
+  }
+
+  .lines {
+    display: flex;
+    flex-wrap: wrap;
+
+    .line:nth-of-type(1) {
+      padding-right: 10px;
+    }
+
+    .line {
+      display: flex;
+      height: 28px;
       padding-left: 2px;
+    }
+
+    .group {
+      display: flex;
+      align-items: center;
+
+      &:not(:first-child) {
+        border-left: 1px solid #d9d9d9;
+        padding-left: 2px;
+      }
     }
   }
 }

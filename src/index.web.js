@@ -198,8 +198,12 @@ function main(html) {
   ReactDOM.render(
     <Editor
       showUpdateNotice={true}
+      enableReturnButton={true}
       readOnly={false}
       editorCore={editorCore}
+      onClickReturn={() => {
+        console.log('Clicked return')
+      }}
     />,
     document.getElementById('editor-container')
   );

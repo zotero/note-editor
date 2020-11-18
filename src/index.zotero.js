@@ -47,6 +47,7 @@ class EditorInstance {
     this._placeholder = options.placeholder;
     this._dir = window.dir = options.dir;
     this._hasBackup = options.hasBackup;
+    this._enableReturnButton = options.enableReturnButton;
     this._editorCore = null;
 
     this._setFont(options.font);
@@ -123,8 +124,12 @@ class EditorInstance {
     ReactDOM.render(
       <Editor
         readOnly={this._readOnly}
+        enableReturnButton={this._enableReturnButton}
         showUpdateNotice={this._editorCore.unsupportedSchema}
         editorCore={this._editorCore}
+        onClickReturn={() => {
+          this._postMessage({ action: 'return' });
+        }}
       />,
       document.getElementById('editor-container')
     );
@@ -331,7 +336,7 @@ window.addEventListener('message', function (e) {
     if (currentInstance) {
       currentInstance.uninit();
     }
-    let { value, readOnly, placeholder, dir, font, hasBackup } = message;
+    let { value, readOnly, placeholder, dir, font, hasBackup, enableReturnButton } = message;
     currentInstance = new EditorInstance({
       instanceId,
       value,
@@ -339,7 +344,8 @@ window.addEventListener('message', function (e) {
       placeholder,
       dir,
       font,
-      hasBackup
+      hasBackup,
+      enableReturnButton
     });
   }
 });

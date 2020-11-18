@@ -8,6 +8,7 @@ import LinkPopup from './link-popup';
 import Noticebar from './noticebar';
 import HighlightPopup from './highlight-popup';
 import CitationPopup from './citation-popup';
+import ImagePopup from './image-popup';
 
 function Editor(props) {
   const editorRef = useRef(null);
@@ -22,7 +23,13 @@ function Editor(props) {
 
   return (
     <div className="editor">
-      <Toolbar menuState={editorState.menu} linkState={editorState.link} searchState={editorState.search}/>
+      <Toolbar
+        enableReturnButton={props.enableReturnButton}
+        menuState={editorState.menu}
+        linkState={editorState.link}
+        searchState={editorState.search}
+        onClickReturn={props.onClickReturn}
+      />
       <Findbar searchState={editorState.search} active={editorState.search.active}/>
       {props.showUpdateNotice &&
       <Noticebar>Editor is in read-only mode. Please update Zotero to use the newest features</Noticebar>}
@@ -30,6 +37,7 @@ function Editor(props) {
         <div className="relative-container">{editorState.link &&
         <LinkPopup parentRef={editorRef} linkState={editorState.link.popup}/>}
         {editorState.highlight && <HighlightPopup parentRef={editorRef} pluginState={editorState.highlight.popup}/>}
+        {editorState.image && <ImagePopup parentRef={editorRef} pluginState={editorState.image.popup}/>}
         {editorState.citation && <CitationPopup parentRef={editorRef} pluginState={editorState.citation.popup}/>}
         </div>
       </div>

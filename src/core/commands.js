@@ -200,7 +200,7 @@ export function toggleMark1(markType, attrs, force) {
 export function insertAnnotationsAndCitations(list, pos) {
   return function (state, dispatch) {
     let nodes = [];
-    for (let { annotation, citation, formattedCitation } of list) {
+    for (let { annotation, citation, formattedCitation, note } of list) {
 
       if (annotation) {
         let savedAnnotation = {
@@ -264,6 +264,9 @@ export function insertAnnotationsAndCitations(list, pos) {
         nodes.push(...fromHtml(annotation.comment, true).content.content);
       }
 
+      if (note) {
+        nodes.push(...fromHtml(note, true).content.content);
+      }
     }
 
     if (Number.isInteger(pos)) {

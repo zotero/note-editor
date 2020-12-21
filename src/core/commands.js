@@ -3,6 +3,7 @@ import { findParentNode } from 'prosemirror-utils';
 import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list'
 import { encodeObject, randomString, SetAttrsStep } from './utils';
 import { fromHtml, schema } from './schema';
+import { Fragment, Slice } from 'prosemirror-model';
 
 function getClosestListItemNode($pos) {
   let depth = $pos.depth;
@@ -283,7 +284,8 @@ export function insertAnnotationsAndCitations(list, pos) {
       dispatch(tr);
     }
     else {
-      dispatch(state.tr.replaceSelectionWith(nodes).setMeta('importImages', true));
+      let slice = new Slice(Fragment.fromArray(nodes), 1, 1);
+      dispatch(state.tr.replaceSelection(slice).setMeta('importImages', true));
     }
   }
 }

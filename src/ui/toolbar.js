@@ -25,7 +25,7 @@ function Toolbar({ enableReturnButton, menuState, linkState, searchState, onClic
 
   return (
     <div className="toolbar" onMouseDown={handleMouseDown}>
-      {enableReturnButton && <div className="return-button" onClick={onClickReturn}>&lt;</div>}
+      {enableReturnButton && <div className="toolbar-button return-button" onClick={onClickReturn}></div>}
       <div className="lines">
         <Line>
           <Group>

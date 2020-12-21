@@ -10,13 +10,28 @@
   .return-button {
     display: flex;
     align-items: center;
-    padding: 0 4px;
-    border-right: 1px solid #d9d9d9;
-    font-weight: bold;
+    margin: 2px;
 
-    &:hover {
-      background: #555c66;
-      color: white;
+    &::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      background-image: url("chevron-left.png");
+      background-size: 100%;
+
+      @media screen and (min-resolution: 1.1dppx) {
+        background-image: url("chevron-left@2x.png");
+      }
+    }
+
+    &:active {
+      &::before {
+        background-image: url("chevron-left-white.png");
+
+        @media screen and (min-resolution: 1.1dppx) {
+          background-image: url("chevron-left-white@2x.png");
+        }
+      }
     }
   }
 
@@ -31,17 +46,13 @@
     .line {
       display: flex;
       height: 28px;
-      padding-left: 2px;
     }
 
     .group {
       display: flex;
       align-items: center;
-
-      &:not(:first-child) {
-        border-left: 1px solid #d9d9d9;
-        padding-left: 2px;
-      }
+      border-left: 1px solid #d9d9d9;
+      padding-left: 2px;
     }
   }
 }
@@ -63,6 +74,7 @@
     border-color: #2276d2
   }
 
+  &:active,
   &.active {
     -webkit-box-shadow: none;
     box-shadow: none;

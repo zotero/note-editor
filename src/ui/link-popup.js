@@ -84,20 +84,20 @@ function LinkPopup({ parentRef, linkState }) {
       <div ref={containerRef}>
         <div
           ref={popupRef}
-          className={cx('link-popup')}
+          className={cx('link-popup page-popup page-popup-top')}
         >
           {editing ? (
             <Fragment>
               <div className="link"><input ref={inputRef} type="edit" placeholder="Enter URL"
                                            onKeyDown={handleKeydown}/>
               </div>
-              <div className="button" onClick={handleSet}>Set</div>
+              <div className="button toolbarButton" onClick={handleSet}>Set</div>
             </Fragment>
           ) : (
             <Fragment>
               <div className="link"><a href={linkState.href} onClick={handleOpen}>{linkState.href}</a></div>
-              <div className="button" onClick={handleEdit}>Edit</div>
-              <div className="button" onClick={handleUnset}>Unlink</div>
+              <div className="button toolbarButton" onClick={handleEdit}>Edit</div>
+              <div className="button toolbarButton" onClick={handleUnset}>Unlink</div>
             </Fragment>
           )}
         </div>

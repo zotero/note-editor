@@ -61,11 +61,11 @@ function ImagePopup({ parentRef, pluginState }) {
       <div ref={containerRef}>
         <div
           ref={popupRef}
-          className={cx('image-popup')}
+          className={cx('image-popup page-popup page-popup-top')}
         >
-          <div className="button" onClick={handleOpen}>Open</div>
-          <div className="button" onClick={handleUnlink}>Unlink</div>
-          {pluginState.enableAddCitation && <div className="button" onClick={handleAdd}>Add Citation</div>}
+          <div className="button toolbarButton" onClick={handleOpen}>Open</div>
+          <div className="button toolbarButton" onClick={handleUnlink}>Unlink</div>
+          {pluginState.enableAddCitation && <div className="button toolbarButton" onClick={handleAdd}>Add Citation</div>}
         </div>
       </div>
     );

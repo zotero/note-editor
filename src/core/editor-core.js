@@ -1,5 +1,5 @@
 import applyDevTools from 'prosemirror-dev-tools';
-import { EditorState, Plugin } from 'prosemirror-state'
+import { EditorState, NodeSelection, Plugin, SelectionRange } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { schema, toHtml, buildClipboardSerializer } from './schema'
 import { DOMSerializer } from 'prosemirror-model'
@@ -34,6 +34,7 @@ import { dropPaste } from './plugins/drop-paste';
 import { placeholder } from './plugins/placeholder';
 import { highlight, highlightKey } from './plugins/highlight'
 import { citation, citationKey } from './plugins/citation';
+import { drag } from './plugins/drag';
 
 // TODO: Avoid resetting cursor and losing the recently typed and unsaved
 //  text when a newly synced note is set
@@ -144,6 +145,7 @@ class EditorCore {
           placeholder({
             text: options.placeholder
           }),
+          drag(),
           // columnResizing(),
           tableEditing(),
           history()

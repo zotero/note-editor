@@ -15,7 +15,6 @@ function Editor(props) {
   const [editorState, setEditorState] = useState(props.editorCore.pluginState);
 
   const [refReady, setRefReady] = useState(false)
-// On first mount, set the variable to true, as the ref is now available
   useEffect(() => {
     setRefReady(true)
   }, [])
@@ -45,7 +44,6 @@ function Editor(props) {
             {editorState.link &&
             <LinkPopup parentRef={editorRef} linkState={editorState.link.popup}/>}
             {editorState.highlight && <HighlightPopup parentRef={editorRef} pluginState={editorState.highlight.popup}/>}
-            <MarginLines parentRef={editorRef} pluginState={editorState}/>
             {editorState.image && <ImagePopup parentRef={editorRef} pluginState={editorState.image.popup}/>}
             {editorState.citation && <CitationPopup parentRef={editorRef} pluginState={editorState.citation.popup}/>}
           </Fragment>}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="18">
+	<style>
+		.r {
+			fill: #9a9a9a;
+		}
+	</style>
+	<circle class="r" cy="3" cx="4" r="1.5"/>
+	<circle class="r" cy="3" cx="10" r="1.5"/>
+	<circle class="r" cy="9" cx="4" r="1.5"/>
+	<circle class="r" cy="9" cx="10" r="1.5"/>
+	<circle class="r" cy="15" cx="4" r="1.5"/>
+	<circle class="r" cy="15" cx="10" r="1.5"/>
+</svg>

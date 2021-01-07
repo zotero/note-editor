@@ -9,7 +9,6 @@ import Noticebar from './noticebar';
 import HighlightPopup from './highlight-popup';
 import CitationPopup from './citation-popup';
 import ImagePopup from './image-popup';
-import MarginLines from './margin-lines';
 
 function Editor(props) {
   const editorRef = useRef(null);

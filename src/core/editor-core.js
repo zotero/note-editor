@@ -65,6 +65,7 @@ class EditorCore {
       if (html !== prevHTML) {
         prevHTML = html;
         options.onUpdate(html);
+        this.docChanged = false;
       }
     }, 1000);
 
@@ -266,6 +267,7 @@ class EditorCore {
   }
 
   getData(onlyChanged) {
+    console.log('dcccc', onlyChanged, this.docChanged)
     if (onlyChanged && !this.docChanged) {
       return null;
     }

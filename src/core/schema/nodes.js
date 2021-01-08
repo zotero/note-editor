@@ -333,8 +333,7 @@ export default {
     // TODO: Limit what marks highlight node can have
     // marks: 'em strong subsup', // The same as in pdf-reader
     attrs: {
-      annotation: { default: '' },
-      citation: { default: '' }
+      annotation: { default: '' }
     },
     parseDOM: [{
       tag: 'span.highlight',

@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, Fragment } from 'react';
 import cx from 'classnames'
 
+// TODO: Consolidate all popups into single component
+
 function ImagePopup({ parentRef, pluginState }) {
   const containerRef = useRef();
   const popupRef = useRef();
@@ -16,7 +18,7 @@ function ImagePopup({ parentRef, pluginState }) {
     let parentScrollTop = parentRef.current.scrollTop;
     let parentTop = parentRef.current.getBoundingClientRect().top;
     let maxWidth = containerRef.current.offsetWidth;
-    let top = parentScrollTop + (pluginState.rect.top - popupRef.current.offsetHeight - parentTop);
+    let top = parentScrollTop + (pluginState.rect.top - popupRef.current.offsetHeight - parentTop - 8);
     let left = pluginState.rect.left;
     let isAbove = true;
     if (top < 0) {
@@ -33,8 +35,8 @@ function ImagePopup({ parentRef, pluginState }) {
       left = maxWidth - width;
     }
 
-    popupRef.current.style.top = top + 'px';
-    popupRef.current.style.left = left + 'px';
+    popupRef.current.style.top = Math.round(top) + 'px';
+    popupRef.current.style.left = Math.round(left) + 'px';
 
     if (inputRef.current) {
       inputRef.current.value = pluginState.href || '';

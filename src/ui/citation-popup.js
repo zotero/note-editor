@@ -16,7 +16,7 @@ function CitationPopup({ parentRef, pluginState }) {
     let parentScrollTop = parentRef.current.scrollTop;
     let parentTop = parentRef.current.getBoundingClientRect().top;
     let maxWidth = containerRef.current.offsetWidth;
-    let top = parentScrollTop + (pluginState.rect.top - popupRef.current.offsetHeight - parentTop);
+    let top = parentScrollTop + (pluginState.rect.top - popupRef.current.offsetHeight - parentTop - 8);
     let left = pluginState.rect.left;
     let isAbove = true;
     if (top < 0) {
@@ -33,8 +33,8 @@ function CitationPopup({ parentRef, pluginState }) {
       left = maxWidth - width;
     }
 
-    popupRef.current.style.top = top + 'px';
-    popupRef.current.style.left = left + 'px';
+    popupRef.current.style.top = Math.round(top) + 'px';
+    popupRef.current.style.left = Math.round(left) + 'px';
 
     if (inputRef.current) {
       inputRef.current.value = pluginState.href || '';
@@ -57,10 +57,10 @@ function CitationPopup({ parentRef, pluginState }) {
       <div ref={containerRef}>
         <div
           ref={popupRef}
-          className={cx('citation-popup')}
+          className={cx('citation-popup page-popup page-popup-top')}
         >
-          <div className="button" onClick={handleEdit}>Edit</div>
-          <div className="button" onClick={handleOpen}>Open</div>
+          <div className="button toolbarButton" onClick={handleEdit}>Edit</div>
+          <div className="button toolbarButton" onClick={handleOpen}>Open</div>
         </div>
       </div>
     );

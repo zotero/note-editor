@@ -79,7 +79,6 @@ export function buildClipboardSerializer(provider, schema) {
     highlight(node) {
       return ['span', {
         class: 'highlight',
-        style: 'background-color: #ffff00',
         'data-annotation': encodeObject(node.attrs.annotation)
       }, 0]
     }

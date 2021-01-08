@@ -132,9 +132,7 @@ class Highlight {
       for (let i = index + 1; i < parent.childCount; i++) {
         let child = parent.child(i);
         if (child.type.name === 'citation') {
-          if (this.citationHasUri(child.attrs.citation, node.attrs.annotation.parentURI)
-            || this.citationHasUri(child.attrs.citation, node.attrs.annotation.uri)
-          ) {
+          if (this.citationHasUri(child.attrs.citation, node.attrs.annotation.parentURI)) {
             citation = child;
           }
           break;
@@ -157,7 +155,7 @@ class Highlight {
         isMultiline,
         pos: from,
         rect,
-        enableAddCitation: !citation,
+        enableAddCitation: !citation && !!node.attrs.annotation.citationItem,
         open: this.open.bind(this),
         unlink: this.unlink.bind(this),
         addCitation: this.addCitation.bind(this)

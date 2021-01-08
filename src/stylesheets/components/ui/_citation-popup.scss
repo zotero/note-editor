@@ -6,7 +6,7 @@
   font-size: 12px;
   background-color: white;
   border: 1px solid #d9d9d9;
-  padding: 3px 3px 3px 0;
+  padding: 7px 3px;
 
   .button {
     cursor: default;
@@ -15,14 +15,14 @@
     padding: 0 3px;
     margin-left: 3px;
     border: 1px solid #c5c5c5;
-    height: 100%;
+    height: 22px;
     text-align: center;
 
-    &:hover {
-      background: #555c66;
-      color: white;
-      border-color: transparent;
-    }
+    //&:hover {
+    //  background: #555c66;
+    //  color: white;
+    //  border-color: transparent;
+    //}
 
   }
 }

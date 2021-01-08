@@ -13,7 +13,7 @@ function getNode(state) {
     parentNode.forEach((node, offset, index) => {
       let absolutePos = parentPos + offset + 1;
       if (node.type.name === 'image') {
-        console.log($from.pos, $to.pos, absolutePos)
+        // console.log($from.pos, $to.pos, absolutePos)
         if ($from.pos === absolutePos && $to.pos === absolutePos + node.nodeSize) {
           nodes.push({ pos: absolutePos, node, parent: parentNode, index });
         }
@@ -42,7 +42,7 @@ class Image {
     }
 
     let node = getNode(state);
-    console.log('no', node);
+
     let pos;
     let index;
     let parent;
@@ -51,6 +51,9 @@ class Image {
       index = node.index;
       parent = node.parent;
       node = node.node;
+      if (!node.attrs.annotation) {
+        return;
+      }
     }
 
     if (node) {
@@ -72,25 +75,23 @@ class Image {
       let next = this.view.state.doc.resolve(pos);
 
       let citation = null;
-      // for (let i = index + 1; i < parent.childCount; i++) {
-      //   let child = parent.child(i);
-      //   if (child.type.name === 'citation') {
-      //     if (this.citationHasUri(child.attrs.citation, node.attrs.annotation.parentURI)
-      //       || this.citationHasUri(child.attrs.citation, node.attrs.annotation.uri)
-      //     ) {
-      //       citation = child;
-      //     }
-      //     break;
-      //   }
-      //   else if (child.type.name === 'text') {
-      //     if (child.text.trim().length) {
-      //       break;
-      //     }
-      //   }
-      //   else {
-      //     break;
-      //   }
-      // }
+      for (let i = index + 1; i < parent.childCount; i++) {
+        let child = parent.child(i);
+        if (child.type.name === 'citation') {
+          if (this.citationHasUri(child.attrs.citation, node.attrs.annotation.parentURI)) {
+            citation = child;
+          }
+          break;
+        }
+        else if (child.type.name === 'text') {
+          if (child.text.trim().length) {
+            break;
+          }
+        }
+        else {
+          break;
+        }
+      }
 
       this.popup = {
         isActive: true,
@@ -122,12 +123,16 @@ class Image {
   }
 
   unlink() {
-    let { state, dispatch } = this.view;
-    let { $from } = state.selection;
-    let pos = $from.pos - $from.parentOffset - 1;
-    let node = $from.parent;
-    let tr = state.tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0))
-    dispatch(tr);
+      let { state, dispatch } = this.view;
+      let { tr } = state;
+      let node = getNode(state);
+      if (node) {
+        tr.setNodeMarkup(node.pos, null, {
+          ...node.node.attrs,
+          annotation: null,
+        });
+        dispatch(tr);
+      }
   }
 
   addCitation() {
@@ -240,7 +245,7 @@ export function image(options) {
                 parentNode.forEach((node, offset) => {
                   let absolutePos = parentPos + offset + 1;
                   if (node.type.name === 'image' && !node.attrs.attachmentKey) {
-
+                    // TODO: Fix some nodes with null 'src'
                     images.push({ nodeId: node.attrs.nodeId, src: node.attrs.src });
                     newTr = newTr.step(new SetAttrsStep(absolutePos, {
                       ...node.attrs,

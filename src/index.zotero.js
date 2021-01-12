@@ -172,9 +172,9 @@ class EditorInstance {
         this._handleContextMenuAction(ctxAction, pos);
         return;
       }
-      case 'insertAnnotationsAndCitations': {
-        let { list, pos } = message;
-        this._editorCore.insertAnnotationsAndCitations(list, pos);
+      case 'insertHtml': {
+        let { pos, html } = message;
+        this._editorCore.insertHtml(pos, html);
         return;
       }
       case 'focus': {

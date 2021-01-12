@@ -198,78 +198,9 @@ export function toggleMark1(markType, attrs, force) {
   }
 }
 
-export function insertAnnotationsAndCitations(list, pos) {
+export function insertHtml(pos, html) {
   return function (state, dispatch) {
-    let nodes = [];
-    for (let { annotation, citation, formattedCitation, note } of list) {
-
-      if (annotation) {
-        let savedAnnotation = {
-          citationItem: annotation.citationItem,
-          parentURI: annotation.parentURI,
-          uri: annotation.uri,
-          position: annotation.position,
-          text: annotation.text
-        }
-
-        if (annotation.image) {
-          let rect = annotation.position.rects[0];
-          let rectWidth = rect[2] - rect[0];
-          let rectHeight = rect[3] - rect[1];
-          // Constants are from pdf.js
-          const CSS_UNITS = 96.0 / 72.0;
-          const PDFJS_DEFAULT_SCALE = 1.25;
-          let width = Math.round(rectWidth * CSS_UNITS * PDFJS_DEFAULT_SCALE);
-          let height = Math.round(rectHeight * width / rectWidth);
-
-          nodes.push(state.schema.nodes.image.create({
-            width,
-            height,
-            annotation: savedAnnotation,
-            src: annotation.image
-          }));
-        }
-
-
-        if (annotation.text) {
-          nodes.push(state.schema.nodes.highlight.create({
-              annotation: savedAnnotation
-            },
-            [
-              state.schema.text('“'),
-              ...fromHtml(annotation.text, true).content.content,
-              state.schema.text('”')
-            ]
-          ));
-        }
-
-        if (nodes.length) {
-          nodes.push(state.schema.text(' '));
-        }
-      }
-
-      if (citation) {
-        nodes.push(state.schema.nodes.citation.create({
-          nodeId: randomString(),
-          citation: citation
-        },
-        [
-          state.schema.text('(' + formattedCitation + ')')
-        ]));
-      }
-
-      if (annotation && annotation.comment) {
-        if (nodes.length) {
-          nodes.push(state.schema.text(' '));
-        }
-        nodes.push(...fromHtml(annotation.comment, true).content.content);
-      }
-
-      if (note) {
-        nodes.push(...fromHtml(note, true).content.content);
-      }
-    }
-
+    let nodes = fromHtml(html, true).content.content;
     if (Number.isInteger(pos)) {
       let negative = false;
       if (pos < 0) {
@@ -277,7 +208,7 @@ export function insertAnnotationsAndCitations(list, pos) {
         pos = state.tr.doc.content.size;
       }
       let { tr } = state;
-      tr = tr.insert(pos, nodes).setMeta('importImages', true);
+      tr = tr.insert(pos, nodes);
       if (negative) {
         tr = tr.setSelection(new TextSelection(tr.doc.resolve(tr.doc.content.size))).scrollIntoView()
       }
@@ -285,7 +216,7 @@ export function insertAnnotationsAndCitations(list, pos) {
     }
     else {
       let slice = new Slice(Fragment.fromArray(nodes), 1, 1);
-      dispatch(state.tr.replaceSelection(slice).setMeta('importImages', true));
+      dispatch(state.tr.replaceSelection(slice));
     }
   }
 }

@@ -9,7 +9,7 @@ import { debounce, decodeObject, encodeObject, randomString } from './utils'
 
 
 import nodeViews from './node-views'
-import { attachImportedImage, insertAnnotationsAndCitations, setCitation } from './commands';
+import { attachImportedImage, insertHtml, setCitation } from './commands';
 import { columnResizing, tableEditing } from 'prosemirror-tables';
 
 import { dropCursor } from 'prosemirror-dropcursor';
@@ -246,8 +246,8 @@ class EditorCore {
     attachImportedImage(nodeId, attachmentKey)(this.view.state, this.view.dispatch);
   }
 
-  insertAnnotationsAndCitations(list, pos) {
-    insertAnnotationsAndCitations(list, pos)(this.view.state, this.view.dispatch);
+  insertHtml(pos, html) {
+    insertHtml(pos, html)(this.view.state, this.view.dispatch);
   }
 
   hasSelection() {

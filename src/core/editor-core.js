@@ -267,7 +267,6 @@ class EditorCore {
   }
 
   getData(onlyChanged) {
-    console.log('dcccc', onlyChanged, this.docChanged)
     if (onlyChanged && !this.docChanged) {
       return null;
     }

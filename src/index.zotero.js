@@ -54,8 +54,8 @@ class EditorInstance {
     this._init(options.value);
   }
 
-  getDataSync() {
-    return this._editorCore.getData(true);
+  getDataSync(onlyChanged) {
+    return this._editorCore.getData(onlyChanged);
   }
 
   _setFont(font) {
@@ -350,9 +350,9 @@ window.addEventListener('message', function (e) {
   }
 });
 
-window.getDataSync = () => {
+window.getDataSync = (onlyChanged) => {
   if (currentInstance) {
-    return currentInstance.getDataSync();
+    return currentInstance.getDataSync(onlyChanged);
   }
   return null;
 }

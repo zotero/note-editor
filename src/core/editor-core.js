@@ -99,7 +99,7 @@ class EditorCore {
     this.view = new EditorView(null, {
       editable: () => !this.readOnly,
       attributes: {
-        'spellcheck': false,
+        // 'spellcheck': false,
         class: 'primary-editor'
       },
       state: EditorState.create({

@@ -1,12 +1,15 @@
 
 .regular-image {
   width: 100%;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+  //display: flex;
+  //align-items: center;
+  //flex-direction: column;
+  display: inline-block;
 
   .resized-wrapper {
     max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 
     .image {
       border: 1px solid #d9d9d9;
@@ -20,9 +23,10 @@
 
 .external-image {
   width: 100%;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+  //display: flex;
+  //align-items: center;
+  //flex-direction: column;
+  display: inline-block;
 
   .resized-wrapper {
     padding: 10px;
@@ -32,6 +36,8 @@
     flex-direction: column;
     max-width: 100%;
     width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 
     .image {
       max-width: 100px;

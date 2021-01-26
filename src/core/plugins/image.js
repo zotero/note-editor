@@ -147,7 +147,7 @@ class Image {
       citationItems: [node.attrs.annotation.citationItem],
       properties: {}
     }
-    dispatch(tr.insert(pos, [state.schema.text(' ')]));
+    dispatch(tr.insert(pos, [state.schema.nodes.hardBreak.create()]));
     this.options.onGenerateCitation(citation, pos + 1);
   }
 

@@ -160,12 +160,7 @@ class EditorCore {
             // TODO: Dimension can also be updated if user modified the document just seconds a go
             this.dimensionsStore.data[node.attrs.nodeId] = [width, height];
           },
-          onOpenUrl: options.onOpenUrl.bind(this),
-          onDoubleClick: (node) => {
-            if (node.attrs.annotation) {
-              options.onOpenAnnotation(node.attrs.annotation);
-            }
-          }
+          onOpenUrl: options.onOpenUrl.bind(this)
         }),
         citation: nodeViews.citation({
           provider: this.provider

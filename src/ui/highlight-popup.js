@@ -74,8 +74,8 @@ function HighlightPopup({ parentRef, pluginState }) {
           className={cx('highlight-popup page-popup page-popup-top')}
         >
           <div className="button toolbarButton" onClick={handleOpen}><div>Open</div></div>
-          <div className="button  toolbarButton" onClick={handleUnlink}><div>Unlink</div></div>
-          {pluginState.enableAddCitation && <div className="button" onClick={handleAdd}>Add Citation</div>}
+          <div className="button toolbarButton" onClick={handleUnlink}><div>Unlink</div></div>
+          {pluginState.enableAddCitation && <div className="button toolbarButton" onClick={handleAdd}>Add Citation</div>}
         </div>
       </div>
     );

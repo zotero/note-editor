@@ -88,7 +88,7 @@ class Image {
             break;
           }
         }
-        else {
+        else if(child.type.name !== 'hardBreak') {
           break;
         }
       }

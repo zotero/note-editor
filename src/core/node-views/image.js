@@ -51,11 +51,6 @@ class ImageView {
 
       resizedWrapper.appendChild(div)
 
-      div.ondblclick = event => {
-        event.preventDefault();
-        options.onDoubleClick(node);
-      }
-
       this.dom = imageBlock;
       this.img = img;
     }

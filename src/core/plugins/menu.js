@@ -136,13 +136,6 @@ class Menu {
       }
     }
 
-    this.alignJustify = {
-      isActive: commands.hasAttr(state, 'align', 'justify'),
-      run() {
-        commands.toggleAlignment('justify')(state, dispatch)
-      }
-    }
-
     this.blockquote = {
       isActive: blockActive(schema.marks.blockquote)(state),
       run() {

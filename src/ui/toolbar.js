@@ -25,7 +25,7 @@ function Toolbar({ enableReturnButton, menuState, linkState, searchState, onClic
 
   return (
     <div className="toolbar" onMouseDown={handleMouseDown}>
-      {enableReturnButton && <div className="toolbar-button return-button" onClick={onClickReturn}></div>}
+      {enableReturnButton ? <div className="toolbar-button return-button" onClick={onClickReturn}></div> : <div/>}
       <div className="lines">
         <Line>
           <Group>
@@ -59,7 +59,6 @@ function Toolbar({ enableReturnButton, menuState, linkState, searchState, onClic
             <Button state={menuState.alignLeft} icon="mce-i-alignleft" title="Align left"/>
             <Button state={menuState.alignCenter} icon="mce-i-aligncenter" title="Align center"/>
             <Button state={menuState.alignRight} icon="mce-i-alignright" title="Align right"/>
-            <Button state={menuState.alignJustify} icon="mce-i-alignjustify" title="Align justify"/>
           </Group>
           <Group>
             <Button state={menuState.bulletList} icon="mce-i-bullist" title="Bullet list"/>
@@ -73,6 +72,7 @@ function Toolbar({ enableReturnButton, menuState, linkState, searchState, onClic
           </Group>
         </Line>
       </div>
+      <div></div>
     </div>
   );
 }

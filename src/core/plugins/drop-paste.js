@@ -2,31 +2,62 @@ import { Plugin } from 'prosemirror-state';
 import { Fragment, Slice } from 'prosemirror-model';
 import { schema } from '../schema';
 
-const IMAGE_MIME_TYPES = [
+// This plugin intercepts all paste/drop/move actions
+
+// Image import behavior on paste/drop/move:
+// - Data URL:
+//   - On paste/drop JPEG/PNG is imported, others rejected
+//   - On move JPEG/PNG is imported, others moved untouched
+// - URL:
+//   - On paste/drop the URL is downloaded in the client
+//     and imported if it is JPEG/PNG
+//   - On move is moved untouched
+//
+// TODO: Add other image types as well
+// But before that evaluate what measures are needed
+// to avoid importing meaningless images i.e. dozens of svg icons
+// when pasting a website, although dropping a svg file from
+// a file system seems a valid reason
+
+const IMPORT_IMAGE_TYPES = [
   'image/jpeg',
   'image/png'
 ];
 
-const IMAGE_DATA_URL_MAX_LENGTH = 20 * 1000 * 1000;
+const IMAGE_DATA_URL_MAX_LENGTH = 20 * 1024 * 1024;
+
+// Limit images that can be imported per single paste/drop action,
+// to avoid creating too many attachments
+const MAX_IMAGES = 10;
 
 function isImageValid(node) {
   let { src, attachmentKey } = node.attrs;
+  // Invalid when:
   return !(
     // Missing src and attachmentKey
     !src && !attachmentKey
     // Is a data URL but has an unsupported MIME type
-    || src.startsWith('data:') && !IMAGE_MIME_TYPES.includes(src.slice(5).split(/[,;]/)[0])
+    || src.startsWith('data:') && !IMPORT_IMAGE_TYPES.includes(src.slice(5).split(/[,;]/)[0])
     // Data URL is too long
     || src.length > IMAGE_DATA_URL_MAX_LENGTH
   );
 }
 
-function transformFragment(schema, fragment) {
+function transformFragment(schema, fragment, data) {
+  if (!data) {
+    data = {
+      imageNum: 0
+    };
+  }
   const nodes = [];
   for (let i = 0; i < fragment.childCount; i++) {
     const child = fragment.child(i);
-    if (child.type === schema.nodes.image && !isImageValid(child)) {
-      continue;
+    if (child.type === schema.nodes.image) {
+      if (isImageValid(child) && data.imageNum < MAX_IMAGES) {
+        data.imageNum++;
+      } else {
+        continue;
+      }
     }
     nodes.push(child.copy(transformFragment(schema, child.content)));
   }
@@ -34,6 +65,7 @@ function transformFragment(schema, fragment) {
 }
 
 function transformSlice(schema, slice) {
+
   const fragment = transformFragment(schema, slice.content);
   if (fragment) {
     return new Slice(fragment, slice.openStart, slice.openEnd);
@@ -45,7 +77,7 @@ async function insertImages(view, pos, files) {
   let nodes = [];
   let promises = [];
   for (let file of files) {
-    if (IMAGE_MIME_TYPES.includes(file.type)) {
+    if (IMPORT_IMAGE_TYPES.includes(file.type)) {
       promises.push(new Promise((resolve) => {
         let reader = new FileReader();
         reader.onload = function () {

@@ -37,7 +37,7 @@ function Editor(props) {
       />
       <Findbar searchState={editorState.search} active={editorState.search.active}/>
       {props.showUpdateNotice &&
-      <Noticebar>Editor is in read-only mode. Please update Zotero to use the newest features</Noticebar>}
+      <Noticebar>Please update Zotero to edit the note</Noticebar>}
       <div className="editor-core" ref={editorRef}>
         <div className="relative-container">
           {refReady && <Fragment>

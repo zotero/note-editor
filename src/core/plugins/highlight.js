@@ -132,7 +132,7 @@ class Highlight {
       for (let i = index + 1; i < parent.childCount; i++) {
         let child = parent.child(i);
         if (child.type.name === 'citation') {
-          if (this.citationHasUri(child.attrs.citation, node.attrs.annotation.parentURI)) {
+          if (this.citationHasItem(child.attrs.citation, node.attrs.annotation.citationItem)) {
             citation = child;
           }
           break;
@@ -201,13 +201,8 @@ class Highlight {
     this.options.onGenerateCitation(citation, pos + 1);
   }
 
-  citationHasUri(citation, uri) {
-    for (let citationItem of citation.citationItems) {
-      if (citationItem.uris.includes(uri)) {
-        return true;
-      }
-    }
-    return false;
+  citationHasItem(citation, citationItem) {
+    return citation.citationItems.find(ci => ci.uris.find(u => citationItem.uris.includes(u)));
   }
 
   destroy() {

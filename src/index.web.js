@@ -65,6 +65,22 @@ function main(html) {
   root.style.setProperty('--font-family', font.fontFamily);
   root.style.setProperty('--font-size', font.fontSize + 'px');
 
+  let resizing = false;
+  document.getElementById('resizer').addEventListener('mousedown', () => {
+    resizing = true;
+  });
+
+  window.addEventListener('mousemove', (event) => {
+    if (resizing) {
+      let x = event.clientX;
+      root.style.setProperty('--width', x + 'px');
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    resizing = false;
+  });
+
   ReactDOM.unmountComponentAtNode(document.getElementById('editor-container'));
 
 
@@ -132,7 +148,10 @@ function main(html) {
     onUpdate(html) {
       console.log('onUpdate', html.length);
 
-      let d = beautify(html, { indent_size: 2, space_in_empty_paren: true });
+      html = html.replace(/(data-annotation=".{5})(.*?)(.{5}")/g, "$1...$3");
+      html = html.replace(/(data-citation=".{5})(.*?)(.{5}")/g, "$1...$3");
+      html = html.replace(/(src=".{5})(.*?)(.{5}")/g, "$1...$3");
+      let d = beautify(html, { indent_size: 2, space_in_empty_parent: true });
       document.getElementById('dev').classList.remove('prettyprinted');
       document.getElementById('dev').innerText = d;
       PR.prettyPrint();
@@ -212,7 +231,7 @@ function main(html) {
 }
 
 let html1 = `
-<h1>Nodes:</h1>
+<h1>Nodes:     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1</h1>
 <p><a href="werwer">Link starts <img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/>link ends</a></p>
 <p><code>Inline code starts <img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/><strong>strong</strong> <a href="test">link</a> inline code ends</code></p>
 <p>Paragraph - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code></p>

@@ -3,7 +3,7 @@ import { encodeObject, decodeObject, randomString } from '../utils'
 
 // Schema does not limit the indent level for the compatibility with
 // the old notes, although the UI doesn't allow to set higher than
-// MAX_INDENT values. Also CSS doesn't support higher levels as well
+// MAX_INDENT values. The  CSS part doesn't support higher levels as well
 export const MAX_INDENT = 7;
 
 function getInteger(value) {
@@ -31,7 +31,10 @@ function getIndent(dom) {
   const INDENT_WIDTH = 40; // TinyMCE padding width for a single indent
   let value = dom.style.paddingLeft || dom.style.paddingRight;
   let num = parseInt(value);
-  if (num + 'px' === value && num > 0 && (num % INDENT_WIDTH === 0)) {
+  if (Number.isInteger(num)
+    && num + 'px' === value
+    && num > 0
+    && (num % INDENT_WIDTH === 0)) {
     return num / INDENT_WIDTH;
   }
 
@@ -50,6 +53,8 @@ function getAlign(dom) {
   let value = dom.style.textAlign;
   if (value) {
     value = value.toLowerCase();
+    // 'justify' doesn't work on FF (works on Chrome), although it's
+    // still preserved, because the old editor had it
     if (['left', 'right', 'center', 'justify'].includes(value)) {
       return value;
     }
@@ -237,8 +242,17 @@ export default {
 
 
   // Inline nodes
+
+  // TinyMCE needs non-breaking spaces to represent sequential spaces,
+  // Google Docs does a similar thing when copying text. ProseMirror
+  // ignores sequential spaces when serializing to DOM.
+  // There are more issues related to `white-space: pre-wrap`
+  // https://github.com/ProseMirror/prosemirror/issues/857
   text: {
-    group: 'inline'
+    group: 'inline',
+    toDOM: (node) => {
+      return node.text.replace(/  /g, ' \u00a0')
+    }
   },
 
 
@@ -283,7 +297,7 @@ export default {
       })
     }],
     toDOM: (node) => ['img', {
-      src: node.attrs.attachmentKey ? null : node.attrs.src,
+      src: node.attrs.src, // Preserves URL (not data URL) even after the import to have a better compatibility with the old client and also have the original URL just in case
       alt: node.attrs.alt,
       title: node.attrs.title,
       width: node.attrs.width,

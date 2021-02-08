@@ -291,7 +291,6 @@ export function attachImportedImage(nodeId, attachmentKey) {
       if (node.attrs.nodeId === nodeId) {
         dispatch(state.tr.step(new SetAttrsStep(pos, {
           ...node.attrs,
-          src: null,
           attachmentKey
         })).setMeta('addToHistory', false));
         return false;

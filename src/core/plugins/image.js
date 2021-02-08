@@ -78,7 +78,7 @@ class Image {
       for (let i = index + 1; i < parent.childCount; i++) {
         let child = parent.child(i);
         if (child.type.name === 'citation') {
-          if (this.citationHasUri(child.attrs.citation, node.attrs.annotation.parentURI)) {
+          if (this.citationHasItem(child.attrs.citation, node.attrs.annotation.citationItem)) {
             citation = child;
           }
           break;
@@ -151,13 +151,8 @@ class Image {
     this.options.onGenerateCitation(citation, pos + 1);
   }
 
-  citationHasUri(citation, uri) {
-    for (let citationItem of citation.citationItems) {
-      if (citationItem.uris.includes(uri)) {
-        return true;
-      }
-    }
-    return false;
+  citationHasItem(citation, citationItem) {
+    return citation.citationItems.find(ci => ci.uris.find(u => citationItem.uris.includes(u)));
   }
 
   destroy() {
@@ -244,15 +239,17 @@ export function image(options) {
               newState.doc.nodesBetween(newStart, newEnd, (parentNode, parentPos) => {
                 parentNode.forEach((node, offset) => {
                   let absolutePos = parentPos + offset + 1;
-                  if (node.type.name === 'image' && !node.attrs.attachmentKey) {
-                    // TODO: Fix some nodes with null 'src'
+                  if (node.type.name === 'image' && node.attrs.src && !node.attrs.attachmentKey) {
                     images.push({ nodeId: node.attrs.nodeId, src: node.attrs.src });
-                    newTr = newTr.step(new SetAttrsStep(absolutePos, {
-                      ...node.attrs,
-                      // Unset src to make sure src (URL or data URL) is not saved,
-                      // although, on failure this can produce "dead" images with an empty tag
-                      src: null
-                    })).setMeta('addToHistory', false);
+                    if (node.attrs.src.startsWith('data:')) {
+                      // Unset src to make sure data URL is never saved,
+                      // although, on import failure this results to empty img tag
+                      // TODO: Remove empty img elements, although make sure they aren't being imported
+                      newTr = newTr.step(new SetAttrsStep(absolutePos, {
+                        ...node.attrs,
+                        src: null
+                      })).setMeta('addToHistory', false);
+                    }
                   }
                 });
               });

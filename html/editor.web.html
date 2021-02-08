@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="--width: 1000px">
 <head>
     <meta charset="UTF-8">
     <title>Zotero Note Editor</title>
@@ -8,12 +8,23 @@
 
     <style>
         #editor-container {
-            width: 350px;
+            width: var(--width);
+        }
+        
+        #resizer {
+            position: absolute;
+            left: var(--width);
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            cursor: ew-resize;
+            z-index: 1;
+            background-color: #ECECEC;
         }
 
         #dev {
             position: absolute;
-            left: 350px;
+            left: var(--width);
             top: 0;
             bottom: 0;
             right: 0;
@@ -27,6 +38,7 @@
 </head>
 <body>
 <div id="editor-container"></div>
+<div id="resizer"></div>
 <pre id="dev" class="prettyprint"></pre>
 <script src="editor.js"></script>
 </body>

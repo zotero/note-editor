@@ -8,11 +8,12 @@
 }
 
 .primary-editor {
-  word-break: break-all;
   word-wrap: break-word;
   white-space: pre-wrap;
+  white-space: break-spaces;
   -webkit-font-variant-ligatures: none;
   font-variant-ligatures: none;
+  font-feature-settings: "liga" 0; /* the above doesn't seem to work in Edge */
 }
 
 .primary-editor pre {
@@ -46,7 +47,7 @@
   /*cursor: pointer;*/
   /*-webkit-user-modify: read-only;*/
   /*-webkit-user-drag: element;*/
-  background-color: #f5f5f5;
+  background-color: #f8f8f8;
   //border-bottom: 1px dotted gray;
   //cursor: default;
 
@@ -271,11 +272,6 @@ $indent-width: 30;
     //color: $color-white;
 
     font-size: 0.9em;
-    overflow-x: auto;
-
-    code {
-      display: block;
-    }
   }
 
   p code {
@@ -401,6 +397,14 @@ $indent-width: 30;
       margin-left: -64px;
       content: "";
     }
+  }
+}
+
+.primary-editor {
+  & > p, h1, h2, h3, h4, h5, h6, pre, blockquote, table, ul, ol, hr {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 

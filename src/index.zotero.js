@@ -65,7 +65,7 @@ class EditorInstance {
   }
 
   _postMessage(message) {
-    console.log('posting', message)
+    // console.log(message)
     window.postMessage({ instanceId: this.instanceId, message }, '*');
   }
 
@@ -143,8 +143,7 @@ class EditorInstance {
   }
 
   _messageHandler = (event) => {
-    console.log('Worker: Message received from the main script');
-    console.log(event);
+    // console.log('Message received from the main script', event);
 
     if (event.data.instanceId !== this.instanceId) {
       return;
@@ -332,7 +331,7 @@ window.addEventListener('message', function (e) {
   let instanceId = e.data.instanceId;
 
   if (message.action === 'init') {
-    console.log('Initializing a new instance', message);
+    // console.log('Initializing a new instance', message);
     if (currentInstance) {
       currentInstance.uninit();
     }

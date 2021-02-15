@@ -79,7 +79,7 @@ class EditorCore {
         this.unsupportedSchema = true;
         this.readOnly = true;
       }
-      console.log({ metadata })
+      // console.log({ metadata })
       doc = DOMParser2.fromSchema(schema).parse((new DOMParser().parseFromString(options.value, 'text/html').body));
     }
     else if (typeof options.value === 'object') {

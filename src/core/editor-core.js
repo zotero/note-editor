@@ -146,7 +146,7 @@ class EditorCore {
           placeholder({
             text: options.placeholder
           }),
-          drag(),
+          ...(this.readOnly ? [] : [drag()]),
           // columnResizing(),
           tableEditing(),
           history()
@@ -204,6 +204,11 @@ class EditorCore {
               options.onOpenContextMenu($from.pos, node, event.screenX, event.screenY);
             }, 0);
 
+          }
+        },
+        click: (view, event) => {
+          if (event.target.closest('a')) {
+            event.preventDefault();
           }
         }
       }

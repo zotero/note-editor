@@ -28,13 +28,13 @@ function Editor(props) {
 
   return (
     <div className="editor">
-      <Toolbar
+      {!props.readOnly && <Toolbar
         enableReturnButton={props.enableReturnButton}
         menuState={editorState.menu}
         linkState={editorState.link}
         searchState={editorState.search}
         onClickReturn={props.onClickReturn}
-      />
+      />}
       <Findbar searchState={editorState.search} active={editorState.search.active}/>
       {props.showUpdateNotice &&
       <Noticebar>Please update Zotero to edit the note</Noticebar>}

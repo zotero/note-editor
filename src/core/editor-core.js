@@ -40,244 +40,244 @@ import { drag } from './plugins/drag';
 //  text when a newly synced note is set
 
 class EditorCore {
-  constructor(options) {
-    this.readOnly = options.readOnly;
-    this.docChanged = false;
-    this.dimensionsStore = { data: {} };
-    this.unsupportedSchema = false;
-    this.nodeViews = [];
+	constructor(options) {
+		this.readOnly = options.readOnly;
+		this.docChanged = false;
+		this.dimensionsStore = { data: {} };
+		this.unsupportedSchema = false;
+		this.nodeViews = [];
 
-    this.provider = new Provider({
-      onSubscribe: options.onSubscribeProvider,
-      onUnsubscribe: options.onUnsubscribeProvider
-    });
+		this.provider = new Provider({
+			onSubscribe: options.onSubscribeProvider,
+			onUnsubscribe: options.onUnsubscribeProvider
+		});
 
-    let clipboardSerializer = buildClipboardSerializer(this.provider, schema);
+		let clipboardSerializer = buildClipboardSerializer(this.provider, schema);
 
-    let prevHTML = null;
-    // TODO: Have a debounce maximum wait time, to prevent not saving
-    //  it too long and therefore losing more text
-    let updateNote = debounce(() => {
-      if (this.readOnly) {
-        return;
-      }
-      let html = this.getHtml() || null;
-      if (html !== prevHTML) {
-        prevHTML = html;
-        options.onUpdate(html);
-        this.docChanged = false;
-      }
-    }, 1000);
+		let prevHTML = null;
+		// TODO: Have a debounce maximum wait time, to prevent not saving
+		//  it too long and therefore losing more text
+		let updateNote = debounce(() => {
+			if (this.readOnly) {
+				return;
+			}
+			let html = this.getHtml() || null;
+			if (html !== prevHTML) {
+				prevHTML = html;
+				options.onUpdate(html);
+				this.docChanged = false;
+			}
+		}, 1000);
 
-    let doc;
-
-
-    if (typeof options.value === 'string') {
-      let { html, metadata } = digestHtml(options.value);
-      options.value = html;
-      if (metadata.schemaVersion > schema.version) {
-        this.unsupportedSchema = true;
-        this.readOnly = true;
-      }
-      // console.log({ metadata })
-      doc = DOMParser2.fromSchema(schema).parse((new DOMParser().parseFromString(options.value, 'text/html').body));
-    }
-    else if (typeof options.value === 'object') {
-      doc = Node.fromJSON(schema, options.value.doc);
-    }
-    if (!doc) return;
+		let doc;
 
 
-    let state = EditorState.create({ doc });
-    let tr = schemaTransform(state);
-    if (tr) {
-      state = state.apply(tr);
-      doc = state.doc;
-    }
+		if (typeof options.value === 'string') {
+			let { html, metadata } = digestHtml(options.value);
+			options.value = html;
+			if (metadata.schemaVersion > schema.version) {
+				this.unsupportedSchema = true;
+				this.readOnly = true;
+			}
+			// console.log({ metadata })
+			doc = DOMParser2.fromSchema(schema).parse((new DOMParser().parseFromString(options.value, 'text/html').body));
+		}
+		else if (typeof options.value === 'object') {
+			doc = Node.fromJSON(schema, options.value.doc);
+		}
+		if (!doc) return;
 
-    let that = this;
-    this.view = new EditorView(null, {
-      editable: () => !this.readOnly,
-      attributes: {
-        // 'spellcheck': false,
-        class: 'primary-editor'
-      },
-      state: EditorState.create({
-        doc,
-        plugins: [
-          readOnly({ enable: this.readOnly }),
-          dropPaste({
-            onInsertObject: options.onInsertObject
-          }),
-          transform(),
-          nodeId(),
-          buildInputRules(schema),
-          keymap(buildKeymap(schema)),
-          keymap(baseKeymap),
-          dropCursor(),
-          gapCursor(),
-          menu(),
-          search(),
-          link({
-            onOpenUrl: options.onOpenUrl.bind(this)
-          }),
-          highlight({
-            onOpen: options.onOpenAnnotation,
-            onGenerateCitation: options.onGenerateCitation
-          }),
-          image({
-            dimensionsStore: this.dimensionsStore,
-            onSyncAttachmentKeys: options.onSyncAttachmentKeys,
-            onImportImages: options.onImportImages,
-            onOpen: options.onOpenAnnotation,
-            onGenerateCitation: options.onGenerateCitation
-          }),
-          citation({
-            onOpen: (node) => {
-              options.onOpenCitation(node.attrs.citation);
-            },
-            onEdit: (node) => {
-              if (!node.attrs.nodeId) return;
-              options.onOpenCitationPopup(node.attrs.nodeId, node.attrs.citation);
-            }
-          }),
-          trailingParagraph(),
-          // inlineFix(),
-          placeholder({
-            text: options.placeholder
-          }),
-          ...(this.readOnly ? [] : [drag()]),
-          // columnResizing(),
-          tableEditing(),
-          history()
-        ]
-      }),
-      clipboardSerializer,
-      nodeViews: {
-        image: nodeViews.image({
-          provider: this.provider,
-          onDimensions: (node, width, height) => {
-            // TODO: Dimension can also be updated if user modified the document just seconds a go
-            this.dimensionsStore.data[node.attrs.nodeId] = [width, height];
-          },
-          onOpenUrl: options.onOpenUrl.bind(this)
-        }),
-        citation: nodeViews.citation({
-          provider: this.provider
-        })
-      },
-      dispatchTransaction(transaction) {
-        let newState = this.state.apply(transaction)
-        if (transaction.docChanged
-          && toHtml(this.state.doc.content) !== toHtml(newState.doc.content)) {
-          that.docChanged = true;
-          updateNote();
-        }
-        this.updateState(newState);
 
-        that.updatePluginState(this.state);
-        that.onUpdateState && that.onUpdateState();
-      },
-      handleDOMEvents: {
-        mousedown: (view, event) => {
-          if (event.button === 2) {
-            // let pos = view.posAtDOM(event.target);
-            //
-            //
-            // // let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
-            // if (pos) {
-            //   let $pos = view.state.doc.resolve(pos);
-            //   let node = view.state.doc.nodeAt(pos);
-            //   if (!node) {
-            //     node = $pos.parent;
-            //   }
-            //   if (node.isText) {
-            //     node = $pos.node()
-            //   }
+		let state = EditorState.create({ doc });
+		let tr = schemaTransform(state);
+		if (tr) {
+			state = state.apply(tr);
+			doc = state.doc;
+		}
 
-            setTimeout(() => {
-              const { $from } = view.state.selection;
-              let node = view.state.doc.nodeAt($from.pos);
-              if (!node) {
-                node = $from.parent;
-              }
-              options.onOpenContextMenu($from.pos, node, event.screenX, event.screenY);
-            }, 0);
+		let that = this;
+		this.view = new EditorView(null, {
+			editable: () => !this.readOnly,
+			attributes: {
+				// 'spellcheck': false,
+				class: 'primary-editor'
+			},
+			state: EditorState.create({
+				doc,
+				plugins: [
+					readOnly({ enable: this.readOnly }),
+					dropPaste({
+						onInsertObject: options.onInsertObject
+					}),
+					transform(),
+					nodeId(),
+					buildInputRules(schema),
+					keymap(buildKeymap(schema)),
+					keymap(baseKeymap),
+					dropCursor(),
+					gapCursor(),
+					menu(),
+					search(),
+					link({
+						onOpenUrl: options.onOpenUrl.bind(this)
+					}),
+					highlight({
+						onOpen: options.onOpenAnnotation,
+						onGenerateCitation: options.onGenerateCitation
+					}),
+					image({
+						dimensionsStore: this.dimensionsStore,
+						onSyncAttachmentKeys: options.onSyncAttachmentKeys,
+						onImportImages: options.onImportImages,
+						onOpen: options.onOpenAnnotation,
+						onGenerateCitation: options.onGenerateCitation
+					}),
+					citation({
+						onOpen: (node) => {
+							options.onOpenCitation(node.attrs.citation);
+						},
+						onEdit: (node) => {
+							if (!node.attrs.nodeId) return;
+							options.onOpenCitationPopup(node.attrs.nodeId, node.attrs.citation);
+						}
+					}),
+					trailingParagraph(),
+					// inlineFix(),
+					placeholder({
+						text: options.placeholder
+					}),
+					...(this.readOnly ? [] : [drag()]),
+					// columnResizing(),
+					tableEditing(),
+					history()
+				]
+			}),
+			clipboardSerializer,
+			nodeViews: {
+				image: nodeViews.image({
+					provider: this.provider,
+					onDimensions: (node, width, height) => {
+						// TODO: Dimension can also be updated if user modified the document just seconds a go
+						this.dimensionsStore.data[node.attrs.nodeId] = [width, height];
+					},
+					onOpenUrl: options.onOpenUrl.bind(this)
+				}),
+				citation: nodeViews.citation({
+					provider: this.provider
+				})
+			},
+			dispatchTransaction(transaction) {
+				let newState = this.state.apply(transaction)
+				if (transaction.docChanged
+					&& toHtml(this.state.doc.content) !== toHtml(newState.doc.content)) {
+					that.docChanged = true;
+					updateNote();
+				}
+				this.updateState(newState);
 
-          }
-        },
-        click: (view, event) => {
-          if (event.target.closest('a')) {
-            event.preventDefault();
-          }
-        }
-      }
-    });
+				that.updatePluginState(this.state);
+				that.onUpdateState && that.onUpdateState();
+			},
+			handleDOMEvents: {
+				mousedown: (view, event) => {
+					if (event.button === 2) {
+						// let pos = view.posAtDOM(event.target);
+						//
+						//
+						// // let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
+						// if (pos) {
+						//   let $pos = view.state.doc.resolve(pos);
+						//   let node = view.state.doc.nodeAt(pos);
+						//   if (!node) {
+						//     node = $pos.parent;
+						//   }
+						//   if (node.isText) {
+						//     node = $pos.node()
+						//   }
 
-    // DevTools might freeze the editor and throw random errors
-    // applyDevTools(this.view);
-    this.view.editorCore = this;
-    this.updatePluginState(this.view.state);
-  }
+						setTimeout(() => {
+							const { $from } = view.state.selection;
+							let node = view.state.doc.nodeAt($from.pos);
+							if (!node) {
+								node = $from.parent;
+							}
+							options.onOpenContextMenu($from.pos, node, event.screenX, event.screenY);
+						}, 0);
 
-  updatePluginState(state) {
-    this.pluginState = {
-      menu: menuKey.getState(state),
-      link: linkKey.getState(state),
-      search: searchKey.getState(state),
-      highlight: highlightKey.getState(state),
-      image: imageKey.getState(state),
-      citation: citationKey.getState(state)
-    }
-  }
+					}
+				},
+				click: (view, event) => {
+					if (event.target.closest('a')) {
+						event.preventDefault();
+					}
+				}
+			}
+		});
 
-  getNodeView(pos) {
-    return this.nodeViews.find(nodeView => {
-      let nodeViewPos = nodeView.getPos();
-      return pos >= nodeViewPos && pos < nodeViewPos + nodeView.node.content.size + 1
-    });
-  }
+		// DevTools might freeze the editor and throw random errors
+		// applyDevTools(this.view);
+		this.view.editorCore = this;
+		this.updatePluginState(this.view.state);
+	}
 
-  setCitation(nodeId, citation, formattedCitation) {
-    setCitation(nodeId, citation, formattedCitation)(this.view.state, this.view.dispatch);
-  }
+	updatePluginState(state) {
+		this.pluginState = {
+			menu: menuKey.getState(state),
+			link: linkKey.getState(state),
+			search: searchKey.getState(state),
+			highlight: highlightKey.getState(state),
+			image: imageKey.getState(state),
+			citation: citationKey.getState(state)
+		}
+	}
 
-  attachImportedImage(nodeId, attachmentKey) {
-    attachImportedImage(nodeId, attachmentKey)(this.view.state, this.view.dispatch);
-  }
+	getNodeView(pos) {
+		return this.nodeViews.find(nodeView => {
+			let nodeViewPos = nodeView.getPos();
+			return pos >= nodeViewPos && pos < nodeViewPos + nodeView.node.content.size + 1
+		});
+	}
 
-  insertHtml(pos, html) {
-    insertHtml(pos, html)(this.view.state, this.view.dispatch);
-  }
+	setCitation(nodeId, citation, formattedCitation) {
+		setCitation(nodeId, citation, formattedCitation)(this.view.state, this.view.dispatch);
+	}
 
-  hasSelection() {
-    let selection = this.view.state.doc.cut(
-      this.view.state.selection.from,
-      this.view.state.selection.to
-    );
-    return selection.content.size > 0;
-  }
+	attachImportedImage(nodeId, attachmentKey) {
+		attachImportedImage(nodeId, attachmentKey)(this.view.state, this.view.dispatch);
+	}
 
-  getHtml() {
-    return toHtml(this.view.state.doc.content);
-  };
+	insertHtml(pos, html) {
+		insertHtml(pos, html)(this.view.state, this.view.dispatch);
+	}
 
-  focus() {
-    this.view.focus();
-  }
+	hasSelection() {
+		let selection = this.view.state.doc.cut(
+			this.view.state.selection.from,
+			this.view.state.selection.to
+		);
+		return selection.content.size > 0;
+	}
 
-  getData(onlyChanged) {
-    if (onlyChanged && !this.docChanged) {
-      return null;
-    }
+	getHtml() {
+		return toHtml(this.view.state.doc.content);
+	};
 
-    return {
-      state: {
-        doc: this.view.state.doc.toJSON()
-      },
-      html: this.getHtml() || null
-    };
-  }
+	focus() {
+		this.view.focus();
+	}
+
+	getData(onlyChanged) {
+		if (onlyChanged && !this.docChanged) {
+			return null;
+		}
+
+		return {
+			state: {
+				doc: this.view.state.doc.toJSON()
+			},
+			html: this.getHtml() || null
+		};
+	}
 }
 
 export default EditorCore;

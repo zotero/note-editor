@@ -11,10 +11,10 @@ const fromHtml = buildFromHtml(schema);
 
 
 export {
-  nodes,
-  marks,
-  schema,
-  toHtml,
-  fromHtml,
-  buildClipboardSerializer
+	nodes,
+	marks,
+	schema,
+	toHtml,
+	fromHtml,
+	buildClipboardSerializer
 };

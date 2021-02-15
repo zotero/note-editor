@@ -1,27 +1,23 @@
 # Schema migration
 
 ## Rules
-- `div[data-schema-version]` container must never be removed,
-although it's a hack that allows `data-schema-version` to survive
-TinyMCE based editor
-- `zotero-note-editor` must never save the opened note
-without user triggered note modification
+
+- `div[data-schema-version]` container must never be removed, although it's a hack that allows `data-schema-version` to
+  survive TinyMCE based editor
+- `zotero-note-editor` must never save the opened note without user triggered note modification
 - Image attachments can be affected by schema changes
-- As long as sync cut-off is not applied to all TinyMCE based Zotero
-versions, the new schema must never introduce elements or attributes
-not listed in TinyMCE valid elements list below
+- As long as sync cut-off is not applied to all TinyMCE based Zotero versions, the new schema must never introduce
+  elements or attributes not listed in TinyMCE valid elements list below
 - `data-schema-version` increase forces all `< data-schema-version`
-clients to open the note in read-only mode and prevent wiping new
-data introduced in the newer editor
-- `data-schema-version` must be increased every time the schema output is
-affected, although not necessary when only the importing part is modified
-- `data-schema-version` can be increased without doing TinyMCE based
-Zotero cut-off to older clients, although that means only very old and
-very new clients can modify the note
-- Any future schema must be able to import any previously
-produced note
+  clients to open the note in read-only mode and prevent wiping new data introduced in the newer editor
+- `data-schema-version` must be increased every time the schema output is affected, although not necessary when only the
+  importing part is modified
+- `data-schema-version` can be increased without doing TinyMCE based Zotero cut-off to older clients, although that
+  means only very old and very new clients can modify the note
+- Any future schema must be able to import any previously produced note
 
 ## Examples
+
 | Case | Cut-off TinyMCE based Zotero | Increase `data-schema-version` (and force read-only) | Comment |
 | --- | --- | --- | --- |
 | `codeBlock` gets a new attribute called `data-language` | no | yes |  |
@@ -35,8 +31,8 @@ produced note
 | Remove inline `code` mark | no | no |  |
 | Rename attribute `data-attachment-key` to `data-attachment-data` | no | yes | `data-schema-version` increase prevents attachments deletion |
 
-
 ## [TinyMCE valid elements list](https://github.com/zotero/zotero/blob/3f3b6501ce0e2313d3904ae5c0a1a8558204a9ae/resource/tinymce/note.html)
+
 ```
 all data-* attributes
 valid_elements: "@[id|class|style|title|dir<ltr?rtl|lang|xml::lang],"

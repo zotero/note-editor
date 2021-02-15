@@ -1,46 +1,46 @@
 
 #editor-container {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
 
-  .editor {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+	.editor {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
 
-    display: flex;
-    flex-direction: column;
+		display: flex;
+		flex-direction: column;
 
-    .editor-core {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      overflow: auto;
+		.editor-core {
+			display: flex;
+			flex: 1;
+			flex-direction: column;
+			overflow: auto;
 
-      .relative-container {
-        position: relative;
-      }
+			.relative-container {
+				position: relative;
+			}
 
-      .primary-editor {
-        flex: 1;
-        // Margins must belong to editor contenteditable area to
-        // allow text selection from the margin
-        padding: 20px;
-        flex-direction: column;
+			.primary-editor {
+				flex: 1;
+				// Margins must belong to editor contenteditable area to
+				// allow text selection from the margin
+				padding: 20px;
+				flex-direction: column;
 
-        & > *:first-child {
-          margin-top: 0;
-        }
+				& > *:first-child {
+					margin-top: 0;
+				}
 
-        & > *:last-child {
-          margin-bottom: 0;
-        }
-      }
-    }
-  }
+				& > *:last-child {
+					margin-bottom: 0;
+				}
+			}
+		}
+	}
 }

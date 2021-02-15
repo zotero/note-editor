@@ -14,220 +14,220 @@ let deletedImages = {};
 
 // Zotero item key
 export function generateObjectKey() {
-  let len = 8;
-  let allowedKeyChars = '23456789ABCDEFGHIJKLMNPQRSTUVWXYZ';
+	let len = 8;
+	let allowedKeyChars = '23456789ABCDEFGHIJKLMNPQRSTUVWXYZ';
 
-  var randomstring = '';
-  for (var i = 0; i < len; i++) {
-    var rnum = Math.floor(Math.random() * allowedKeyChars.length);
-    randomstring += allowedKeyChars.substring(rnum, rnum + 1);
-  }
-  return randomstring;
+	var randomstring = '';
+	for (var i = 0; i < len; i++) {
+		var rnum = Math.floor(Math.random() * allowedKeyChars.length);
+		randomstring += allowedKeyChars.substring(rnum, rnum + 1);
+	}
+	return randomstring;
 }
 
 // Notice: This fails to fetch the image if the host has
 // CORS restrictions
 async function loadImageAsDataUrl(url) {
-  let blob = await fetch(url).then(r => r.blob());
-  return await new Promise((resolve, reject) => {
-    let reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
+	let blob = await fetch(url).then(r => r.blob());
+	return await new Promise((resolve, reject) => {
+		let reader = new FileReader();
+		reader.onload = () => resolve(reader.result);
+		reader.onerror = reject;
+		reader.readAsDataURL(blob);
+	});
 }
 
 async function importImage(src) {
-  if (!src) return null;
-  if (src.startsWith('data:')) {
+	if (!src) return null;
+	if (src.startsWith('data:')) {
 
-  }
-  else {
-    src = await loadImageAsDataUrl(src);
-  }
+	}
+	else {
+		src = await loadImageAsDataUrl(src);
+	}
 
-  let attachmentKey = generateObjectKey();
+	let attachmentKey = generateObjectKey();
 
-  imageStore[attachmentKey] = src;
-  return attachmentKey;
+	imageStore[attachmentKey] = src;
+	return attachmentKey;
 }
 
 function main(html) {
 
-  window.dir = 'ltr';
+	window.dir = 'ltr';
 
-  let font = {
-    fontFamily: 'Lucida Grande, Tahoma, Verdana, Helvetica, sans-serif',
-    fontSize: 14
-  };
+	let font = {
+		fontFamily: 'Lucida Grande, Tahoma, Verdana, Helvetica, sans-serif',
+		fontSize: 14
+	};
 
-  let root = document.documentElement;
-  root.style.setProperty('--font-family', font.fontFamily);
-  root.style.setProperty('--font-size', font.fontSize + 'px');
+	let root = document.documentElement;
+	root.style.setProperty('--font-family', font.fontFamily);
+	root.style.setProperty('--font-size', font.fontSize + 'px');
 
-  let resizing = false;
-  document.getElementById('resizer').addEventListener('mousedown', () => {
-    resizing = true;
-  });
+	let resizing = false;
+	document.getElementById('resizer').addEventListener('mousedown', () => {
+		resizing = true;
+	});
 
-  window.addEventListener('mousemove', (event) => {
-    if (resizing) {
-      let x = event.clientX;
-      root.style.setProperty('--width', x + 'px');
-    }
-  });
+	window.addEventListener('mousemove', (event) => {
+		if (resizing) {
+			let x = event.clientX;
+			root.style.setProperty('--width', x + 'px');
+		}
+	});
 
-  window.addEventListener('mouseup', () => {
-    resizing = false;
-  });
+	window.addEventListener('mouseup', () => {
+		resizing = false;
+	});
 
-  ReactDOM.unmountComponentAtNode(document.getElementById('editor-container'));
+	ReactDOM.unmountComponentAtNode(document.getElementById('editor-container'));
 
 
-  let editorCore = new EditorCore({
-    container: null,
-    value: html,
-    readOnly: false,
-    placeholder: 'This is a placeholder',
-    onSubscribeProvider(subscriber) {
-      console.log('onSubscribeProvider', subscriber);
-      if (subscriber.type === 'citation') {
-        setTimeout(function () {
-          let key = JSON.stringify(subscriber.data.citation);
-          if (citationStore[key]) {
-            editorCore.provider.notify(subscriber.id, 'citation', {
-              formattedCitation: citationStore[key]
-            });
-          }
-          //
-          // setTimeout(()=> {
-          //   this.editorCore.updateCitation(subscriber.id, subscriber.data.citation);
-          // }, 5000);
-        }, 0);
-      }
-      else if (subscriber.type === 'image') {
-        setTimeout(function () {
-          if (imageStore[subscriber.data.attachmentKey]) {
-            editorCore.provider.notify(subscriber.id, 'image', {
-              src: imageStore[subscriber.data.attachmentKey]
-            });
-          }
-          else if (deletedImages[subscriber.data.attachmentKey]) {
-            imageStore[subscriber.data.attachmentKey] = deletedImages[subscriber.data.attachmentKey];
-            editorCore.provider.notify(subscriber.id, 'image', {
-              src: imageStore[subscriber.data.attachmentKey]
-            });
-          }
-        }, 0);
-      }
-    },
-    onUnsubscribeProvider(subscription) {
-      console.log('onUnsubscribeProvider', subscription);
-    },
-    async onImportImages(images) {
-      console.log('onImportImages', images)
-      for (let image of images) {
-        let attachmentKey = await importImage(image.src);
-        editorCore.attachImportedImage(image.nodeId, attachmentKey);
-      }
-    },
-    onSyncAttachmentKeys(attachmentKeys) {
-      console.log('onSyncAttachmentKeys', attachmentKeys);
-      for (let key in imageStore) {
-        if (!attachmentKeys.includes(key)) {
-          console.log(`deleting ${key} from imageStore`);
-          deletedImages[key] = imageStore[key];
-          delete imageStore[key];
-        }
-      }
-    },
-    onOpenUrl(url) {
-      console.log('onOpenUrl(core)', url);
-      window.open(url, '_blank');
-    },
-    onUpdate(html) {
-      console.log('onUpdate', html.length);
+	let editorCore = new EditorCore({
+		container: null,
+		value: html,
+		readOnly: false,
+		placeholder: 'This is a placeholder',
+		onSubscribeProvider(subscriber) {
+			console.log('onSubscribeProvider', subscriber);
+			if (subscriber.type === 'citation') {
+				setTimeout(function () {
+					let key = JSON.stringify(subscriber.data.citation);
+					if (citationStore[key]) {
+						editorCore.provider.notify(subscriber.id, 'citation', {
+							formattedCitation: citationStore[key]
+						});
+					}
+					//
+					// setTimeout(()=> {
+					//   this.editorCore.updateCitation(subscriber.id, subscriber.data.citation);
+					// }, 5000);
+				}, 0);
+			}
+			else if (subscriber.type === 'image') {
+				setTimeout(function () {
+					if (imageStore[subscriber.data.attachmentKey]) {
+						editorCore.provider.notify(subscriber.id, 'image', {
+							src: imageStore[subscriber.data.attachmentKey]
+						});
+					}
+					else if (deletedImages[subscriber.data.attachmentKey]) {
+						imageStore[subscriber.data.attachmentKey] = deletedImages[subscriber.data.attachmentKey];
+						editorCore.provider.notify(subscriber.id, 'image', {
+							src: imageStore[subscriber.data.attachmentKey]
+						});
+					}
+				}, 0);
+			}
+		},
+		onUnsubscribeProvider(subscription) {
+			console.log('onUnsubscribeProvider', subscription);
+		},
+		async onImportImages(images) {
+			console.log('onImportImages', images)
+			for (let image of images) {
+				let attachmentKey = await importImage(image.src);
+				editorCore.attachImportedImage(image.nodeId, attachmentKey);
+			}
+		},
+		onSyncAttachmentKeys(attachmentKeys) {
+			console.log('onSyncAttachmentKeys', attachmentKeys);
+			for (let key in imageStore) {
+				if (!attachmentKeys.includes(key)) {
+					console.log(`deleting ${key} from imageStore`);
+					deletedImages[key] = imageStore[key];
+					delete imageStore[key];
+				}
+			}
+		},
+		onOpenUrl(url) {
+			console.log('onOpenUrl(core)', url);
+			window.open(url, '_blank');
+		},
+		onUpdate(html) {
+			console.log('onUpdate', html.length);
 
-      html = html.replace(/(data-annotation=".{5})(.*?)(.{5}")/g, "$1...$3");
-      html = html.replace(/(data-citation=".{5})(.*?)(.{5}")/g, "$1...$3");
-      html = html.replace(/(src=".{5})(.*?)(.{5}")/g, "$1...$3");
-      let d = beautify(html, { indent_size: 2, space_in_empty_parent: true });
-      document.getElementById('dev').classList.remove('prettyprinted');
-      document.getElementById('dev').innerText = d;
-      PR.prettyPrint();
-    },
-    onGenerateCitation: (annotation, pos) => {
-      console.log('generateCitation', annotation, pos);
+			html = html.replace(/(data-annotation=".{5})(.*?)(.{5}")/g, '$1...$3');
+			html = html.replace(/(data-citation=".{5})(.*?)(.{5}")/g, '$1...$3');
+			html = html.replace(/(src=".{5})(.*?)(.{5}")/g, '$1...$3');
+			let d = beautify(html, { indent_size: 2, space_in_empty_parent: true });
+			document.getElementById('dev').classList.remove('prettyprinted');
+			document.getElementById('dev').innerText = d;
+			PR.prettyPrint();
+		},
+		onGenerateCitation: (annotation, pos) => {
+			console.log('generateCitation', annotation, pos);
 
-      // let citation = {
-      //   citationItems: [
-      //     {
-      //       uri: 'uri1',
-      //       backupText: 'a citation'
-      //     }
-      //   ],
-      //   properties: {}
-      // };
-      //
-      // editorCore.insertCitations([citation], pos);
-    },
-    onInsertObject(type, data, pos) {
-      console.log('onInsertObject', type, data, pos);
-      if (type === 'zotero/item') {
-        let ids = data.split(',').map(id => parseInt(id));
+			// let citation = {
+			//   citationItems: [
+			//     {
+			//       uri: 'uri1',
+			//       backupText: 'a citation'
+			//     }
+			//   ],
+			//   properties: {}
+			// };
+			//
+			// editorCore.insertCitations([citation], pos);
+		},
+		onInsertObject(type, data, pos) {
+			console.log('onInsertObject', type, data, pos);
+			if (type === 'zotero/item') {
+				let ids = data.split(',').map(id => parseInt(id));
 
-        let citations = [];
-        for (let id of ids) {
-          citations.push(
-            {
-              citationItems: [
-                {
-                  uri: 'uri1',
-                  backupText: 'item' + id
-                }
-              ],
-              properties: {}
-            }
-          );
-        }
+				let citations = [];
+				for (let id of ids) {
+					citations.push(
+						{
+							citationItems: [
+								{
+									uri: 'uri1',
+									backupText: 'item' + id
+								}
+							],
+							properties: {}
+						}
+					);
+				}
 
-        editorCore.insertCitations(citations, pos);
-      }
-    },
-    onOpenAnnotation(annotation) {
-      console.log('onOpenAnnotation', annotation)
-      alert('Opening annotation: ' + JSON.stringify(annotation));
-    },
-    onOpenCitation(citation) {
-      console.log('onOpenCitation', citation);
-      alert('Opening citation: ' + JSON.stringify(citation));
-    },
-    onOpenCitationPopup(id, citation) {
-      console.log('onOpenCitationPopup', id, citation);
-      alert('Open quick format citation dialog ' + id + ' ' + JSON.stringify(citation));
-    },
-    onOpenContextMenu: (pos, node, x, y) => {
-      console.log('onOpenContextMenu', pos, node, x, y)
-      console.log('nodeView', editorCore.getNodeView(pos))
-    }
-  });
+				editorCore.insertCitations(citations, pos);
+			}
+		},
+		onOpenAnnotation(annotation) {
+			console.log('onOpenAnnotation', annotation)
+			alert('Opening annotation: ' + JSON.stringify(annotation));
+		},
+		onOpenCitation(citation) {
+			console.log('onOpenCitation', citation);
+			alert('Opening citation: ' + JSON.stringify(citation));
+		},
+		onOpenCitationPopup(id, citation) {
+			console.log('onOpenCitationPopup', id, citation);
+			alert('Open quick format citation dialog ' + id + ' ' + JSON.stringify(citation));
+		},
+		onOpenContextMenu: (pos, node, x, y) => {
+			console.log('onOpenContextMenu', pos, node, x, y)
+			console.log('nodeView', editorCore.getNodeView(pos))
+		}
+	});
 
-  document.body.dir = 'ltr';
+	document.body.dir = 'ltr';
 
-  ReactDOM.render(
-    <Editor
-      showUpdateNotice={true}
-      enableReturnButton={true}
-      readOnly={false}
-      editorCore={editorCore}
-      onClickReturn={() => {
-        console.log('Clicked return')
-      }}
-    />,
-    document.getElementById('editor-container')
-  );
+	ReactDOM.render(
+		<Editor
+			showUpdateNotice={true}
+			enableReturnButton={true}
+			readOnly={false}
+			editorCore={editorCore}
+			onClickReturn={() => {
+				console.log('Clicked return')
+			}}
+		/>,
+		document.getElementById('editor-container')
+	);
 
-  window.editorCore = editorCore;
+	window.editorCore = editorCore;
 }
 
 let html1 = `
@@ -422,7 +422,6 @@ let html1 = `
 
 
 `;
-
 
 
 main(html1);

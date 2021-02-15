@@ -5,15 +5,15 @@
 *,
 ::before,
 ::after {
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 *:focus {
-  outline: none;
+	outline: none;
 }
 
 body {
-  background-color: white;
-  font-family: var(--font-family);
-  font-size: var(--font-size);
+	background-color: white;
+	font-family: var(--font-family);
+	font-size: var(--font-size);
 }

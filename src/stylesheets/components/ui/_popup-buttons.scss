@@ -3,25 +3,25 @@
 //
 
 .tool-group {
-  display: flex;
+	display: flex;
 }
 
 .toolbarButton {
-  &.global-color {
-    white-space: nowrap;
+	&.global-color {
+		white-space: nowrap;
 
-    &::before {
-      content: "";
-      display: inline-block;
-      vertical-align: top;
-      width: 12px;
-      height: 12px;
-      margin: 2px;
-      background-color: currentColor;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 3px;
-    }
-  }
+		&::before {
+			content: "";
+			display: inline-block;
+			vertical-align: top;
+			width: 12px;
+			height: 12px;
+			margin: 2px;
+			background-color: currentColor;
+			border: 1px solid rgba(0, 0, 0, 0.08);
+			border-radius: 3px;
+		}
+	}
 }
 
 
@@ -30,77 +30,77 @@
 //
 
 .toolbarButton {
-  height: $toolbar-btn-height;
-  background: $toolbar-btn-bg;
-  padding: $toolbar-btn-padding;
-  border: $toolbar-btn-border;
-  border-radius: $toolbar-btn-border-radius;
-  margin: 0 $toolbar-btn-margin-x;
-  position: relative;
-  box-shadow: $toolbar-btn-box-shadow;
+	height: $toolbar-btn-height;
+	background: $toolbar-btn-bg;
+	padding: $toolbar-btn-padding;
+	border: $toolbar-btn-border;
+	border-radius: $toolbar-btn-border-radius;
+	margin: 0 $toolbar-btn-margin-x;
+	position: relative;
+	box-shadow: $toolbar-btn-box-shadow;
 
-  @include retina {
-    box-shadow: $toolbar-btn-box-shadow-2x;
-  }
+	@include retina {
+		box-shadow: $toolbar-btn-box-shadow-2x;
+	}
 
-  &:focus-visible {
-    box-shadow: $toolbar-btn-focus-box-shadow;
-    z-index: 1;
+	&:focus-visible {
+		box-shadow: $toolbar-btn-focus-box-shadow;
+		z-index: 1;
 
-    @include retina {
-      box-shadow: $toolbar-btn-focus-box-shadow-2x;
-    }
-  }
+		@include retina {
+			box-shadow: $toolbar-btn-focus-box-shadow-2x;
+		}
+	}
 
-  &:-moz-focusring {
-    box-shadow: $toolbar-btn-focus-box-shadow;
-    z-index: 1;
+	&:-moz-focusring {
+		box-shadow: $toolbar-btn-focus-box-shadow;
+		z-index: 1;
 
-    @include retina {
-      box-shadow: $toolbar-btn-focus-box-shadow-2x;
-    }
-  }
+		@include retina {
+			box-shadow: $toolbar-btn-focus-box-shadow-2x;
+		}
+	}
 
-  &:hover {
-    background: $toolbar-btn-hover-bg;
-    border-color: $toolbar-btn-border-hover-color;
-  }
+	&:hover {
+		background: $toolbar-btn-hover-bg;
+		border-color: $toolbar-btn-border-hover-color;
+	}
 
-  &:active,
-  &.active {
-    background: $toolbar-btn-active-bg;
-    border-color: $toolbar-btn-border-active-color;
-  }
+	&:active,
+	&.active {
+		background: $toolbar-btn-active-bg;
+		border-color: $toolbar-btn-border-active-color;
+	}
 
-  &[disabled] {
-    pointer-events: none;
+	&[disabled] {
+		pointer-events: none;
 
-    &::before {
-      opacity: 0.5;
-    }
-  }
+		&::before {
+			opacity: 0.5;
+		}
+	}
 
-  &::before {
-    position: relative;
-    z-index: 2;
+	&::before {
+		position: relative;
+		z-index: 2;
 
-    @include state(".toolbarButton:active", ".toolbarButton.active") {
-      top: $toolbar-btn-icon-active-offset;
-    }
-  }
+		@include state(".toolbarButton:active", ".toolbarButton.active") {
+			top: $toolbar-btn-icon-active-offset;
+		}
+	}
 
-  // Label for screen readers
-  > span:first-child {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
+	// Label for screen readers
+	> span:first-child {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
 }
 
 

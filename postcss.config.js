@@ -1,6 +1,6 @@
 module.exports = {
-  plugins: {
-    'autoprefixer': {},
-    'postcss-rtl': {}
-  }
+	plugins: {
+		'autoprefixer': {},
+		'postcss-rtl': {}
+	}
 };

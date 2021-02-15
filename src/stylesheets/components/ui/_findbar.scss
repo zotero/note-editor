@@ -1,84 +1,84 @@
 
 .findbar {
-  font-size: 14px;
-  color: #595959;
-  display: flex;
-  border-bottom: 1px solid #d9d9d9;
-  padding-bottom: 3px;
+	font-size: 14px;
+	color: #595959;
+	display: flex;
+	border-bottom: 1px solid #d9d9d9;
+	padding-bottom: 3px;
 
-  .column-left {
-    width: 100%;
-    padding-left: 4px;
+	.column-left {
+		width: 100%;
+		padding-left: 4px;
 
-    .line {
-      display: flex;
-      height: 22px;
-      margin-top: 3px;
-      border: 1px solid #c5c5c5;
+		.line {
+			display: flex;
+			height: 22px;
+			margin-top: 3px;
+			border: 1px solid #c5c5c5;
 
-      input {
-        width: 100%;
-        border: none;
-        outline: none;
-        color: inherit;
-      }
-    }
-  }
+			input {
+				width: 100%;
+				border: none;
+				outline: none;
+				color: inherit;
+			}
+		}
+	}
 
-  .column-right {
-    white-space: nowrap;
-    padding-right: 2px;
+	.column-right {
+		white-space: nowrap;
+		padding-right: 2px;
 
-    .line {
-      margin-top: 3px;
-      display: flex;
-      height: 22px;
-      justify-content: space-between;
-
-
-      .button {
-        cursor: default;
-        display: flex;
-        align-items: center;
-        padding: 0 3px;
-        margin-left: 2px;
-        border: 1px solid #c5c5c5;
-        height: 100%;
-      }
-
-      .buttons {
-        display: flex;
-        align-items: center;
-
-        .button {
-          &:hover {
-            background: #555c66;
-            color: white;
-            border-color: transparent;
-          }
-        }
-      }
+		.line {
+			margin-top: 3px;
+			display: flex;
+			height: 22px;
+			justify-content: space-between;
 
 
-      .toggles {
-        display: flex;
-        align-items: center;
+			.button {
+				cursor: default;
+				display: flex;
+				align-items: center;
+				padding: 0 3px;
+				margin-left: 2px;
+				border: 1px solid #c5c5c5;
+				height: 100%;
+			}
 
-        .button {
-          border-color: transparent;
-          font-weight: bold;
+			.buttons {
+				display: flex;
+				align-items: center;
 
-          &:hover {
-            border-color: #c5c5c5;
-          }
+				.button {
+					&:hover {
+						background: #555c66;
+						color: white;
+						border-color: transparent;
+					}
+				}
+			}
 
-          &.active {
-            background: #555c66;
-            color: white;
-            border-color: transparent;
-          }
-        }
-      }
-    }
-  }
+
+			.toggles {
+				display: flex;
+				align-items: center;
+
+				.button {
+					border-color: transparent;
+					font-weight: bold;
+
+					&:hover {
+						border-color: #c5c5c5;
+					}
+
+					&.active {
+						background: #555c66;
+						color: white;
+						border-color: transparent;
+					}
+				}
+			}
+		}
+	}
 }

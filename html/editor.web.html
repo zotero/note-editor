@@ -1,40 +1,40 @@
 <!DOCTYPE html>
 <html lang="en" style="--width: 1000px">
 <head>
-    <meta charset="UTF-8">
-    <title>Zotero Note Editor</title>
-    <link rel="stylesheet" href="editor.css">
-    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autorun=true"></script>
+	<meta charset="UTF-8">
+	<title>Zotero Note Editor</title>
+	<link rel="stylesheet" href="editor.css">
+	<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autorun=true"></script>
 
-    <style>
-        #editor-container {
-            width: var(--width);
-        }
-        
-        #resizer {
-            position: absolute;
-            left: var(--width);
-            top: 0;
-            bottom: 0;
-            width: 5px;
-            cursor: ew-resize;
-            z-index: 1;
-            background-color: #ECECEC;
-        }
+	<style>
+		#editor-container {
+			width: var(--width);
+		}
 
-        #dev {
-            position: absolute;
-            left: var(--width);
-            top: 0;
-            bottom: 0;
-            right: 0;
-            padding: 20px;
-            font-family: monospace, monospace;
-            overflow: scroll;
-            margin: 0;
-            border: 0;
-        }
-    </style>
+		#resizer {
+			position: absolute;
+			left: var(--width);
+			top: 0;
+			bottom: 0;
+			width: 5px;
+			cursor: ew-resize;
+			z-index: 1;
+			background-color: #ECECEC;
+		}
+
+		#dev {
+			position: absolute;
+			left: var(--width);
+			top: 0;
+			bottom: 0;
+			right: 0;
+			padding: 20px;
+			font-family: monospace, monospace;
+			overflow: scroll;
+			margin: 0;
+			border: 0;
+		}
+	</style>
 </head>
 <body>
 <div id="editor-container"></div>

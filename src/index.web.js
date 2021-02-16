@@ -391,10 +391,10 @@ let html1 = `
 <p></p>
 <p></p>
 <p></p>
-<blockquote cite="asdfasdf">nkjkj</blockquote>
+<blockquote cite="asdfasdf">Cite attribute</blockquote>
 <asdfasdf>
-<p style="background-image:  linear-gradient(rgba(0, 0, 255, 0.5), rgba(255, 255, 0, 0.5)), url('https://mdn.mozillademos.org/files/7693/catfront.png');">dddd</p>
-<div style="background-image: asdf;">dddd</div>
+<p style="background-image:  linear-gradient(rgba(0, 0, 255, 0.5), rgba(255, 255, 0, 0.5)), url('https://mdn.mozillademos.org/files/7693/catfront.png');">Background image extracted</p>
+<div style="background-image: asdf;">Invalid background color</div>
 </asdfasdf>
 
   <video width = "500" height = "300" controls>
@@ -404,7 +404,7 @@ let html1 = `
 
 <p>Please press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> to re-render an MDN page.</p>
 
-<p><p>ppp</p></p>
+<p>Paragraph<p> in paragraph</p></p>
 
 <p>&ltq&gt;: When Dave asks HAL to open the pod bay door, HAL answers: <q cite="https://www.imdb.com/title/tt0062622/quotes/qt0396921">I'm sorry, Dave. I'm afraid I can't do that.</q></p>
 

@@ -52,11 +52,11 @@ function LinkPopup({ parentRef, linkState }) {
 	}, [editing, linkState]);
 
 	function handleSet() {
-		linkState.setUrl(inputRef.current.value);
+		linkState.setURL(inputRef.current.value);
 	}
 
 	function handleUnset() {
-		linkState.removeUrl();
+		linkState.removeURL();
 	}
 
 	function handleOpen(event) {
@@ -70,7 +70,7 @@ function LinkPopup({ parentRef, linkState }) {
 
 	function handleKeydown(event) {
 		if (event.key === 'Enter') {
-			linkState.setUrl(inputRef.current.value);
+			linkState.setURL(inputRef.current.value);
 		}
 		else if (event.key === 'Escape') {
 			setEditing(false);

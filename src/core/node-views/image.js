@@ -16,7 +16,7 @@ class ImageView {
 			this.provider = options.provider;
 			this.provider.subscribe({
 				type: 'image',
-				nodeId: node.attrs.nodeId,
+				nodeID: node.attrs.nodeID,
 				data: {
 					attachmentKey: node.attrs.attachmentKey
 				},
@@ -77,7 +77,7 @@ class ImageView {
 				a.href = node.attrs.src;
 				a.onclick = (event) => {
 					event.preventDefault();
-					options.onOpenUrl(event.target.href);
+					options.onOpenURL(event.target.href);
 				}
 				let host = 'unknown';
 				try {

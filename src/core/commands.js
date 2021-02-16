@@ -2,7 +2,7 @@ import { TextSelection } from 'prosemirror-state'
 import { findParentNode } from 'prosemirror-utils';
 import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list'
 import { encodeObject, randomString, SetAttrsStep } from './utils';
-import { fromHtml, schema } from './schema';
+import { fromHTML, schema } from './schema';
 import { Fragment, Slice } from 'prosemirror-model';
 
 function getClosestListItemNode($pos) {
@@ -198,9 +198,9 @@ export function toggleMark1(markType, attrs, force) {
 	}
 }
 
-export function insertHtml(pos, html) {
+export function insertHTML(pos, html) {
 	return function (state, dispatch) {
-		let nodes = fromHtml(html, true).content.content;
+		let nodes = fromHTML(html, true).content.content;
 		if (Number.isInteger(pos)) {
 			let negative = false;
 			if (pos < 0) {
@@ -259,10 +259,10 @@ export function toggleList(listType, itemType) {
 	}
 }
 
-export function setCitation(nodeId, citation, formattedCitation) {
+export function setCitation(nodeID, citation, formattedCitation) {
 	return function (state, dispatch) {
 		state.doc.descendants((node, pos) => {
-			if (node.attrs.nodeId === nodeId) {
+			if (node.attrs.nodeID === nodeID) {
 				if (citation.citationItems.length) {
 
 					let citationNode = state.schema.nodes.citation.create({
@@ -285,10 +285,10 @@ export function setCitation(nodeId, citation, formattedCitation) {
 	};
 }
 
-export function attachImportedImage(nodeId, attachmentKey) {
+export function attachImportedImage(nodeID, attachmentKey) {
 	return function (state, dispatch) {
 		state.doc.descendants((node, pos) => {
-			if (node.attrs.nodeId === nodeId) {
+			if (node.attrs.nodeID === nodeID) {
 				dispatch(state.tr.step(new SetAttrsStep(pos, {
 					...node.attrs,
 					attachmentKey

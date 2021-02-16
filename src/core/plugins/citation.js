@@ -83,7 +83,7 @@ class Citation {
 		this.popup = {
 			isActive: false
 		}
-		// this.onOpenUrl = options.onOpenUrl;
+		// this.onOpenURL = options.onOpenURL;
 	}
 
 	update(state, oldState) {

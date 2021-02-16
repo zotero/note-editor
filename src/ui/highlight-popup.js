@@ -57,7 +57,7 @@ function HighlightPopup({ parentRef, pluginState }) {
 
 	function handleKeydown(event) {
 		if (event.key === 'Enter') {
-			pluginState.setUrl(inputRef.current.value);
+			pluginState.setURL(inputRef.current.value);
 		}
 		else if (event.key === 'Escape') {
 			setEditing(false);

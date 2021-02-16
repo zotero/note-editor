@@ -27,7 +27,7 @@ export function generateObjectKey() {
 
 // Notice: This fails to fetch the image if the host has
 // CORS restrictions
-async function loadImageAsDataUrl(url) {
+async function loadImageAsDataURL(url) {
 	let blob = await fetch(url).then(r => r.blob());
 	return await new Promise((resolve, reject) => {
 		let reader = new FileReader();
@@ -43,7 +43,7 @@ async function importImage(src) {
 
 	}
 	else {
-		src = await loadImageAsDataUrl(src);
+		src = await loadImageAsDataURL(src);
 	}
 
 	let attachmentKey = generateObjectKey();
@@ -128,7 +128,7 @@ function main(html) {
 			console.log('onImportImages', images)
 			for (let image of images) {
 				let attachmentKey = await importImage(image.src);
-				editorCore.attachImportedImage(image.nodeId, attachmentKey);
+				editorCore.attachImportedImage(image.nodeID, attachmentKey);
 			}
 		},
 		onSyncAttachmentKeys(attachmentKeys) {
@@ -141,8 +141,8 @@ function main(html) {
 				}
 			}
 		},
-		onOpenUrl(url) {
-			console.log('onOpenUrl(core)', url);
+		onOpenURL(url) {
+			console.log('onOpenURL(core)', url);
 			window.open(url, '_blank');
 		},
 		onUpdate(html) {

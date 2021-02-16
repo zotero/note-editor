@@ -1,7 +1,7 @@
 import applyDevTools from 'prosemirror-dev-tools';
 import { EditorState, NodeSelection, Plugin, SelectionRange } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
-import { schema, toHtml, buildClipboardSerializer } from './schema'
+import { schema, toHTML, buildClipboardSerializer } from './schema'
 import { DOMSerializer } from 'prosemirror-model'
 import { TextSelection } from 'prosemirror-state'
 import { DOMParser as DOMParser2, Pos, Node } from 'prosemirror-model'
@@ -9,7 +9,7 @@ import { debounce, decodeObject, encodeObject, randomString } from './utils'
 
 
 import nodeViews from './node-views'
-import { attachImportedImage, insertHtml, setCitation } from './commands';
+import { attachImportedImage, insertHTML, setCitation } from './commands';
 import { columnResizing, tableEditing } from 'prosemirror-tables';
 
 import { dropCursor } from 'prosemirror-dropcursor';
@@ -25,9 +25,9 @@ import { buildKeymap } from './keymap';
 import { baseKeymap } from 'prosemirror-commands';
 import { buildInputRules } from './input-rules';
 import { trailingParagraph } from './plugins/trailing-paragraph';
-import { nodeId } from './plugins/node-id';
+import { nodeID } from './plugins/node-id';
 import Provider from './provider';
-import { schemaTransform, digestHtml } from './schema/transformer';
+import { schemaTransform, digestHTML } from './schema/transformer';
 import { readOnly } from './plugins/read-only';
 import { transform } from './plugins/schema-transform';
 import { dropPaste } from './plugins/drop-paste';
@@ -61,7 +61,7 @@ class EditorCore {
 			if (this.readOnly) {
 				return;
 			}
-			let html = this.getHtml() || null;
+			let html = this.getHTML() || null;
 			if (html !== prevHTML) {
 				prevHTML = html;
 				options.onUpdate(html);
@@ -73,7 +73,7 @@ class EditorCore {
 
 
 		if (typeof options.value === 'string') {
-			let { html, metadata } = digestHtml(options.value);
+			let { html, metadata } = digestHTML(options.value);
 			options.value = html;
 			if (metadata.schemaVersion > schema.version) {
 				this.unsupportedSchema = true;
@@ -110,7 +110,7 @@ class EditorCore {
 						onInsertObject: options.onInsertObject
 					}),
 					transform(),
-					nodeId(),
+					nodeID(),
 					buildInputRules(schema),
 					keymap(buildKeymap(schema)),
 					keymap(baseKeymap),
@@ -119,7 +119,7 @@ class EditorCore {
 					menu(),
 					search(),
 					link({
-						onOpenUrl: options.onOpenUrl.bind(this)
+						onOpenURL: options.onOpenURL.bind(this)
 					}),
 					highlight({
 						onOpen: options.onOpenAnnotation,
@@ -137,8 +137,8 @@ class EditorCore {
 							options.onOpenCitation(node.attrs.citation);
 						},
 						onEdit: (node) => {
-							if (!node.attrs.nodeId) return;
-							options.onOpenCitationPopup(node.attrs.nodeId, node.attrs.citation);
+							if (!node.attrs.nodeID) return;
+							options.onOpenCitationPopup(node.attrs.nodeID, node.attrs.citation);
 						}
 					}),
 					trailingParagraph(),
@@ -158,9 +158,9 @@ class EditorCore {
 					provider: this.provider,
 					onDimensions: (node, width, height) => {
 						// TODO: Dimension can also be updated if user modified the document just seconds a go
-						this.dimensionsStore.data[node.attrs.nodeId] = [width, height];
+						this.dimensionsStore.data[node.attrs.nodeID] = [width, height];
 					},
-					onOpenUrl: options.onOpenUrl.bind(this)
+					onOpenURL: options.onOpenURL.bind(this)
 				}),
 				citation: nodeViews.citation({
 					provider: this.provider
@@ -169,7 +169,7 @@ class EditorCore {
 			dispatchTransaction(transaction) {
 				let newState = this.state.apply(transaction)
 				if (transaction.docChanged
-					&& toHtml(this.state.doc.content) !== toHtml(newState.doc.content)) {
+					&& toHTML(this.state.doc.content) !== toHTML(newState.doc.content)) {
 					that.docChanged = true;
 					updateNote();
 				}
@@ -238,16 +238,16 @@ class EditorCore {
 		});
 	}
 
-	setCitation(nodeId, citation, formattedCitation) {
-		setCitation(nodeId, citation, formattedCitation)(this.view.state, this.view.dispatch);
+	setCitation(nodeID, citation, formattedCitation) {
+		setCitation(nodeID, citation, formattedCitation)(this.view.state, this.view.dispatch);
 	}
 
-	attachImportedImage(nodeId, attachmentKey) {
-		attachImportedImage(nodeId, attachmentKey)(this.view.state, this.view.dispatch);
+	attachImportedImage(nodeID, attachmentKey) {
+		attachImportedImage(nodeID, attachmentKey)(this.view.state, this.view.dispatch);
 	}
 
-	insertHtml(pos, html) {
-		insertHtml(pos, html)(this.view.state, this.view.dispatch);
+	insertHTML(pos, html) {
+		insertHTML(pos, html)(this.view.state, this.view.dispatch);
 	}
 
 	hasSelection() {
@@ -258,8 +258,8 @@ class EditorCore {
 		return selection.content.size > 0;
 	}
 
-	getHtml() {
-		return toHtml(this.view.state.doc.content);
+	getHTML() {
+		return toHTML(this.view.state.doc.content);
 	};
 
 	focus() {
@@ -275,7 +275,7 @@ class EditorCore {
 			state: {
 				doc: this.view.state.doc.toJSON()
 			},
-			html: this.getHtml() || null
+			html: this.getHTML() || null
 		};
 	}
 }

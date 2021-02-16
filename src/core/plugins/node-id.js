@@ -1,18 +1,18 @@
 import { Plugin, PluginKey } from 'prosemirror-state';
 import { randomString } from '../utils';
 
-function addOrDeduplicateIds(state) {
-	let nodeIds = [];
+function addOrDeduplicateIDs(state) {
+	let nodeIDs = [];
 	let tr = state.tr;
 	let updated = false;
 	state.doc.descendants((node, pos) => {
-		if (node.type.attrs.nodeId) {
-			let nodeId = node.attrs.nodeId;
-			if (!nodeId || nodeIds.includes(nodeId)) {
-				nodeId = randomString();
+		if (node.type.attrs.nodeID) {
+			let nodeID = node.attrs.nodeID;
+			if (!nodeID || nodeIDs.includes(nodeID)) {
+				nodeID = randomString();
 				tr.setNodeMarkup(pos, null, {
 					...node.attrs,
-					nodeId
+					nodeID
 				});
 				updated = true;
 			}
@@ -22,10 +22,10 @@ function addOrDeduplicateIds(state) {
 	return updated && tr || null;
 }
 
-export function nodeId(options) {
+export function nodeID(options) {
 	return new Plugin({
 		appendTransaction(transactions, oldState, newState) {
-			return addOrDeduplicateIds(newState);
+			return addOrDeduplicateIDs(newState);
 		}
 	});
 }

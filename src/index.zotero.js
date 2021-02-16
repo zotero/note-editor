@@ -42,7 +42,7 @@ Element.prototype.addEventListener = function (name, fn) {
 
 class EditorInstance {
 	constructor(options) {
-		this.instanceId = options.instanceId;
+		this.instanceID = options.instanceID;
 		this._readOnly = options.readOnly;
 		this._placeholder = options.placeholder;
 		this._dir = window.dir = options.dir;
@@ -65,8 +65,9 @@ class EditorInstance {
 	}
 
 	_postMessage(message) {
-		// console.log(message)
-		window.postMessage({ instanceId: this.instanceId, message }, '*');
+		console.log('posting', message)
+		console.log('posting 1111', { instanceID: this.instanceID, message })
+		window.postMessage({ instanceID: this.instanceID, message }, '*');
 	}
 
 	_init(value) {
@@ -75,8 +76,8 @@ class EditorInstance {
 			readOnly: this._readOnly,
 			placeholder: this._placeholder,
 			onSubscribeProvider: (subscription) => {
-				let { id, type, nodeId, data } = subscription;
-				subscription = { id, type, nodeId, data };
+				let { id, type, nodeID, data } = subscription;
+				subscription = { id, type, nodeID, data };
 				this._postMessage({ action: 'subscribeProvider', subscription });
 			},
 			onUnsubscribeProvider: (subscription) => {
@@ -98,8 +99,8 @@ class EditorInstance {
 			onInsertObject: (type, data, pos) => {
 				this._postMessage({ action: 'insertObject', type, data, pos });
 			},
-			onOpenUrl: (url) => {
-				this._postMessage({ action: 'openUrl', url });
+			onOpenURL: (url) => {
+				this._postMessage({ action: 'openURL', url });
 			},
 			onOpenAnnotation: (annotation) => {
 				this._postMessage({ action: 'openAnnotation', uri: annotation.uri, position: annotation.position });
@@ -107,8 +108,8 @@ class EditorInstance {
 			onOpenCitation: (citation) => {
 				this._postMessage({ action: 'openCitation', citation });
 			},
-			onOpenCitationPopup: (nodeId, citation) => {
-				this._postMessage({ action: 'openCitationPopup', nodeId, citation });
+			onOpenCitationPopup: (nodeID, citation) => {
+				this._postMessage({ action: 'openCitationPopup', nodeID, citation });
 			},
 			onOpenContextMenu: (pos, node, x, y) => {
 				this._postMessage({ action: 'openContextMenu', x, y, pos, itemGroups: this._getContextMenuItemGroups(node) });
@@ -145,7 +146,7 @@ class EditorInstance {
 	_messageHandler = (event) => {
 		// console.log('Message received from the main script', event);
 
-		if (event.data.instanceId !== this.instanceId) {
+		if (event.data.instanceID !== this.instanceID) {
 			return;
 		}
 
@@ -157,13 +158,13 @@ class EditorInstance {
 				return;
 			}
 			case 'setCitation': {
-				let { nodeId, citation, formattedCitation } = message;
-				this._editorCore.setCitation(nodeId, citation, formattedCitation);
+				let { nodeID, citation, formattedCitation } = message;
+				this._editorCore.setCitation(nodeID, citation, formattedCitation);
 				return;
 			}
 			case 'attachImportedImage': {
-				let { nodeId, attachmentKey } = message;
-				this._editorCore.attachImportedImage(nodeId, attachmentKey);
+				let { nodeID, attachmentKey } = message;
+				this._editorCore.attachImportedImage(nodeID, attachmentKey);
 				return;
 			}
 			case 'contextMenuAction': {
@@ -171,9 +172,9 @@ class EditorInstance {
 				this._handleContextMenuAction(ctxAction, pos);
 				return;
 			}
-			case 'insertHtml': {
+			case 'insertHTML': {
 				let { pos, html } = message;
-				this._editorCore.insertHtml(pos, html);
+				this._editorCore.insertHTML(pos, html);
 				return;
 			}
 			case 'focus': {
@@ -235,11 +236,11 @@ class EditorInstance {
 					properties: {}
 				};
 
-				let nodeId = randomString();
-				let citationNode = schema.nodes.citation.create({ nodeId, citation });
+				let nodeID = randomString();
+				let citationNode = schema.nodes.citation.create({ nodeID, citation });
 				let { state, dispatch } = this._editorCore.view;
 				dispatch(state.tr.insert(pos, citationNode));
-				this._postMessage({ action: 'openCitationPopup', nodeId, citation });
+				this._postMessage({ action: 'openCitationPopup', nodeID, citation });
 				return;
 			}
 			case 'rtl': {
@@ -325,10 +326,10 @@ class EditorInstance {
 }
 
 window.addEventListener('message', function (e) {
-	// console.log('Editor: Message received from the main script');
-	// console.log(e);
+	console.log('Editor: Message received from the main script');
+	console.log(e);
 	let message = e.data.message;
-	let instanceId = e.data.instanceId;
+	let instanceID = e.data.instanceID;
 
 	if (message.action === 'init') {
 		// console.log('Initializing a new instance', message);
@@ -337,7 +338,7 @@ window.addEventListener('message', function (e) {
 		}
 		let { value, readOnly, placeholder, dir, font, hasBackup, enableReturnButton } = message;
 		currentInstance = new EditorInstance({
-			instanceId,
+			instanceID,
 			value,
 			readOnly,
 			placeholder,

@@ -28,8 +28,8 @@ class Provider {
 		});
 	}
 
-	getCachedData(nodeId, type) {
-		let subscription = this.subscriptions.find(s => s.nodeId === nodeId);
+	getCachedData(nodeID, type) {
+		let subscription = this.subscriptions.find(s => s.nodeID === nodeID);
 		return subscription && subscription.cachedData || null;
 	}
 }

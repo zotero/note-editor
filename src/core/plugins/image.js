@@ -32,7 +32,7 @@ class Image {
 		this.popup = {
 			isActive: false
 		}
-		// this.onOpenUrl = options.onOpenUrl;
+		// this.onOpenURL = options.onOpenURL;
 	}
 
 	update(state, oldState) {
@@ -217,8 +217,8 @@ export function image(options) {
 			if (changed) {
 				newState.doc.descendants((node, pos) => {
 					if (node.type.name === 'image'
-						&& options.dimensionsStore.data[node.attrs.nodeId]) {
-						let [width, height] = options.dimensionsStore.data[node.attrs.nodeId];
+						&& options.dimensionsStore.data[node.attrs.nodeID]) {
+						let [width, height] = options.dimensionsStore.data[node.attrs.nodeID];
 						newTr = newTr.step(new SetAttrsStep(pos, {
 							...node.attrs,
 							naturalWidth: width,
@@ -240,7 +240,7 @@ export function image(options) {
 								parentNode.forEach((node, offset) => {
 									let absolutePos = parentPos + offset + 1;
 									if (node.type.name === 'image' && node.attrs.src && !node.attrs.attachmentKey) {
-										images.push({ nodeId: node.attrs.nodeId, src: node.attrs.src });
+										images.push({ nodeID: node.attrs.nodeID, src: node.attrs.src });
 										if (node.attrs.src.startsWith('data:')) {
 											// Unset src to make sure data URL is never saved,
 											// although, on import failure this results to empty img tag

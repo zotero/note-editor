@@ -71,7 +71,7 @@ class Link {
 		this.popup = {
 			isActive: false
 		}
-		this.onOpenUrl = options.onOpenUrl;
+		this.onOpenURL = options.onOpenURL;
 	}
 
 	update(state, oldState) {
@@ -111,8 +111,8 @@ class Link {
 			href,
 			isMultiline,
 			pos: from,
-			setUrl: this.setUrl.bind(this),
-			removeUrl: this.removeUrl.bind(this),
+			setURL: this.setURL.bind(this),
+			removeURL: this.removeURL.bind(this),
 			toggle: this.toggle.bind(this),
 			open: this.open.bind(this)
 		};
@@ -147,16 +147,16 @@ class Link {
 				});
 			}
 			else {
-				this.onOpenUrl(this.popup.href);
+				this.onOpenURL(this.popup.href);
 			}
 		}
 	}
 
-	setUrl(url) {
+	setURL(url) {
 		this.updateMark(schema.marks.link, { href: url })(this.view.state, this.view.dispatch);
 	}
 
-	removeUrl() {
+	removeURL() {
 		this.removeMark(schema.marks.link)(this.view.state, this.view.dispatch);
 	}
 
@@ -298,7 +298,7 @@ export function link(options) {
 							});
 						}
 						else {
-							options.onOpenUrl(href);
+							options.onOpenURL(href);
 						}
 					}
 				}

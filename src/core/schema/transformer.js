@@ -1,4 +1,4 @@
-export function digestHtml(html) {
+export function digestHTML(html) {
 	let metadata = {
 		schemaVersion: 0
 	};

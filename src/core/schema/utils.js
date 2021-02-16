@@ -2,7 +2,7 @@ import { DOMParser, DOMSerializer, Schema } from 'prosemirror-model';
 import { schema } from './index';
 import { encodeObject } from '../utils';
 
-export function buildToHtml(schema) {
+export function buildToHTML(schema) {
 	return function (content) {
 		let fragment = DOMSerializer.fromSchema(schema).serializeFragment(content);
 		let tmp = document.implementation.createHTMLDocument('New').body;
@@ -28,7 +28,7 @@ export function buildToHtml(schema) {
 	}
 }
 
-export function buildFromHtml(schema) {
+export function buildFromHTML(schema) {
 	return function (html, slice) {
 		let domNode = document.createElement('div');
 		domNode.innerHTML = html;
@@ -50,7 +50,7 @@ export function buildClipboardSerializer(provider, schema) {
 	return new DOMSerializer(Object.assign({}, base.nodes, {
 		image(node) {
 			let src = node.attrs.src;
-			let data = provider.getCachedData(node.attrs.nodeId, 'image');
+			let data = provider.getCachedData(node.attrs.nodeID, 'image');
 			if (data) {
 				src = data.src;
 			}
@@ -66,7 +66,7 @@ export function buildClipboardSerializer(provider, schema) {
 		},
 		citation(node) {
 			let text = '';
-			let data = provider.getCachedData(node.attrs.nodeId, 'citation');
+			let data = provider.getCachedData(node.attrs.nodeID, 'citation');
 			if (data) {
 				text = '(' + data.formattedCitation + ')';
 			}

@@ -12,7 +12,7 @@ class CitationView {
 
 		this.provider.subscribe({
 			type: 'citation',
-			nodeId: node.attrs.nodeId,
+			nodeID: node.attrs.nodeID,
 			data: {
 				citation: node.attrs.citation
 			},

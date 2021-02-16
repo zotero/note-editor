@@ -1,5 +1,5 @@
 import { Plugin, PluginKey, TextSelection } from 'prosemirror-state'
-import { fromHtml, schema } from '../schema';
+import { fromHTML, schema } from '../schema';
 import { toggleMark } from 'prosemirror-commands';
 import { levenshtein, randomString, SetAttrsStep } from '../utils';
 import { Fragment, NodeRange, Slice } from 'prosemirror-model';
@@ -88,7 +88,7 @@ class Highlight {
 		this.popup = {
 			isActive: false
 		}
-		// this.onOpenUrl = options.onOpenUrl;
+		// this.onOpenURL = options.onOpenURL;
 	}
 
 	update(state, oldState) {
@@ -210,7 +210,7 @@ class Highlight {
 }
 
 function unlinkHighlights(tr) {
-	let nodeIds = [];
+	let nodeIDs = [];
 	let updated = false;
 	tr.doc.descendants((node, pos) => {
 		if (node.type.name === 'highlight') {

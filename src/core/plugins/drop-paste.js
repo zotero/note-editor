@@ -82,9 +82,9 @@ async function insertImages(view, pos, files) {
 			promises.push(new Promise((resolve) => {
 				let reader = new FileReader();
 				reader.onload = function () {
-					let dataUrl = this.result;
+					let dataURL = this.result;
 					nodes.push(schema.nodes.image.create({
-						src: dataUrl
+						src: dataURL
 					}));
 					resolve();
 				}
@@ -130,6 +130,7 @@ export function dropPaste(options) {
 				let html = event.dataTransfer.getData('text/html') || window.droppedData && window.droppedData['text/html'];
 				let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
 				let data;
+				console.log('drop', event)
 				if (event.dataTransfer.files.length) {
 					insertImages(view, pos.pos, event.dataTransfer.files);
 					return true;

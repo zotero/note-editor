@@ -270,7 +270,7 @@ export default {
 		inline: true,
 		draggable: true,
 		attrs: {
-			nodeId: { default: null },
+			nodeID: { default: null },
 			src: { default: null },
 			alt: { default: '' }, // It's recommended to always have alt attribute
 			title: { default: null },
@@ -284,7 +284,7 @@ export default {
 		parseDOM: [{
 			tag: 'img',
 			getAttrs: (dom) => ({
-				nodeId: randomString(),
+				nodeID: randomString(),
 				src: dom.getAttribute('src'),
 				alt: dom.getAttribute('alt') || '',
 				title: dom.getAttribute('title'),
@@ -318,13 +318,13 @@ export default {
 		atom: true,
 		selectable: true,
 		attrs: {
-			nodeId: { default: null },
+			nodeID: { default: null },
 			citation: { default: null }
 		},
 		parseDOM: [{
 			tag: 'span.citation',
 			getAttrs: (dom) => ({
-				nodeId: randomString(),
+				nodeID: randomString(),
 				citation: decodeObject(dom.getAttribute('data-citation'))
 					|| { citationItems: [], properties: {} }
 			})

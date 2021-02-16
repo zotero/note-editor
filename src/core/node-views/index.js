@@ -4,4 +4,4 @@ import image from './image';
 export default {
 	citation,
 	image
-}
+};

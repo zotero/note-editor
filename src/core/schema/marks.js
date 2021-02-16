@@ -9,11 +9,11 @@ export default {
 			// tags with a font-weight normal.
 			{
 				tag: 'b',
-				getAttrs: (dom) => dom.style.fontWeight !== 'normal' && null
+				getAttrs: dom => dom.style.fontWeight !== 'normal' && null
 			},
 			{
 				style: 'font-weight',
-				getAttrs: (value) => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
+				getAttrs: value => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
 			},
 			{ tag: 'dt' }
 		],
@@ -69,7 +69,7 @@ export default {
 			{ tag: 'sup', attrs: { type: 'sup' } },
 			{ style: 'vertical-align=super', attrs: { type: 'sup' } }
 		],
-		toDOM: (mark) => [mark.attrs.type]
+		toDOM: mark => [mark.attrs.type]
 	},
 
 
@@ -78,9 +78,9 @@ export default {
 		attrs: { color: {} },
 		parseDOM: [{
 			style: 'color',
-			getAttrs: (value) => ({ color: value })
+			getAttrs: value => ({ color: value })
 		}],
-		toDOM: (mark) => ['span', { style: `color: ${mark.attrs.color}` }, 0]
+		toDOM: mark => ['span', { style: `color: ${mark.attrs.color}` }, 0]
 	},
 
 
@@ -89,9 +89,9 @@ export default {
 		attrs: { color: {} },
 		parseDOM: [{
 			style: 'background-color',
-			getAttrs: (value) => ({ color: value })
+			getAttrs: value => ({ color: value })
 		}],
-		toDOM: (mark) => ['span', { style: `background-color: ${mark.attrs.color}` }, 0]
+		toDOM: mark => ['span', { style: `background-color: ${mark.attrs.color}` }, 0]
 	},
 
 
@@ -104,12 +104,12 @@ export default {
 		},
 		parseDOM: [{
 			tag: 'a[href]',
-			getAttrs: (dom) => ({
+			getAttrs: dom => ({
 				href: dom.getAttribute('href'),
 				title: dom.getAttribute('title')
 			})
 		}],
-		toDOM: (mark) => ['a', {
+		toDOM: mark => ['a', {
 			...mark.attrs,
 			rel: 'noopener noreferrer nofollow'
 		}, 0]
@@ -129,7 +129,7 @@ export default {
 			{
 				style: 'font-family',
 				preserveWhitespace: true,
-				getAttrs: (value) => (value.toLowerCase().indexOf('monospace') > -1) && null
+				getAttrs: value => (value.toLowerCase().indexOf('monospace') > -1) && null
 			},
 			{ style: 'white-space=pre', preserveWhitespace: true }
 		],

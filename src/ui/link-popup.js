@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, Fragment } from 'react';
-import cx from 'classnames'
+import cx from 'classnames';
 
 function LinkPopup({ parentRef, linkState }) {
 	const [editing, setEditing] = useState(false);
@@ -47,7 +47,7 @@ function LinkPopup({ parentRef, linkState }) {
 				if (inputRef.current) {
 					inputRef.current.focus();
 				}
-			}, 0)
+			}, 0);
 		}
 	}, [editing, linkState]);
 
@@ -86,20 +86,22 @@ function LinkPopup({ parentRef, linkState }) {
 					ref={popupRef}
 					className={cx('link-popup page-popup page-popup-top')}
 				>
-					{editing ? (
-						<Fragment>
-							<div className="link"><input ref={inputRef} type="edit" placeholder="Enter URL"
+					{editing
+						? (
+							<Fragment>
+								<div className="link"><input ref={inputRef} type="edit" placeholder="Enter URL"
 							                             onKeyDown={handleKeydown}/>
-							</div>
-							<div className="button toolbarButton" onClick={handleSet}>Set</div>
-						</Fragment>
-					) : (
-						<Fragment>
-							<div className="link"><a href={linkState.href} onClick={handleOpen}>{linkState.href}</a></div>
-							<div className="button toolbarButton" onClick={handleEdit}>Edit</div>
-							<div className="button toolbarButton" onClick={handleUnset}>Unlink</div>
-						</Fragment>
-					)}
+								</div>
+								<div className="button toolbarButton" onClick={handleSet}>Set</div>
+							</Fragment>
+						)
+						: (
+							<Fragment>
+								<div className="link"><a href={linkState.href} onClick={handleOpen}>{linkState.href}</a></div>
+								<div className="button toolbarButton" onClick={handleEdit}>Edit</div>
+								<div className="button toolbarButton" onClick={handleUnset}>Unlink</div>
+							</Fragment>
+						)}
 				</div>
 			</div>
 		);

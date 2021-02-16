@@ -8,10 +8,9 @@ export const getActiveColor = function (state) {
 		marks.push(
 			textColor.isInSet(state.storedMarks || $cursor.marks()) || undefined
 		);
-
 	}
 	else {
-		state.doc.nodesBetween($from.pos, $to.pos, currentNode => {
+		state.doc.nodesBetween($from.pos, $to.pos, (currentNode) => {
 			if (currentNode.isLeaf) {
 				const mark = textColor.isInSet(currentNode.marks) || undefined;
 				marks.push(mark);
@@ -24,8 +23,8 @@ export const getActiveColor = function (state) {
 	const marksWithColor = marks.filter(mark => !!mark);
 	// When multiple colors are selected revert back to default color
 	if (
-		marksWithColor.length > 1 ||
-		(marksWithColor.length === 1 && marks.length > 1)
+		marksWithColor.length > 1
+		|| (marksWithColor.length === 1 && marks.length > 1)
 	) {
 		return null;
 	}
@@ -156,58 +155,57 @@ export function levenshtein(a, b) {
 import {
 	findParentNode,
 	findSelectedNodeOfType
-} from 'prosemirror-utils'
+} from 'prosemirror-utils';
 
 export default function nodeIsActive(state, type, attrs = {}) {
-	const predicate = node => node.type === type
+	const predicate = node => node.type === type;
 	const node = findSelectedNodeOfType(type)(state.selection)
-		|| findParentNode(predicate)(state.selection)
+		|| findParentNode(predicate)(state.selection);
 
 	if (!Object.keys(attrs).length || !node) {
-		return !!node
+		return !!node;
 	}
 
-	return node.node.hasMarkup(type, { ...node.node.attrs, ...attrs })
+	return node.node.hasMarkup(type, { ...node.node.attrs, ...attrs });
 }
 
 // TODO: Move this somewhere else
-const { Fragment, Slice } = require('prosemirror-model')
-const { Step, StepResult } = require('prosemirror-transform')
+const { Fragment, Slice } = require('prosemirror-model');
+const { Step, StepResult } = require('prosemirror-transform');
 
 // https://discuss.prosemirror.net/t/preventing-image-placeholder-replacement-from-being-undone/1394
 export class SetAttrsStep extends Step {
 	// :: (number, Object | null)
 	constructor(pos, attrs) {
-		super()
-		this.pos = pos
-		this.attrs = attrs
+		super();
+		this.pos = pos;
+		this.attrs = attrs;
 	}
 
 	apply(doc) {
-		let target = doc.nodeAt(this.pos)
-		if (!target) return StepResult.fail('No node at given position')
-		let newNode = target.type.create(this.attrs, Fragment.emtpy, target.marks)
-		let slice = new Slice(Fragment.from(newNode), 0, target.isLeaf ? 0 : 1)
-		return StepResult.fromReplace(doc, this.pos, this.pos + 1, slice)
+		let target = doc.nodeAt(this.pos);
+		if (!target) return StepResult.fail('No node at given position');
+		let newNode = target.type.create(this.attrs, Fragment.emtpy, target.marks);
+		let slice = new Slice(Fragment.from(newNode), 0, target.isLeaf ? 0 : 1);
+		return StepResult.fromReplace(doc, this.pos, this.pos + 1, slice);
 	}
 
 	invert(doc) {
-		let target = doc.nodeAt(this.pos)
-		return new SetAttrsStep(this.pos, target ? target.attrs : null)
+		let target = doc.nodeAt(this.pos);
+		return new SetAttrsStep(this.pos, target ? target.attrs : null);
 	}
 
 	map(mapping) {
-		let pos = mapping.mapResult(this.pos, 1)
-		return pos.deleted ? null : new SetAttrsStep(pos.pos, this.attrs)
+		let pos = mapping.mapResult(this.pos, 1);
+		return pos.deleted ? null : new SetAttrsStep(pos.pos, this.attrs);
 	}
 
 	toJSON() {
-		return { stepType: 'setAttrs', pos: this.pos, attrs: this.attrs }
+		return { stepType: 'setAttrs', pos: this.pos, attrs: this.attrs };
 	}
 
 	static fromJSON(schema, json) {
-		if (typeof json.pos != 'number' || (json.attrs != null && typeof json.attrs != 'object'))
-			throw new RangeError('Invalid input for SetAttrsStep.fromJSON')
-		return new SetAttrsStep(json.pos, json.attrs)
+		if (typeof json.pos != 'number' || (json.attrs != null && typeof json.attrs != 'object')) throw new RangeError('Invalid input for SetAttrsStep.fromJSON');
+		return new SetAttrsStep(json.pos, json.attrs);
 	}
 }

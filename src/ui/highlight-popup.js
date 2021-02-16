@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, Fragment } from 'react';
-import cx from 'classnames'
+import cx from 'classnames';
 
 function HighlightPopup({ parentRef, pluginState }) {
 	const containerRef = useRef();
@@ -39,7 +39,6 @@ function HighlightPopup({ parentRef, pluginState }) {
 		if (inputRef.current) {
 			inputRef.current.value = pluginState.href || '';
 		}
-
 	}, [pluginState]);
 
 	function handleOpen() {

@@ -1,58 +1,58 @@
-import { Plugin, PluginKey, TextSelection } from 'prosemirror-state'
+import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { schema } from '../schema';
 import { toggleMark } from 'prosemirror-commands';
 import { randomString } from '../utils';
 
 function textRange(node, from, to) {
-	const range = document.createRange()
-	range.setEnd(node, to == null ? node.nodeValue.length : to)
-	range.setStart(node, from || 0)
-	return range
+	const range = document.createRange();
+	range.setEnd(node, to == null ? node.nodeValue.length : to);
+	range.setStart(node, from || 0);
+	return range;
 }
 
 function singleRect(object, bias) {
-	const rects = object.getClientRects()
-	return !rects.length ? object.getBoundingClientRect() : rects[bias < 0 ? 0 : rects.length - 1]
+	const rects = object.getClientRects();
+	return !rects.length ? object.getBoundingClientRect() : rects[bias < 0 ? 0 : rects.length - 1];
 }
 
 function coordsAtPos(view, pos, end = false) {
-	const { node, offset } = view.docView.domFromPos(pos)
-	let side
-	let rect
+	const { node, offset } = view.docView.domFromPos(pos);
+	let side;
+	let rect;
 	if (node.nodeType === 3) {
 		if (end && offset < node.nodeValue.length) {
-			rect = singleRect(textRange(node, offset - 1, offset), -1)
-			side = 'right'
+			rect = singleRect(textRange(node, offset - 1, offset), -1);
+			side = 'right';
 		}
 		else if (offset < node.nodeValue.length) {
-			rect = singleRect(textRange(node, offset, offset + 1), -1)
-			side = 'left'
+			rect = singleRect(textRange(node, offset, offset + 1), -1);
+			side = 'left';
 		}
 	}
 	else if (node.firstChild) {
 		if (offset < node.childNodes.length) {
-			const child = node.childNodes[offset]
-			rect = singleRect(child.nodeType === 3 ? textRange(child) : child, -1)
-			side = 'left'
+			const child = node.childNodes[offset];
+			rect = singleRect(child.nodeType === 3 ? textRange(child) : child, -1);
+			side = 'left';
 		}
 		if ((!rect || rect.top === rect.bottom) && offset) {
-			const child = node.childNodes[offset - 1]
-			rect = singleRect(child.nodeType === 3 ? textRange(child) : child, 1)
-			side = 'right'
+			const child = node.childNodes[offset - 1];
+			rect = singleRect(child.nodeType === 3 ? textRange(child) : child, 1);
+			side = 'right';
 		}
 	}
 	else {
-		rect = node.getBoundingClientRect()
-		side = 'left'
+		rect = node.getBoundingClientRect();
+		side = 'left';
 	}
 
-	const x = rect[side]
+	const x = rect[side];
 	return {
 		top: rect.top,
 		bottom: rect.bottom,
 		left: x,
 		right: x
-	}
+	};
 }
 
 function getHrefAtPos($pos) {
@@ -70,7 +70,7 @@ class Link {
 	constructor(state, options) {
 		this.popup = {
 			isActive: false
-		}
+		};
 		this.onOpenURL = options.onOpenURL;
 	}
 
@@ -83,16 +83,16 @@ class Link {
 		this.isActive = this.hasMark(schema.marks.link)(this.view.state, this.view.dispatch);
 
 		if (oldState && oldState.doc.eq(state.doc) && oldState.selection.eq(state.selection)) {
-			return
+			return;
 		}
 
-		const { from, to } = state.selection
+		const { from, to } = state.selection;
 
 		// These are in screen coordinates
 		// We can't use EditorView.cordsAtPos here because it can't handle linebreaks correctly
 		// See: https://github.com/ProseMirror/prosemirror-view/pull/47
-		const start = coordsAtPos(this.view, from)
-		const end = coordsAtPos(this.view, to, true)
+		const start = coordsAtPos(this.view, from);
+		const end = coordsAtPos(this.view, to, true);
 
 		let isMultiline = start.top !== end.top;
 		let left = isMultiline ? start.left : start.left + (end.left - start.left) / 2;
@@ -123,11 +123,9 @@ class Link {
 		if (this.hasMark(schema.marks.link)(this.view.state, this.view.dispatch)) {
 			this.removeMark(schema.marks.link)(this.view.state, this.view.dispatch);
 		}
-		else {
-			if (!state.selection.empty) {
-				this.popup = { ...this.popup, isActive: true };
-				dispatch(state.tr);
-			}
+		else if (!state.selection.empty) {
+			this.popup = { ...this.popup, isActive: true };
+			dispatch(state.tr);
 		}
 	}
 
@@ -174,99 +172,98 @@ class Link {
 
 	getMarkRange($pos = null, type = null) {
 		if (!$pos || !type) {
-			return false
+			return false;
 		}
 
-		const start = $pos.parent.childAfter($pos.parentOffset)
+		const start = $pos.parent.childAfter($pos.parentOffset);
 
 		if (!start.node) {
-			return false
+			return false;
 		}
 
-		const link = start.node.marks.find(mark => mark.type === type)
+		const link = start.node.marks.find(mark => mark.type === type);
 		if (!link) {
-			return false
+			return false;
 		}
 
-		let startIndex = $pos.index()
-		let startPos = $pos.start() + start.offset
-		let endIndex = startIndex + 1
-		let endPos = startPos + start.node.nodeSize
+		let startIndex = $pos.index();
+		let startPos = $pos.start() + start.offset;
+		let endIndex = startIndex + 1;
+		let endPos = startPos + start.node.nodeSize;
 
 		while (startIndex > 0 && link.isInSet($pos.parent.child(startIndex - 1).marks)) {
-			startIndex -= 1
-			startPos -= $pos.parent.child(startIndex).nodeSize
+			startIndex -= 1;
+			startPos -= $pos.parent.child(startIndex).nodeSize;
 		}
 
 		while (endIndex < $pos.parent.childCount && link.isInSet($pos.parent.child(endIndex).marks)) {
-			endPos += $pos.parent.child(endIndex).nodeSize
-			endIndex += 1
+			endPos += $pos.parent.child(endIndex).nodeSize;
+			endIndex += 1;
 		}
 
-		return { from: startPos, to: endPos }
-
+		return { from: startPos, to: endPos };
 	}
 
 	updateMark(type, attrs) {
 		return (state, dispatch) => {
-			const { tr, selection, doc } = state
-			let { from, to } = selection
-			const { $from, empty } = selection
+			const { tr, selection, doc } = state;
+			let { from, to } = selection;
+			const { $from, empty } = selection;
 
 			if (empty) {
-				const range = this.getMarkRange($from, type)
+				const range = this.getMarkRange($from, type);
 
-				from = range.from
-				to = range.to
+				from = range.from;
+				to = range.to;
 			}
 
-			const hasMark = doc.rangeHasMark(from, to, type)
+			const hasMark = doc.rangeHasMark(from, to, type);
 
 			if (hasMark) {
-				tr.removeMark(from, to, type)
+				tr.removeMark(from, to, type);
 			}
 
-			tr.addMark(from, to, type.create(attrs))
+			tr.addMark(from, to, type.create(attrs));
 
-			return dispatch(tr)
-		}
+			return dispatch(tr);
+		};
 	}
 
 	removeMark(type) {
 		return (state, dispatch) => {
-			const { tr, selection } = state
-			let { from, to } = selection
-			const { $from, empty } = selection
+			const { tr, selection } = state;
+			let { from, to } = selection;
+			const { $from, empty } = selection;
 
 			if (empty) {
-				const range = this.getMarkRange($from, type)
+				const range = this.getMarkRange($from, type);
 
-				from = range.from
-				to = range.to
+				from = range.from;
+				to = range.to;
 			}
 
-			tr.removeMark(from, to, type)
+			tr.removeMark(from, to, type);
 
-			return dispatch(tr)
-		}
+			return dispatch(tr);
+		};
 	}
 
 
 	hasMark(type) {
 		return (state, dispatch) => {
-			const { tr, selection, doc } = state
-			let { from, to } = selection
-			const { $from, empty } = selection
+			const { tr, selection, doc } = state;
+			let { from, to } = selection;
+			const { $from, empty } = selection;
 
 			if (empty) {
-				const range = this.getMarkRange($from, type)
+				const range = this.getMarkRange($from, type);
 
-				from = range.from
-				to = range.to
+				from = range.from;
+				to = range.to;
 			}
 
-			return doc.rangeHasMark(from, to, type)
-		}
+			return doc.rangeHasMark(from, to, type);
+		};
 	}
 
 	destroy() {
@@ -322,7 +319,7 @@ export function link(options) {
 				destroy() {
 					pluginState.destroy();
 				}
-			}
+			};
 		}
 	});
 }

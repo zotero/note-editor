@@ -5,7 +5,6 @@ import { highlightKey } from './highlight';
 import { Slice } from 'prosemirror-model';
 
 function getNode(state) {
-
 	const { $from, $to, $cursor } = state.selection;
 
 	let nodes = [];
@@ -31,7 +30,7 @@ class Image {
 		this.options = options;
 		this.popup = {
 			isActive: false
-		}
+		};
 		// this.onOpenURL = options.onOpenURL;
 	}
 
@@ -70,7 +69,7 @@ class Image {
 			let left = isMultiline ? start.left : start.left + (end.left - start.left) / 2;
 
 			let dom = this.view.nodeDOM(pos);
-			let rect = dom.getBoundingClientRect()
+			let rect = dom.getBoundingClientRect();
 
 			let next = this.view.state.doc.resolve(pos);
 
@@ -146,7 +145,7 @@ class Image {
 		let citation = {
 			citationItems: [node.attrs.annotation.citationItem],
 			properties: {}
-		}
+		};
 		dispatch(tr.insert(pos, [state.schema.nodes.hardBreak.create()]));
 		this.options.onGenerateCitation(citation, pos + 1);
 	}
@@ -194,10 +193,10 @@ export function image(options) {
 				destroy() {
 					pluginState.destroy();
 				}
-			}
+			};
 		},
 		appendTransaction(transactions, oldState, newState) {
-			let newTr = newState.tr
+			let newTr = newState.tr;
 
 			let changed = transactions.some(tr => tr.docChanged);
 
@@ -210,7 +209,7 @@ export function image(options) {
 			else if (JSON.stringify(attachmentKeys) !== JSON.stringify(prevAttachmentKeys)) {
 				options.onSyncAttachmentKeys(attachmentKeys);
 			}
-			prevAttachmentKeys = attachmentKeys
+			prevAttachmentKeys = attachmentKeys;
 
 
 			let updatedDimensions = false;
@@ -232,8 +231,8 @@ export function image(options) {
 			}
 
 			let images = [];
-			transactions.forEach(tr => {
-				tr.steps.forEach(step => {
+			transactions.forEach((tr) => {
+				tr.steps.forEach((step) => {
 					if (tr.getMeta('importImages') && step instanceof ReplaceStep && step.slice) {
 						step.getMap().forEach((oldStart, oldEnd, newStart, newEnd) => {
 							newState.doc.nodesBetween(newStart, newEnd, (parentNode, parentPos) => {
@@ -263,7 +262,7 @@ export function image(options) {
 			}
 
 			if (updatedDimensions || images.length) {
-				return newTr
+				return newTr;
 			}
 		}
 	});

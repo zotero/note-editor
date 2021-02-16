@@ -1,4 +1,4 @@
-import { Plugin, PluginKey, TextSelection } from 'prosemirror-state'
+import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { fromHTML, schema } from '../schema';
 import { toggleMark } from 'prosemirror-commands';
 import { levenshtein, randomString, SetAttrsStep } from '../utils';
@@ -6,63 +6,62 @@ import { Fragment, NodeRange, Slice } from 'prosemirror-model';
 import { TextNode } from 'prosemirror-model/src/node';
 import { liftTarget, ReplaceAroundStep, ReplaceStep } from 'prosemirror-transform';
 
-window.TextSelection = TextSelection
+window.TextSelection = TextSelection;
 
 
 function textRange(node, from, to) {
-	const range = document.createRange()
-	range.setEnd(node, to == null ? node.nodeValue.length : to)
-	range.setStart(node, from || 0)
-	return range
+	const range = document.createRange();
+	range.setEnd(node, to == null ? node.nodeValue.length : to);
+	range.setStart(node, from || 0);
+	return range;
 }
 
 function singleRect(object, bias) {
-	const rects = object.getClientRects()
-	return !rects.length ? object.getBoundingClientRect() : rects[bias < 0 ? 0 : rects.length - 1]
+	const rects = object.getClientRects();
+	return !rects.length ? object.getBoundingClientRect() : rects[bias < 0 ? 0 : rects.length - 1];
 }
 
 function coordsAtPos(view, pos, end = false) {
-	const { node, offset } = view.docView.domFromPos(pos)
-	let side
-	let rect
+	const { node, offset } = view.docView.domFromPos(pos);
+	let side;
+	let rect;
 	if (node.nodeType === 3) {
 		if (end && offset < node.nodeValue.length) {
-			rect = singleRect(textRange(node, offset - 1, offset), -1)
-			side = 'right'
+			rect = singleRect(textRange(node, offset - 1, offset), -1);
+			side = 'right';
 		}
 		else if (offset < node.nodeValue.length) {
-			rect = singleRect(textRange(node, offset, offset + 1), -1)
-			side = 'left'
+			rect = singleRect(textRange(node, offset, offset + 1), -1);
+			side = 'left';
 		}
 	}
 	else if (node.firstChild) {
 		if (offset < node.childNodes.length) {
-			const child = node.childNodes[offset]
-			rect = singleRect(child.nodeType === 3 ? textRange(child) : child, -1)
-			side = 'left'
+			const child = node.childNodes[offset];
+			rect = singleRect(child.nodeType === 3 ? textRange(child) : child, -1);
+			side = 'left';
 		}
 		if ((!rect || rect.top === rect.bottom) && offset) {
-			const child = node.childNodes[offset - 1]
-			rect = singleRect(child.nodeType === 3 ? textRange(child) : child, 1)
-			side = 'right'
+			const child = node.childNodes[offset - 1];
+			rect = singleRect(child.nodeType === 3 ? textRange(child) : child, 1);
+			side = 'right';
 		}
 	}
 	else {
-		rect = node.getBoundingClientRect()
-		side = 'left'
+		rect = node.getBoundingClientRect();
+		side = 'left';
 	}
 
-	const x = rect[side]
+	const x = rect[side];
 	return {
 		top: rect.top,
 		bottom: rect.bottom,
 		left: x,
 		right: x
-	}
+	};
 }
 
 function getNode(state) {
-
 	const { $from, $to, $cursor } = state.selection;
 
 	let nodes = [];
@@ -87,7 +86,7 @@ class Highlight {
 		this.options = options;
 		this.popup = {
 			isActive: false
-		}
+		};
 		// this.onOpenURL = options.onOpenURL;
 	}
 
@@ -117,13 +116,13 @@ class Highlight {
 			// These are in screen coordinates
 			// We can't use EditorView.cordsAtPos here because it can't handle linebreaks correctly
 			// See: https://github.com/ProseMirror/prosemirror-view/pull/47
-			let start = coordsAtPos(this.view, from)
-			let end = coordsAtPos(this.view, to, true)
+			let start = coordsAtPos(this.view, from);
+			let end = coordsAtPos(this.view, to, true);
 			let isMultiline = start.top !== end.top;
 			let left = isMultiline ? start.left : start.left + (end.left - start.left) / 2;
 
 			let dom = this.view.nodeDOM(pos);
-			let rect = dom.getBoundingClientRect()
+			let rect = dom.getBoundingClientRect();
 
 			let next = this.view.state.doc.resolve(pos);
 
@@ -180,7 +179,7 @@ class Highlight {
 		let { $from } = state.selection;
 		let pos = $from.pos - $from.parentOffset - 1;
 		let node = $from.parent;
-		let tr = state.tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0))
+		let tr = state.tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0));
 		dispatch(tr);
 	}
 
@@ -195,7 +194,7 @@ class Highlight {
 		let citation = {
 			citationItems: [node.attrs.annotation.citationItem],
 			properties: {}
-		}
+		};
 		dispatch(tr.insert(pos, [state.schema.text(' ')]));
 		this.options.onGenerateCitation(citation, pos + 1);
 	}
@@ -235,7 +234,7 @@ function unlinkHighlights(tr) {
 
 				if (drifted || first.text[0] !== '"' || last.text[last.text.length - 1] !== '"') {
 					pos = tr.mapping.map(pos);
-					tr = tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0))
+					tr = tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0));
 					updated = true;
 				}
 			}
@@ -246,20 +245,20 @@ function unlinkHighlights(tr) {
 }
 
 function handleEnter(state, dispatch) {
-	const { schema } = state
-	const { $from, $to } = state.selection
+	const { schema } = state;
+	const { $from, $to } = state.selection;
 	// No selection & the cursor inside word-node
 	if ($from.pos === $to.pos && $from.parent.type === schema.nodes.highlight) {
 		const blockParent = $from.node(1);
-		const newBlock = blockParent.type.create(blockParent.attrs)
+		const newBlock = blockParent.type.create(blockParent.attrs);
 		// node like the block parent with an empty inline node in it
 		let block = blockParent.copy();
 		// Slice that opens both nodes at both sides, so that only the inner close-and-then-open
 		// tokens are part of it
-		let slice = new Slice(new Fragment([block]), 0, 1)
-		let tr = state.tr.replace($from.pos, $from.pos, slice)
-		dispatch(tr)
-		return true
+		let slice = new Slice(new Fragment([block]), 0, 1);
+		let tr = state.tr.replace($from.pos, $from.pos, slice);
+		dispatch(tr);
+		return true;
 	}
 }
 
@@ -286,14 +285,14 @@ export function highlight(options) {
 				destroy() {
 					pluginState.destroy();
 				}
-			}
+			};
 		},
 		appendTransaction(transactions, oldState, newState) {
 			let { tr: trr } = newState;
 			let updated = false;
 			if (newState.selection.empty) {
-				transactions.forEach(tr => {
-					tr.steps.forEach(step => {
+				transactions.forEach((tr) => {
+					tr.steps.forEach((step) => {
 						if (step instanceof ReplaceStep && step.slice) {
 							step.getMap().forEach((oldStart, oldEnd, newStart, newEnd) => {
 								// TODO: Investigate this potentially buggy part
@@ -310,7 +309,7 @@ export function highlight(options) {
 									else if ($pos.parentOffset === $pos.parent.content.size) {
 										trr = trr.delete(newStart, newEnd);
 										trr = trr.replace(newStart + 1, newStart + 1, step.slice);
-										trr = trr.setSelection(new TextSelection(trr.doc.resolve(newStart + step.slice.size + 1)))
+										trr = trr.setSelection(new TextSelection(trr.doc.resolve(newStart + step.slice.size + 1)));
 										updated = true;
 									}
 								}
@@ -339,7 +338,7 @@ export function highlight(options) {
 							setTimeout(() => {
 								let pluginState = highlightKey.getState(state);
 								let { dispatch } = pluginState.view;
-								dispatch(pluginState.view.state.tr.delete(from + 1, from + 2))
+								dispatch(pluginState.view.state.tr.delete(from + 1, from + 2));
 							}, 0);
 						}
 						else if (from === step.to) {
@@ -347,7 +346,7 @@ export function highlight(options) {
 							setTimeout(() => {
 								let pluginState = highlightKey.getState(state);
 								let { dispatch } = pluginState.view;
-								dispatch(pluginState.view.state.tr.delete(from - 2, from - 1))
+								dispatch(pluginState.view.state.tr.delete(from - 2, from - 1));
 							}, 0);
 						}
 					}

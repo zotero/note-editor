@@ -14,31 +14,31 @@ Element.prototype.addEventListenerPrev = Element.prototype.addEventListener;
 Element.prototype.addEventListener = function (name, fn) {
 	if (name === 'drop') {
 		this.addEventListenerPrev('drop', function (event) {
-				let dataTransfer = event.dataTransfer;
-				Object.defineProperty(event, 'dataTransfer', {
-					configurable: true,
-					get() {
-						return new Proxy(dataTransfer, {
-							get(target, propKey) {
-								let propValue = target[propKey];
-								if (propKey === 'getData') {
-									return function (name) {
-										return window.droppedData[name];
-									}
-								}
-								if (typeof propValue !== 'function') {
-									return propValue;
-								}
+			let dataTransfer = event.dataTransfer;
+			Object.defineProperty(event, 'dataTransfer', {
+				configurable: true,
+				get() {
+					return new Proxy(dataTransfer, {
+						get(target, propKey) {
+							let propValue = target[propKey];
+							if (propKey === 'getData') {
+								return function (name) {
+									return window.droppedData[name];
+								};
 							}
-						});
-					}
-				});
-				fn(event);
-			}
+							if (typeof propValue !== 'function') {
+								return propValue;
+							}
+						}
+					});
+				}
+			});
+			fn(event);
+		}
 		);
 	}
 	return this.addEventListenerPrev(name, fn);
-}
+};
 
 class EditorInstance {
 	constructor(options) {
@@ -65,8 +65,8 @@ class EditorInstance {
 	}
 
 	_postMessage(message) {
-		console.log('posting', message)
-		console.log('posting 1111', { instanceID: this.instanceID, message })
+		console.log('posting', message);
+		console.log('posting 1111', { instanceID: this.instanceID, message });
 		window.postMessage({ instanceID: this.instanceID, message }, '*');
 	}
 
@@ -184,7 +184,6 @@ class EditorInstance {
 			case 'updateFont': {
 				let { font } = message;
 				this._setFont(font);
-				return;
 			}
 		}
 	}
@@ -249,7 +248,6 @@ class EditorInstance {
 			}
 			case 'ltr': {
 				this._editorCore.pluginState.menu.ltr.run();
-				return;
 			}
 		}
 	}
@@ -319,8 +317,7 @@ class EditorInstance {
 			]
 		];
 
-		return groups.map(items =>
-			items.filter(item => item.enabled || item.persistent)
+		return groups.map(items => items.filter(item => item.enabled || item.persistent)
 		).filter(items => items.length);
 	}
 }
@@ -355,4 +352,4 @@ window.getDataSync = (onlyChanged) => {
 		return currentInstance.getDataSync(onlyChanged);
 	}
 	return null;
-}
+};

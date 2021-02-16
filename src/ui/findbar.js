@@ -1,4 +1,5 @@
 'use strict';
+
 import cx from 'classnames';
 import React, { useState, useEffect, useRef } from 'react';
 
@@ -13,7 +14,7 @@ function Findbar({ searchState, active }) {
 				searchInputRef.current.focus();
 			}, 100);
 		}
-	}, [active])
+	}, [active]);
 
 	function handleMouseDown(event) {
 		if (event.target.nodeName !== 'INPUT') {

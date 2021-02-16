@@ -1,5 +1,5 @@
 import { tableNodes } from 'prosemirror-tables';
-import { encodeObject, decodeObject, randomString } from '../utils'
+import { encodeObject, decodeObject, randomString } from '../utils';
 
 // Schema does not limit the indent level for the compatibility with
 // the old notes, although the UI doesn't allow to set higher than
@@ -78,10 +78,10 @@ function backCompIndent(node) {
 	if (node.attrs.indent) {
 		let dir = node.attrs.dir || window.dir;
 		if (dir === 'rtl') {
-			return { 'padding-right': node.attrs.indent * INDENT_WIDTH + 'px' }
+			return { 'padding-right': node.attrs.indent * INDENT_WIDTH + 'px' };
 		}
 		else {
-			return { 'padding-left': node.attrs.indent * INDENT_WIDTH + 'px' }
+			return { 'padding-left': node.attrs.indent * INDENT_WIDTH + 'px' };
 		}
 	}
 	return {};
@@ -105,7 +105,7 @@ export default {
 		parseDOM: [
 			{
 				tag: 'p',
-				getAttrs: (dom) => ({
+				getAttrs: dom => ({
 					indent: getIndent(dom),
 					align: getAlign(dom),
 					dir: getDir(dom)
@@ -113,7 +113,7 @@ export default {
 			},
 			{ tag: 'dd' }
 		],
-		toDOM: (node) => ['p', {
+		toDOM: node => ['p', {
 			style: style({ 'text-align': node.attrs.align, ...backCompIndent(node) }),
 			dir: node.attrs.dir,
 			'data-indent': node.attrs.indent
@@ -134,7 +134,7 @@ export default {
 		},
 		parseDOM: [1, 2, 3, 4, 5, 6].map(level => ({
 			tag: 'h' + level,
-			getAttrs: (dom) => ({
+			getAttrs: dom => ({
 				level,
 				id: dom.getAttribute('id'),
 				dir: getDir(dom),
@@ -142,7 +142,7 @@ export default {
 				align: getAlign(dom)
 			})
 		})),
-		toDOM: (node) => ['h' + node.attrs.level, {
+		toDOM: node => ['h' + node.attrs.level, {
 			style: style({ 'text-align': node.attrs.align, ...backCompIndent(node) }),
 			id: node.attrs.id,
 			dir: node.attrs.dir,
@@ -164,12 +164,12 @@ export default {
 		parseDOM: [{
 			tag: 'pre',
 			preserveWhitespace: 'full',
-			getAttrs: (dom) => ({
+			getAttrs: dom => ({
 				dir: getDir(dom),
 				indent: getIndent(dom)
 			})
 		}],
-		toDOM: (node) => ['pre', {
+		toDOM: node => ['pre', {
 			style: style({ ...backCompIndent(node) }),
 			dir: node.attrs.dir,
 			'data-indent': node.attrs.indent
@@ -199,11 +199,11 @@ export default {
 		attrs: { order: { default: 1 } },
 		parseDOM: [{
 			tag: 'ol',
-			getAttrs: (dom) => ({
+			getAttrs: dom => ({
 				order: dom.hasAttribute('start') ? +dom.getAttribute('start') : 1
 			})
 		}],
-		toDOM: (node) => (node.attrs.order === 1 ? ['ol', 0] : ['ol', { start: node.attrs.order }, 0])
+		toDOM: node => (node.attrs.order === 1 ? ['ol', 0] : ['ol', { start: node.attrs.order }, 0])
 	},
 
 
@@ -234,7 +234,7 @@ export default {
 					return dom.style.backgroundColor || null;
 				},
 				setDOMAttr(value, attrs) {
-					if (value) attrs.style = (attrs.style || '') + `background-color: ${value};`
+					if (value) attrs.style = (attrs.style || '') + `background-color: ${value};`;
 				}
 			}
 		}
@@ -251,7 +251,7 @@ export default {
 	text: {
 		group: 'inline',
 		toDOM: (node) => {
-			return node.text.replace(/  /g, ' \u00a0')
+			return node.text.replace(/ {2}/g, ' \u00a0');
 		}
 	},
 
@@ -283,7 +283,7 @@ export default {
 		},
 		parseDOM: [{
 			tag: 'img',
-			getAttrs: (dom) => ({
+			getAttrs: dom => ({
 				nodeID: randomString(),
 				src: dom.getAttribute('src'),
 				alt: dom.getAttribute('alt') || '',
@@ -296,7 +296,7 @@ export default {
 				annotation: decodeObject(dom.getAttribute('data-annotation'))
 			})
 		}],
-		toDOM: (node) => ['img', {
+		toDOM: node => ['img', {
 			src: node.attrs.src, // Preserves URL (not data URL) even after the import to have a better compatibility with the old client and also have the original URL just in case
 			alt: node.attrs.alt,
 			title: node.attrs.title,
@@ -323,14 +323,13 @@ export default {
 		},
 		parseDOM: [{
 			tag: 'span.citation',
-			getAttrs: (dom) => ({
+			getAttrs: dom => ({
 				nodeID: randomString(),
 				citation: decodeObject(dom.getAttribute('data-citation'))
 					|| { citationItems: [], properties: {} }
 			})
-		}
-		],
-		toDOM: (node) => ['span', {
+		}],
+		toDOM: node => ['span', {
 			class: 'citation',
 			'data-citation': encodeObject(node.attrs.citation)
 		}, 0]
@@ -351,13 +350,13 @@ export default {
 		},
 		parseDOM: [{
 			tag: 'span.highlight',
-			getAttrs: (dom) => ({
+			getAttrs: dom => ({
 				annotation: decodeObject(dom.getAttribute('data-annotation'))
 			})
 		}],
-		toDOM: (node) => ['span', {
+		toDOM: node => ['span', {
 			class: 'highlight',
 			'data-annotation': encodeObject(node.attrs.annotation)
 		}, 0]
 	}
-}
+};

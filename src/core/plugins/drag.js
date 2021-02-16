@@ -15,11 +15,10 @@ class Drag {
 				return this[name](e);
 			};
 			view.dom.addEventListener(name, handler);
-			return { name: name, handler: handler }
+			return { name: name, handler: handler };
 		});
 
 		this.updateDragHandle = throttle(() => {
-
 			let parentRect = this.view.dom.getBoundingClientRect();
 
 			if (!this.node) {
@@ -40,17 +39,16 @@ class Drag {
 				this.dragHandleNode.className = 'drag-handle';
 				this.dragHandleNode.draggable = true;
 				this.dragHandleNode.addEventListener('dragstart', (event) => {
-
 					event.dataTransfer.setData('text/plain', null);
-					event.dataTransfer.setDragImage(new Image(), 0, 0)
+					event.dataTransfer.setDragImage(new Image(), 0, 0);
 
 					let pos = this.view.posAtDOM(this.node, 0) - 1;
 					let nnn = this.view.state.tr.doc.nodeAt(pos);
 					let $from = this.view.state.tr.doc.resolve(pos);
 
 					this.view.dispatch(this.view.state.tr.setSelection(new NodeSelection($from)));
-					let slice = new Slice(new Fragment([nnn]), 0, 0)
-					this.view.dragging = { slice, move: true }
+					let slice = new Slice(new Fragment([nnn]), 0, 0);
+					this.view.dragging = { slice, move: true };
 				});
 
 				this.dragHandleNode.addEventListener('dragend', (event) => {
@@ -116,7 +114,7 @@ class Drag {
 export function drag(options = {}) {
 	return new Plugin({
 		view(view) {
-			return new Drag(view, options)
+			return new Drag(view, options);
 		}
-	})
+	});
 }

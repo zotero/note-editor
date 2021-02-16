@@ -1,6 +1,6 @@
-import { TextSelection } from 'prosemirror-state'
+import { TextSelection } from 'prosemirror-state';
 import { findParentNode } from 'prosemirror-utils';
-import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list'
+import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
 import { encodeObject, randomString, SetAttrsStep } from './utils';
 import { fromHTML, schema } from './schema';
 import { Fragment, Slice } from 'prosemirror-model';
@@ -70,7 +70,6 @@ export function changeIndent(dir = 1, tab) {
 					dispatch(tr);
 				}
 			}
-
 		}
 
 		if (node) {
@@ -87,8 +86,7 @@ export function changeIndent(dir = 1, tab) {
 		}
 
 		return false;
-	}
-		;
+	};
 }
 
 
@@ -119,15 +117,15 @@ export function toggleAlignment(direction) {
 				if (node.type.attrs.align) {
 					changes = true;
 					if (node.attrs.align === direction) direction = null;
-					tr.setNodeMarkup(pos, null, { ...node.attrs, align: direction })
+					tr.setNodeMarkup(pos, null, { ...node.attrs, align: direction });
 				}
 			});
 
 		if (!changes) return false;
 		if (dispatch) dispatch(tr);
 
-		return true
-	}
+		return true;
+	};
 }
 
 export function toggleDir(dir) {
@@ -142,15 +140,15 @@ export function toggleDir(dir) {
 				if (node.type.attrs.dir) {
 					changes = true;
 					if (node.attrs.dir === dir) dir = null;
-					tr.setNodeMarkup(pos, null, { ...node.attrs, dir })
+					tr.setNodeMarkup(pos, null, { ...node.attrs, dir });
 				}
 			});
 
 		if (!changes) return false;
 		if (dispatch) dispatch(tr);
 
-		return true
-	}
+		return true;
+	};
 }
 
 export function toggleMark1(markType, attrs, force) {
@@ -160,7 +158,7 @@ export function toggleMark1(markType, attrs, force) {
 		var $cursor = ref.$cursor;
 		var ranges = ref.ranges;
 		if ((empty && !$cursor)) {
-			return false
+			return false;
 		}
 		if (dispatch) {
 			if ($cursor) {
@@ -194,8 +192,8 @@ export function toggleMark1(markType, attrs, force) {
 				dispatch(tr.scrollIntoView());
 			}
 		}
-		return true
-	}
+		return true;
+	};
 }
 
 export function insertHTML(pos, html) {
@@ -210,7 +208,7 @@ export function insertHTML(pos, html) {
 			let { tr } = state;
 			tr = tr.insert(pos, nodes);
 			if (negative) {
-				tr = tr.setSelection(new TextSelection(tr.doc.resolve(tr.doc.content.size))).scrollIntoView()
+				tr = tr.setSelection(new TextSelection(tr.doc.resolve(tr.doc.content.size))).scrollIntoView();
 			}
 			dispatch(tr);
 		}
@@ -218,45 +216,45 @@ export function insertHTML(pos, html) {
 			let slice = new Slice(Fragment.fromArray(nodes), 1, 1);
 			dispatch(state.tr.replaceSelection(slice));
 		}
-	}
+	};
 }
 
 function isList(node, schema) {
 	return (node.type === schema.nodes.bulletList
-		|| node.type === schema.nodes.orderedList)
+		|| node.type === schema.nodes.orderedList);
 }
 
 export function toggleList(listType, itemType) {
 	return (state, dispatch, view) => {
-		const { schema, selection } = state
-		const { $from, $to } = selection
-		const range = $from.blockRange($to)
+		const { schema, selection } = state;
+		const { $from, $to } = selection;
+		const range = $from.blockRange($to);
 
 		if (!range) {
-			return false
+			return false;
 		}
 
-		const parentList = findParentNode(node => isList(node, schema))(selection)
+		const parentList = findParentNode(node => isList(node, schema))(selection);
 
 		if (range.depth >= 1 && parentList && range.depth - parentList.depth <= 1) {
 			if (parentList.node.type === listType) {
-				return liftListItem(itemType)(state, dispatch, view)
+				return liftListItem(itemType)(state, dispatch, view);
 			}
 
 			if (isList(parentList.node, schema) && listType.validContent(parentList.node.content)) {
-				const { tr } = state
-				tr.setNodeMarkup(parentList.pos, listType)
+				const { tr } = state;
+				tr.setNodeMarkup(parentList.pos, listType);
 
 				if (dispatch) {
-					dispatch(tr)
+					dispatch(tr);
 				}
 
-				return false
+				return false;
 			}
 		}
 
-		return wrapInList(listType)(state, dispatch, view)
-	}
+		return wrapInList(listType)(state, dispatch, view);
+	};
 }
 
 export function setCitation(nodeID, citation, formattedCitation) {
@@ -264,15 +262,14 @@ export function setCitation(nodeID, citation, formattedCitation) {
 		state.doc.descendants((node, pos) => {
 			if (node.attrs.nodeID === nodeID) {
 				if (citation.citationItems.length) {
-
 					let citationNode = state.schema.nodes.citation.create({
-							...node.attrs,
-							citation
-						},
-						[
-							state.schema.text('(' + formattedCitation + ')')
-						]
-					)
+						...node.attrs,
+						citation
+					},
+					[
+						state.schema.text('(' + formattedCitation + ')')
+					]
+					);
 					dispatch(state.tr.replaceWith(pos, pos + node.nodeSize, citationNode));
 				}
 				else {

@@ -14,7 +14,7 @@ export function buildToHTML(schema) {
 
 		let blockNodes = [
 			'ol', 'ul', 'li', 'br', 'hr', 'blockquote', 'table', 'th', 'tr', 'td', 'thead', 'tbody', 'tfoot'
-		]
+		];
 
 		let nodes = tmp.querySelectorAll([...textNodes, ...blockNodes].join(','));
 		for (let node of nodes) {
@@ -25,7 +25,7 @@ export function buildToHTML(schema) {
 		}
 		let html = tmp.innerHTML.trim();
 		return `<div data-schema-version="${schema.version}">${html}</div>`;
-	}
+	};
 }
 
 export function buildFromHTML(schema) {
@@ -42,7 +42,7 @@ export function buildFromHTML(schema) {
 		else {
 			return DOMParser.fromSchema(schema).parse(fragment);
 		}
-	}
+	};
 }
 
 export function buildClipboardSerializer(provider, schema) {
@@ -80,7 +80,7 @@ export function buildClipboardSerializer(provider, schema) {
 			return ['span', {
 				class: 'highlight',
 				'data-annotation': encodeObject(node.attrs.annotation)
-			}, 0]
+			}, 0];
 		}
 	}), base.marks);
 }

@@ -1,22 +1,22 @@
 import applyDevTools from 'prosemirror-dev-tools';
-import { EditorState, NodeSelection, Plugin, SelectionRange } from 'prosemirror-state'
-import { EditorView } from 'prosemirror-view'
-import { schema, toHTML, buildClipboardSerializer } from './schema'
-import { DOMSerializer } from 'prosemirror-model'
-import { TextSelection } from 'prosemirror-state'
-import { DOMParser as DOMParser2, Pos, Node } from 'prosemirror-model'
-import { debounce, decodeObject, encodeObject, randomString } from './utils'
+import { EditorState, NodeSelection, Plugin, SelectionRange } from 'prosemirror-state';
+import { EditorView } from 'prosemirror-view';
+import { schema, toHTML, buildClipboardSerializer } from './schema';
+import { DOMSerializer } from 'prosemirror-model';
+import { TextSelection } from 'prosemirror-state';
+import { DOMParser as DOMParser2, Pos, Node } from 'prosemirror-model';
+import { debounce, decodeObject, encodeObject, randomString } from './utils';
 
 
-import nodeViews from './node-views'
+import nodeViews from './node-views';
 import { attachImportedImage, insertHTML, setCitation } from './commands';
 import { columnResizing, tableEditing } from 'prosemirror-tables';
 
 import { dropCursor } from 'prosemirror-dropcursor';
 import { menu, menuKey } from './plugins/menu';
 import { link, linkKey } from './plugins/link';
-import { search, searchKey } from './plugins/search'
-import { image, imageKey } from './plugins/image'
+import { search, searchKey } from './plugins/search';
+import { image, imageKey } from './plugins/image';
 
 import { gapCursor } from 'prosemirror-gapcursor';
 import { keymap } from 'prosemirror-keymap';
@@ -32,7 +32,7 @@ import { readOnly } from './plugins/read-only';
 import { transform } from './plugins/schema-transform';
 import { dropPaste } from './plugins/drop-paste';
 import { placeholder } from './plugins/placeholder';
-import { highlight, highlightKey } from './plugins/highlight'
+import { highlight, highlightKey } from './plugins/highlight';
 import { citation, citationKey } from './plugins/citation';
 import { drag } from './plugins/drag';
 
@@ -167,7 +167,7 @@ class EditorCore {
 				})
 			},
 			dispatchTransaction(transaction) {
-				let newState = this.state.apply(transaction)
+				let newState = this.state.apply(transaction);
 				if (transaction.docChanged
 					&& toHTML(this.state.doc.content) !== toHTML(newState.doc.content)) {
 					that.docChanged = true;
@@ -203,7 +203,6 @@ class EditorCore {
 							}
 							options.onOpenContextMenu($from.pos, node, event.screenX, event.screenY);
 						}, 0);
-
 					}
 				},
 				click: (view, event) => {
@@ -228,13 +227,13 @@ class EditorCore {
 			highlight: highlightKey.getState(state),
 			image: imageKey.getState(state),
 			citation: citationKey.getState(state)
-		}
+		};
 	}
 
 	getNodeView(pos) {
-		return this.nodeViews.find(nodeView => {
+		return this.nodeViews.find((nodeView) => {
 			let nodeViewPos = nodeView.getPos();
-			return pos >= nodeViewPos && pos < nodeViewPos + nodeView.node.content.size + 1
+			return pos >= nodeViewPos && pos < nodeViewPos + nodeView.node.content.size + 1;
 		});
 	}
 
@@ -260,7 +259,7 @@ class EditorCore {
 
 	getHTML() {
 		return toHTML(this.view.state.doc.content);
-	};
+	}
 
 	focus() {
 		this.view.focus();

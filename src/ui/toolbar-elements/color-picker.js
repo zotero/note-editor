@@ -60,7 +60,7 @@ export default function ColorPicker(props) {
 		window.addEventListener('mousedown', handleMouseDownCallback);
 		return () => {
 			window.removeEventListener('mousedown', handleMouseDownCallback);
-		}
+		};
 	}, [handleMouseDownCallback]);
 
 	function handleWindowMousedown(event) {
@@ -82,7 +82,7 @@ export default function ColorPicker(props) {
 			setPopupPosition({
 				left,
 				top
-			})
+			});
 		}
 	}
 
@@ -111,7 +111,7 @@ export default function ColorPicker(props) {
 	}
 
 	return (
-		<div ref={rootRef} className={cx('color-picker', { 'background': props.isBackground })}>
+		<div ref={rootRef} className={cx('color-picker', { background: props.isBackground })}>
 			<div className="color-button" onClick={handleColorButtonClick} title={props.title}>
 				<div className="mce-ico mce-i-forecolor"/>
 				<div className="preview" style={{ backgroundColor: color[0] }}/>
@@ -137,5 +137,5 @@ export default function ColorPicker(props) {
 				</div>
 			</div>}
 		</div>
-	)
+	);
 }

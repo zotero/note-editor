@@ -8,7 +8,7 @@ export default function Button({ state, icon, title }) {
 		<div
 			className={cx('toolbar-button', { active: state.isActive })}
 			title={title}
-			onMouseDown={e => {
+			onMouseDown={(e) => {
 				e.preventDefault();
 				state.run();
 			}}

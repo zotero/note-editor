@@ -66,7 +66,6 @@ function transformFragment(schema, fragment, data) {
 }
 
 function transformSlice(schema, slice) {
-
 	const fragment = transformFragment(schema, slice.content);
 	if (fragment) {
 		return new Slice(fragment, slice.openStart, slice.openEnd);
@@ -87,12 +86,12 @@ async function insertImages(view, pos, files) {
 						src: dataURL
 					}));
 					resolve();
-				}
+				};
 				reader.onerror = () => {
 					resolve();
-				}
+				};
 				reader.readAsDataURL(file);
-			}))
+			}));
 		}
 	}
 	await Promise.all(promises);
@@ -130,14 +129,14 @@ export function dropPaste(options) {
 				let html = event.dataTransfer.getData('text/html') || window.droppedData && window.droppedData['text/html'];
 				let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
 				let data;
-				console.log('drop', event)
+				console.log('drop', event);
 				if (event.dataTransfer.files.length) {
 					insertImages(view, pos.pos, event.dataTransfer.files);
 					return true;
 				}
 				else if (data = event.dataTransfer.getData('zotero/annotation')) {
 					options.onInsertObject('zotero/annotation', data, pos.pos);
-					return true
+					return true;
 				}
 				else if (data = event.dataTransfer.getData('zotero/item')) {
 					options.onInsertObject('zotero/item', data, pos.pos);

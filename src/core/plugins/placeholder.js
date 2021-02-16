@@ -4,7 +4,7 @@ import { Decoration, DecorationSet } from 'prosemirror-view';
 export function placeholder(options) {
 	return new Plugin({
 		props: {
-			decorations: state => {
+			decorations: (state) => {
 				const decorations = [];
 				if (options.text && state.doc.content.childCount === 1) {
 					state.doc.descendants((node, pos) => {
@@ -14,12 +14,12 @@ export function placeholder(options) {
 									class: 'empty-node',
 									'data-placeholder': options.text
 								})
-							)
+							);
 						}
 						return false;
 					});
 				}
-				return DecorationSet.create(state.doc, decorations)
+				return DecorationSet.create(state.doc, decorations);
 			}
 		}
 	});

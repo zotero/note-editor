@@ -9,9 +9,9 @@ class ImageView {
 					}
 					this.img.parentNode.style.paddingBottom = '';
 					this.img.style.display = 'block';
-				}
+				};
 				this.img.src = data.src;
-			}
+			};
 
 			this.provider = options.provider;
 			this.provider.subscribe({
@@ -49,7 +49,7 @@ class ImageView {
 			}
 			div.appendChild(img);
 
-			resizedWrapper.appendChild(div)
+			resizedWrapper.appendChild(div);
 
 			this.dom = imageBlock;
 			this.img = img;
@@ -78,7 +78,7 @@ class ImageView {
 				a.onclick = (event) => {
 					event.preventDefault();
 					options.onOpenURL(event.target.href);
-				}
+				};
 				let host = 'unknown';
 				try {
 					host = (new URL(node.attrs.src)).host;
@@ -125,5 +125,5 @@ class ImageView {
 export default function (options) {
 	return function (node, view, getPos) {
 		return new ImageView(node, view, getPos, options);
-	}
+	};
 }

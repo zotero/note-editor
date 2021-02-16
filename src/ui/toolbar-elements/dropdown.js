@@ -25,7 +25,7 @@ export default function Dropdown({ blocks }) {
 		window.addEventListener('mousedown', handleMouseDownCallback);
 		return () => {
 			window.removeEventListener('mousedown', handleMouseDownCallback);
-		}
+		};
 	}, [handleMouseDownCallback]);
 
 	function handleWindowMousedown(event) {
@@ -44,7 +44,7 @@ export default function Dropdown({ blocks }) {
 			setPopupPosition({
 				left,
 				top
-			})
+			});
 		}
 	}
 

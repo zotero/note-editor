@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Editor from './ui/editor'
+import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
 
 import { imageStore, citationStore } from './index.web.data';
@@ -53,7 +53,6 @@ async function importImage(src) {
 }
 
 function main(html) {
-
 	window.dir = 'ltr';
 
 	let font = {
@@ -125,7 +124,7 @@ function main(html) {
 			console.log('onUnsubscribeProvider', subscription);
 		},
 		async onImportImages(images) {
-			console.log('onImportImages', images)
+			console.log('onImportImages', images);
 			for (let image of images) {
 				let attachmentKey = await importImage(image.src);
 				editorCore.attachImportedImage(image.nodeID, attachmentKey);
@@ -195,7 +194,7 @@ function main(html) {
 			}
 		},
 		onOpenAnnotation(annotation) {
-			console.log('onOpenAnnotation', annotation)
+			console.log('onOpenAnnotation', annotation);
 			alert('Opening annotation: ' + JSON.stringify(annotation));
 		},
 		onOpenCitation(citation) {
@@ -207,8 +206,8 @@ function main(html) {
 			alert('Open quick format citation dialog ' + id + ' ' + JSON.stringify(citation));
 		},
 		onOpenContextMenu: (pos, node, x, y) => {
-			console.log('onOpenContextMenu', pos, node, x, y)
-			console.log('nodeView', editorCore.getNodeView(pos))
+			console.log('onOpenContextMenu', pos, node, x, y);
+			console.log('nodeView', editorCore.getNodeView(pos));
 		}
 	});
 
@@ -221,7 +220,7 @@ function main(html) {
 			readOnly={false}
 			editorCore={editorCore}
 			onClickReturn={() => {
-				console.log('Clicked return')
+				console.log('Clicked return');
 			}}
 		/>,
 		document.getElementById('editor-container')

@@ -20,7 +20,7 @@ class Provider {
 	}
 
 	notify(id, type, data) {
-		this.subscriptions.forEach(subscription => {
+		this.subscriptions.forEach((subscription) => {
 			if (subscription.id === id && subscription.type === type) {
 				subscription.listener(data);
 				subscription.cachedData = data;

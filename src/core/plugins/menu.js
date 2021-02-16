@@ -1,31 +1,31 @@
 import { Plugin, PluginKey } from 'prosemirror-state';
 
 
-import { toggleMark, setBlockType, wrapIn } from 'prosemirror-commands'
-import { wrapInList } from 'prosemirror-schema-list'
+import { toggleMark, setBlockType, wrapIn } from 'prosemirror-commands';
+import { wrapInList } from 'prosemirror-schema-list';
 
-import * as commands from '../commands'
-import { schema } from '../schema'
+import * as commands from '../commands';
+import { schema } from '../schema';
 
-import { TextSelection } from 'prosemirror-state'
+import { TextSelection } from 'prosemirror-state';
 import nodeIsActive, { getActiveColor } from '../utils';
 
 
-let markActive3 = type => state => {
-	let { from, $from, to, empty } = state.selection
-	if (empty) return type.isInSet(state.storedMarks || $from.marks())
-	else return state.doc.rangeHasMark(from, to, type)
-}
+let markActive3 = type => (state) => {
+	let { from, $from, to, empty } = state.selection;
+	if (empty) return type.isInSet(state.storedMarks || $from.marks());
+	else return state.doc.rangeHasMark(from, to, type);
+};
 
-const blockActive = (type, attrs = {}) => state => {
-	const { $from, to, node } = state.selection
+const blockActive = (type, attrs = {}) => (state) => {
+	const { $from, to, node } = state.selection;
 
 	if (node) {
-		return node.hasMarkup(type, attrs)
+		return node.hasMarkup(type, attrs);
 	}
 
-	return to <= $from.end() && $from.parent.hasMarkup(type, attrs)
-}
+	return to <= $from.end() && $from.parent.hasMarkup(type, attrs);
+};
 
 
 function hasMarkup(node, type, attrs) {
@@ -35,26 +35,26 @@ function hasMarkup(node, type, attrs) {
 
 class Menu {
 	constructor(state) {
-		this.update(state)
+		this.update(state);
 	}
 
 	buildToggle(type, attrs) {
 		return {
 			isActive: markActive3(type.create(attrs))(this.state),
 			run: () => {
-				toggleMark(type, attrs)(this.view.state, this.view.dispatch)
+				toggleMark(type, attrs)(this.view.state, this.view.dispatch);
 			}
-		}
+		};
 	}
 
 	buildBlock(nodeType, attrs) {
 		let command = setBlockType(nodeType, attrs);
 		let isActive;
 
-		const { $from, to, node } = this.state.selection
+		const { $from, to, node } = this.state.selection;
 
 		if (node) {
-			isActive = hasMarkup(node, nodeType, attrs)
+			isActive = hasMarkup(node, nodeType, attrs);
 		}
 		else {
 			isActive = to <= $from.end() && hasMarkup($from.parent, nodeType, attrs);
@@ -63,9 +63,9 @@ class Menu {
 		return {
 			isActive,
 			run: () => {
-				command(this.view.state, this.view.dispatch)
+				command(this.view.state, this.view.dispatch);
 			}
-		}
+		};
 	}
 
 	update(newState) {
@@ -77,11 +77,11 @@ class Menu {
 		let state = newState;
 		this.state = newState;
 		this.strong = this.buildToggle(schema.marks.strong);
-		this.em = this.buildToggle(schema.marks.em)
-		this.strike = this.buildToggle(schema.marks.strike)
-		this.underline = this.buildToggle(schema.marks.underline)
-		this.subscript = this.buildToggle(schema.marks.subsup, { type: 'sub' })
-		this.superscript = this.buildToggle(schema.marks.subsup, { type: 'sup' })
+		this.em = this.buildToggle(schema.marks.em);
+		this.strike = this.buildToggle(schema.marks.strike);
+		this.underline = this.buildToggle(schema.marks.underline);
+		this.subscript = this.buildToggle(schema.marks.subsup, { type: 'sub' });
+		this.superscript = this.buildToggle(schema.marks.subsup, { type: 'sup' });
 
 		this.textColor = {
 			color: getActiveColor(state),
@@ -95,14 +95,14 @@ class Menu {
 			run(color) {
 				commands.toggleMark1(schema.marks.backgroundColor, { color }, true)(state, dispatch);
 			}
-		}
+		};
 
 		this.clearFormatting = {
 			isActive: false,
 			run() {
 				dispatch(state.tr.removeMark(state.selection.from, state.selection.to).setStoredMarks([]));
 			}
-		}
+		};
 
 		this.blocks = {
 			paragraph: this.buildBlock(schema.nodes.paragraph),
@@ -113,77 +113,77 @@ class Menu {
 			heading4: this.buildBlock(schema.nodes.heading, { level: 4 }),
 			heading5: this.buildBlock(schema.nodes.heading, { level: 5 }),
 			heading6: this.buildBlock(schema.nodes.heading, { level: 6 })
-		}
+		};
 
 		this.alignLeft = {
 			isActive: commands.hasAttr(state, 'align', 'left'),
 			run() {
-				commands.toggleAlignment('left')(state, dispatch)
+				commands.toggleAlignment('left')(state, dispatch);
 			}
-		}
+		};
 
 		this.alignCenter = {
 			isActive: commands.hasAttr(state, 'align', 'center'),
 			run() {
-				commands.toggleAlignment('center')(state, dispatch)
+				commands.toggleAlignment('center')(state, dispatch);
 			}
-		}
+		};
 
 		this.alignRight = {
 			isActive: commands.hasAttr(state, 'align', 'right'),
 			run() {
-				commands.toggleAlignment('right')(state, dispatch)
+				commands.toggleAlignment('right')(state, dispatch);
 			}
-		}
+		};
 
 		this.blockquote = {
 			isActive: blockActive(schema.marks.blockquote)(state),
 			run() {
 				return wrapIn(schema.nodes.blockquote)(state, dispatch);
 			}
-		}
+		};
 
 		this.bulletList = {
 			isActive: nodeIsActive(state, schema.nodes.bulletList),
 			run() {
 				commands.toggleList(schema.nodes.bulletList, schema.nodes.listItem)(state, dispatch);
 			}
-		}
+		};
 
 		this.orderedList = {
 			isActive: nodeIsActive(state, schema.nodes.orderedList),
 			run() {
 				commands.toggleList(schema.nodes.orderedList, schema.nodes.listItem)(state, dispatch);
 			}
-		}
+		};
 
 		this.indent = {
 			isActive: false,
 			run() {
-				commands.changeIndent(1)(state, dispatch)
+				commands.changeIndent(1)(state, dispatch);
 			}
-		}
+		};
 
 		this.outdent = {
 			isActive: false,
 			run() {
-				commands.changeIndent(-1)(state, dispatch)
+				commands.changeIndent(-1)(state, dispatch);
 			}
-		}
+		};
 
 		this.ltr = {
 			isActive: commands.hasAttr(state, 'dir', 'ltr'),
 			run() {
-				commands.toggleDir('ltr')(state, dispatch)
+				commands.toggleDir('ltr')(state, dispatch);
 			}
-		}
+		};
 
 		this.rtl = {
 			isActive: commands.hasAttr(state, 'dir', 'rtl'),
 			run() {
-				commands.toggleDir('rtl')(state, dispatch)
+				commands.toggleDir('rtl')(state, dispatch);
 			}
-		}
+		};
 	}
 }
 
@@ -204,7 +204,7 @@ export function menu() {
 		view: (view) => {
 			let pluginState = menuKey.getState(view.state);
 			pluginState.view = view;
-			return {}
+			return {};
 		}
 	});
 }

@@ -10,5 +10,5 @@ export function readOnly(options) {
 			}
 			return true;
 		}
-	})
+	});
 }

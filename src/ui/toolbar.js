@@ -18,7 +18,6 @@ function Group({ children }) {
 }
 
 function Toolbar({ enableReturnButton, menuState, linkState, searchState, onClickReturn }) {
-
 	function handleMouseDown(event) {
 		event.preventDefault();
 	}

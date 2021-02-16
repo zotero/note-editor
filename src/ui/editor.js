@@ -14,15 +14,15 @@ function Editor(props) {
 	const editorRef = useRef(null);
 	const [editorState, setEditorState] = useState(props.editorCore.pluginState);
 
-	const [refReady, setRefReady] = useState(false)
+	const [refReady, setRefReady] = useState(false);
 	useEffect(() => {
-		setRefReady(true)
-	}, [])
+		setRefReady(true);
+	}, []);
 
 	useLayoutEffect(() => {
 		props.editorCore.onUpdateState = (state) => {
 			setEditorState(props.editorCore.pluginState);
-		}
+		};
 		editorRef.current.appendChild(props.editorCore.view.dom);
 	}, []);
 

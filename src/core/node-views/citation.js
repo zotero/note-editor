@@ -1,14 +1,15 @@
 class CitationView {
 	constructor(node, view, getPos, options) {
 		this.provider = options.provider;
-		this.dom = document.createElement('span')
+		this.dom = document.createElement('span');
 		this.dom.className = 'citation';
 		this.dom.innerHTML = '{citation}';
 
 		this.listener = (data) => {
-			this.dom.innerHTML = data.formattedCitation ?
-				`(${data.formattedCitation})` : '{citation}';
-		}
+			this.dom.innerHTML = data.formattedCitation
+				? `(${data.formattedCitation})`
+				: '{citation}';
+		};
 
 		this.provider.subscribe({
 			type: 'citation',
@@ -36,5 +37,5 @@ class CitationView {
 export default function (options) {
 	return function (node, view, getPos) {
 		return new CitationView(node, view, getPos, options);
-	}
+	};
 }

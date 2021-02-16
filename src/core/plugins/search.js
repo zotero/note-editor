@@ -1,6 +1,6 @@
-import { TextSelection } from 'prosemirror-state'
-import { Plugin, PluginKey } from 'prosemirror-state'
-import { Decoration, DecorationSet } from 'prosemirror-view'
+import { TextSelection } from 'prosemirror-state';
+import { Plugin, PluginKey } from 'prosemirror-state';
+import { Decoration, DecorationSet } from 'prosemirror-view';
 
 // TODO: Keyboard navigation
 // TODO: Focus the first result when typing
@@ -9,7 +9,7 @@ import { Decoration, DecorationSet } from 'prosemirror-view'
 class Search {
 	constructor(options = {}) {
 		this.active = false;
-		this.searchTerm = ''
+		this.searchTerm = '';
 		this.caseSensitive = false;
 		this.wholeWords = false;
 		this.findClass = 'find';
@@ -101,7 +101,7 @@ class Search {
 		let searchRe = new RegExp(
 			this.wholeWords ? `\\b(${searchTerm})\\b` : searchTerm,
 			!this.caseSensitive ? 'gui' : 'gu'
-		)
+		);
 
 		doc.descendants((node, pos) => {
 			if (node.isText) {
@@ -109,19 +109,19 @@ class Search {
 					mergedTextNodes[index] = {
 						text: mergedTextNodes[index].text + node.text,
 						pos: mergedTextNodes[index].pos
-					}
+					};
 				}
 				else {
 					mergedTextNodes[index] = {
 						text: node.text,
 						pos
-					}
+					};
 				}
 			}
 			else {
-				index += 1
+				index += 1;
 			}
-		})
+		});
 
 		mergedTextNodes.forEach(({ text, pos }) => {
 			searchRe.lastIndex = 0;
@@ -134,9 +134,9 @@ class Search {
 				this.results.push({
 					from: pos + m.index,
 					to: pos + m.index + m[0].length
-				})
+				});
 			}
-		})
+		});
 	}
 
 	replace(replace) {
@@ -164,7 +164,7 @@ class Search {
 		for (let result of this.results) {
 			tr.insertText(replace, tr.mapping.map(result.from), tr.mapping.map(result.to));
 		}
-		dispatch(tr)
+		dispatch(tr);
 	}
 
 	updateDecorations(tr) {
@@ -201,12 +201,12 @@ export function search() {
 		view: (view) => {
 			let pluginState = searchKey.getState(view.state);
 			pluginState.view = view;
-			return {}
+			return {};
 		},
 		props: {
 			decorations(state) {
 				return this.getState(state).decorations;
 			}
 		}
-	})
+	});
 }

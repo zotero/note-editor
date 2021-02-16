@@ -1,4 +1,4 @@
-import { wrappingInputRule, inputRules } from 'prosemirror-inputrules'
+import { wrappingInputRule, inputRules } from 'prosemirror-inputrules';
 
 export function buildInputRules(schema) {
 	let rules = [
@@ -7,5 +7,5 @@ export function buildInputRules(schema) {
 		wrappingInputRule(/^\s*([-+*])\s$/, schema.nodes.bulletList)
 	];
 
-	return inputRules({ rules })
+	return inputRules({ rules });
 }

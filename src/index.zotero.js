@@ -65,8 +65,6 @@ class EditorInstance {
 	}
 
 	_postMessage(message) {
-		console.log('posting', message);
-		console.log('posting 1111', { instanceID: this.instanceID, message });
 		window.postMessage({ instanceID: this.instanceID, message }, '*');
 	}
 
@@ -105,8 +103,11 @@ class EditorInstance {
 			onOpenAnnotation: (annotation) => {
 				this._postMessage({ action: 'openAnnotation', uri: annotation.uri, position: annotation.position });
 			},
-			onOpenCitation: (citation) => {
-				this._postMessage({ action: 'openCitation', citation });
+			onOpenCitationPage: (citation) => {
+				this._postMessage({ action: 'openCitationPage', citation });
+			},
+			onShowCitationItem: (citation) => {
+				this._postMessage({ action: 'showCitationItem', citation });
 			},
 			onOpenCitationPopup: (nodeID, citation) => {
 				this._postMessage({ action: 'openCitationPopup', nodeID, citation });

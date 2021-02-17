@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, Fragment } from 'react';
 import cx from 'classnames';
 
+// TODO: Rewrite all popups and reuse the common logic
+
 function CitationPopup({ parentRef, pluginState }) {
 	const containerRef = useRef();
 	const popupRef = useRef();
@@ -16,21 +18,27 @@ function CitationPopup({ parentRef, pluginState }) {
 		let parentScrollTop = parentRef.current.scrollTop;
 		let parentTop = parentRef.current.getBoundingClientRect().top;
 		let maxWidth = containerRef.current.offsetWidth;
-		let top = parentScrollTop + (pluginState.rect.top - popupRef.current.offsetHeight - parentTop - 8);
-		let left = pluginState.rect.left;
-		let isAbove = true;
+		let top = parentScrollTop + (pluginState.rect.top - popupRef.current.offsetHeight - parentTop - 10);
 		if (top < 0) {
-			top = parentScrollTop + (pluginState.rect.bottom - parentTop);
-			isAbove = false;
+			top = parentScrollTop + (pluginState.rect.bottom - parentTop) + 10;
+			popupRef.current.classList.remove('page-popup-top');
+			popupRef.current.classList.add('page-popup-bottom');
+		}
+		else {
+			popupRef.current.classList.remove('page-popup-bottom');
+			popupRef.current.classList.add('page-popup-top');
 		}
 
 		let width = popupRef.current.offsetWidth;
 
-
-		left = pluginState.rect.left + (pluginState.rect.right - pluginState.rect.left) / 2 - width / 2;
+		let left = pluginState.rect.left + (pluginState.rect.right - pluginState.rect.left) / 2 - width / 2;
 
 		if (left + width > maxWidth) {
 			left = maxWidth - width;
+		}
+
+		if (left < 0) {
+			left = 0;
 		}
 
 		popupRef.current.style.top = Math.round(top) + 'px';
@@ -45,6 +53,10 @@ function CitationPopup({ parentRef, pluginState }) {
 		pluginState.open();
 	}
 
+	function handleShowItem() {
+		pluginState.showItem();
+	}
+
 	function handleEdit() {
 		pluginState.edit();
 	}
@@ -56,10 +68,11 @@ function CitationPopup({ parentRef, pluginState }) {
 			<div ref={containerRef}>
 				<div
 					ref={popupRef}
-					className={cx('citation-popup page-popup page-popup-top')}
+					className={cx('citation-popup page-popup')}
 				>
-					<div className="button toolbarButton" onClick={handleEdit}>Edit</div>
-					<div className="button toolbarButton" onClick={handleOpen}>Open</div>
+					{pluginState.enableOpen && <div className="button toolbarButton" onClick={handleOpen}>Show on Page</div>}
+					<div className="button toolbarButton" onClick={handleShowItem}>Show Item</div>
+					<div className="button toolbarButton" onClick={handleEdit}>Edit Citation</div>
 				</div>
 			</div>
 		);

@@ -22,12 +22,17 @@ function LinkPopup({ parentRef, linkState }) {
 		let parentScrollTop = parentRef.current.scrollTop;
 		let parentTop = parentRef.current.getBoundingClientRect().top;
 		let maxWidth = containerRef.current.offsetWidth;
-		let top = parentScrollTop + (linkState.top - popupRef.current.offsetHeight - parentTop);
+		let top = parentScrollTop + (linkState.top - popupRef.current.offsetHeight - parentTop - 10);
 		let left = linkState.left;
 		let isAbove = true;
 		if (top < 0) {
-			top = parentScrollTop + (linkState.bottom - parentTop);
-			isAbove = false;
+			top = parentScrollTop + (linkState.bottom - parentTop) + 10;
+			popupRef.current.classList.remove('page-popup-top');
+			popupRef.current.classList.add('page-popup-bottom');
+		}
+		else {
+			popupRef.current.classList.remove('page-popup-bottom');
+			popupRef.current.classList.add('page-popup-top');
 		}
 
 		let width = popupRef.current.offsetWidth;
@@ -35,8 +40,12 @@ function LinkPopup({ parentRef, linkState }) {
 			left = maxWidth - width;
 		}
 
-		popupRef.current.style.top = top + 'px';
-		popupRef.current.style.left = left + 'px';
+		if (left < 0) {
+			left = 0;
+		}
+
+		popupRef.current.style.top = Math.round(top) + 'px';
+		popupRef.current.style.left = Math.round(left) + 'px';
 
 		if (inputRef.current) {
 			inputRef.current.value = linkState.href || '';

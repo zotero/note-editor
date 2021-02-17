@@ -16,21 +16,27 @@ function HighlightPopup({ parentRef, pluginState }) {
 		let parentScrollTop = parentRef.current.scrollTop;
 		let parentTop = parentRef.current.getBoundingClientRect().top;
 		let maxWidth = containerRef.current.offsetWidth;
-		let top = parentScrollTop + (pluginState.rect.top - popupRef.current.offsetHeight - parentTop - 8);
-		let left = pluginState.rect.left;
-		let isAbove = true;
+		let top = parentScrollTop + (pluginState.rect.top - popupRef.current.offsetHeight - parentTop - 10);
 		if (top < 0) {
-			top = parentScrollTop + (pluginState.rect.bottom - parentTop);
-			isAbove = false;
+			top = parentScrollTop + (pluginState.rect.bottom - parentTop) + 10;
+			popupRef.current.classList.remove('page-popup-top');
+			popupRef.current.classList.add('page-popup-bottom');
+		}
+		else {
+			popupRef.current.classList.remove('page-popup-bottom');
+			popupRef.current.classList.add('page-popup-top');
 		}
 
 		let width = popupRef.current.offsetWidth;
 
-		left = pluginState.rect.left + (pluginState.rect.right - pluginState.rect.left) / 2 - width / 2;
-
+		let left = pluginState.rect.left + (pluginState.rect.right - pluginState.rect.left) / 2 - width / 2;
 
 		if (left + width > maxWidth) {
 			left = maxWidth - width;
+		}
+
+		if (left < 0) {
+			left = 0;
 		}
 
 		popupRef.current.style.top = Math.round(top) + 'px';
@@ -72,14 +78,9 @@ function HighlightPopup({ parentRef, pluginState }) {
 					ref={popupRef}
 					className={cx('highlight-popup page-popup page-popup-top')}
 				>
-					<div className="button toolbarButton" onClick={handleOpen}>
-						<div>Open</div>
-					</div>
-					<div className="button toolbarButton" onClick={handleUnlink}>
-						<div>Unlink</div>
-					</div>
-					{pluginState.enableAddCitation &&
-					<div className="button toolbarButton" onClick={handleAdd}>Add Citation</div>}
+					<div className="button toolbarButton" onClick={handleOpen}>Show on Page</div>
+					<div className="button toolbarButton" onClick={handleUnlink}>Unlink</div>
+					{pluginState.enableAddCitation && <div className="button toolbarButton" onClick={handleAdd}>Add Citation</div>}
 				</div>
 			</div>
 		);

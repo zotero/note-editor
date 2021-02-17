@@ -127,6 +127,10 @@ class Citation {
 				isMultiline,
 				pos: from,
 				rect,
+				enableOpen: node.attrs.citation && node.attrs.citation.citationItems && node.attrs.citation.citationItems[0].locator,
+				showItem: () => {
+					this.options.onShowItem(node);
+				},
 				open: () => {
 					this.options.onOpen(node);
 				},

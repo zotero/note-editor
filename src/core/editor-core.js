@@ -133,8 +133,11 @@ class EditorCore {
 						onGenerateCitation: options.onGenerateCitation
 					}),
 					citation({
+						onShowItem: (node) => {
+							options.onShowCitationItem(node.attrs.citation);
+						},
 						onOpen: (node) => {
-							options.onOpenCitation(node.attrs.citation);
+							options.onOpenCitationPage(node.attrs.citation);
 						},
 						onEdit: (node) => {
 							if (!node.attrs.nodeID) return;

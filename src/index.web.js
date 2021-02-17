@@ -201,6 +201,14 @@ function main(html) {
 			console.log('onOpenCitation', citation);
 			alert('Opening citation: ' + JSON.stringify(citation));
 		},
+		onOpenCitationPage: (citation) => {
+			console.log('onOpenCitationPage', citation);
+			alert('Opening citation: ' + JSON.stringify(citation));
+		},
+		onShowCitationItem: (citation) => {
+			console.log('onShowCitationItem', citation);
+			alert('Opening citation: ' + JSON.stringify(citation));
+		},
 		onOpenCitationPopup(id, citation) {
 			console.log('onOpenCitationPopup', id, citation);
 			alert('Open quick format citation dialog ' + id + ' ' + JSON.stringify(citation));

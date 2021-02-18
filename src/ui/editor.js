@@ -28,7 +28,7 @@ function Editor(props) {
 
 	return (
 		<div className="editor">
-			{!props.readOnly && <Toolbar
+			{!props.disableUI && <Toolbar
 				enableReturnButton={props.enableReturnButton}
 				menuState={editorState.menu}
 				linkState={editorState.link}
@@ -36,13 +36,11 @@ function Editor(props) {
 				onClickReturn={props.onClickReturn}
 			/>}
 			<Findbar searchState={editorState.search} active={editorState.search.active}/>
-			{props.showUpdateNotice &&
-			<Noticebar>Please update Zotero to edit the note</Noticebar>}
+			{props.showUpdateNotice && <Noticebar>Please update Zotero to edit the note</Noticebar>}
 			<div className="editor-core" ref={editorRef}>
 				<div className="relative-container">
-					{refReady && <Fragment>
-						{editorState.link &&
-						<LinkPopup parentRef={editorRef} linkState={editorState.link.popup}/>}
+					{refReady && !props.disableUI && <Fragment>
+						{editorState.link && <LinkPopup parentRef={editorRef} linkState={editorState.link.popup}/>}
 						{editorState.highlight && <HighlightPopup parentRef={editorRef} pluginState={editorState.highlight.popup}/>}
 						{editorState.image && <ImagePopup parentRef={editorRef} pluginState={editorState.image.popup}/>}
 						{editorState.citation && <CitationPopup parentRef={editorRef} pluginState={editorState.citation.popup}/>}

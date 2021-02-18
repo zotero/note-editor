@@ -223,9 +223,10 @@ function main(html) {
 
 	ReactDOM.render(
 		<Editor
+			readOnly={false}
+			disableUI={false}
 			showUpdateNotice={true}
 			enableReturnButton={true}
-			readOnly={false}
 			editorCore={editorCore}
 			onClickReturn={() => {
 				console.log('Clicked return');

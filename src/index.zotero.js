@@ -44,6 +44,7 @@ class EditorInstance {
 	constructor(options) {
 		this.instanceID = options.instanceID;
 		this._readOnly = options.readOnly;
+		this._disableUI = options.disableUI;
 		this._placeholder = options.placeholder;
 		this._dir = window.dir = options.dir;
 		this._hasBackup = options.hasBackup;
@@ -126,6 +127,7 @@ class EditorInstance {
 		ReactDOM.render(
 			<Editor
 				readOnly={this._readOnly}
+				disableUI={this._disableUI}
 				enableReturnButton={this._enableReturnButton}
 				showUpdateNotice={this._editorCore.unsupportedSchema}
 				editorCore={this._editorCore}
@@ -334,16 +336,17 @@ window.addEventListener('message', function (e) {
 		if (currentInstance) {
 			currentInstance.uninit();
 		}
-		let { value, readOnly, placeholder, dir, font, hasBackup, enableReturnButton } = message;
+
 		currentInstance = new EditorInstance({
 			instanceID,
-			value,
-			readOnly,
-			placeholder,
-			dir,
-			font,
-			hasBackup,
-			enableReturnButton
+			value: message.value,
+			readOnly: message.readOnly,
+			disableUI: message.disableUI,
+			placeholder: message.placeholder,
+			dir: message.dir,
+			font: message.font,
+			hasBackup: message.hasBackup,
+			enableReturnButton: message.enableReturnButton
 		});
 	}
 });

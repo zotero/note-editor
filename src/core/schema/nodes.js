@@ -276,8 +276,6 @@ export default {
 			title: { default: null },
 			width: { default: null },
 			height: { default: null },
-			naturalWidth: { default: null },
-			naturalHeight: { default: null },
 			attachmentKey: { default: null },
 			annotation: { default: null }
 		},
@@ -290,8 +288,6 @@ export default {
 				title: dom.getAttribute('title'),
 				width: getInteger(dom.getAttribute('width')),
 				height: getInteger(dom.getAttribute('height')),
-				naturalWidth: getInteger(dom.getAttribute('data-natural-width')),
-				naturalHeight: getInteger(dom.getAttribute('data-natural-height')),
 				attachmentKey: dom.getAttribute('data-attachment-key'),
 				annotation: decodeObject(dom.getAttribute('data-annotation'))
 			})
@@ -302,8 +298,6 @@ export default {
 			title: node.attrs.title,
 			width: node.attrs.width,
 			height: node.attrs.height,
-			'data-natural-width': node.attrs.naturalWidth,
-			'data-natural-height': node.attrs.naturalHeight,
 			'data-attachment-key': node.attrs.attachmentKey,
 			'data-annotation': node.attrs.annotation && encodeObject(node.attrs.annotation)
 		}]

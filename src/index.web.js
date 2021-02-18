@@ -333,8 +333,8 @@ let html1 = `
 <p>Internal image:</p>
 <p><img data-attachment-key="DDAAFF11"/></p>
 <p>Internal image placeholder (while waiting for the load):</p>
-<p><img data-natural-width="500" data-natural-height="500" data-attachment-key="DDAAFFXX"/></p>
-<p><img data-natural-width="500" data-natural-height="500"/></p>
+<p><img width="500" height="500" data-attachment-key="DDAAFFXX"/></p>
+<p><img width="500" height="500"/></p>
 
 
 <h1>Marks:</h1>
@@ -378,7 +378,7 @@ let html1 = `
 <p></p>
 <h1>Citations and annotations:</h1>
 <p>Internal image with annotation (double-click to open):</p>
-<p><img width="100" height="100" data-attachment-key="DDAAFF22" data-annotation="%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2F6RCWW44F%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B298.2%2C480.2%2C552.6%2C749%5D%5D%7D%7D" data-natural-width="1017" data-natural-height="1075"/>
+<p><img width="100" height="100" data-attachment-key="DDAAFF22" data-annotation="%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2F6RCWW44F%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B298.2%2C480.2%2C552.6%2C749%5D%5D%7D%7D"/>
 <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2F5JM6M9R4%22%2C%22backupText%22%3A%22Hui%20et%20al.%2C%202005%22%2C%22locator%22%3A%221177%22%7D%5D%2C%22properties%22%3A%7B%7D%7D"/></p>
 <p></p>
 <p>Highlight with annotation (double-click to open):</p>

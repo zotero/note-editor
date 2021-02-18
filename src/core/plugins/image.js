@@ -220,8 +220,8 @@ export function image(options) {
 						let [width, height] = options.dimensionsStore.data[node.attrs.nodeID];
 						newTr = newTr.step(new SetAttrsStep(pos, {
 							...node.attrs,
-							naturalWidth: width,
-							naturalHeight: height
+							width,
+							height
 						})).setMeta('addToHistory', false);
 						updatedDimensions = true;
 					}

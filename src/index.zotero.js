@@ -299,14 +299,14 @@ class EditorInstance {
 				{
 					name: 'rtl',
 					label: 'Right to Left',
-					enabled: this._dir === 'ltr' && !this._editorCore.pluginState.menu.rtl.isActive
-						|| this._dir === 'rtl' && this._editorCore.pluginState.menu.ltr.isActive
+					enabled: !this._readOnly && (this._dir === 'ltr' && !this._editorCore.pluginState.menu.rtl.isActive
+						|| this._dir === 'rtl' && this._editorCore.pluginState.menu.ltr.isActive)
 				},
 				{
 					name: 'ltr',
 					label: 'Left to Right',
-					enabled: this._dir === 'ltr' && this._editorCore.pluginState.menu.rtl.isActive
-						|| this._dir === 'rtl' && !this._editorCore.pluginState.menu.ltr.isActive
+					enabled: !this._readOnly && (this._dir === 'ltr' && this._editorCore.pluginState.menu.rtl.isActive
+						|| this._dir === 'rtl' && !this._editorCore.pluginState.menu.ltr.isActive)
 				}
 			],
 			[

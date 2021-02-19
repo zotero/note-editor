@@ -129,7 +129,6 @@ export function dropPaste(options) {
 				let html = event.dataTransfer.getData('text/html') || window.droppedData && window.droppedData['text/html'];
 				let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
 				let data;
-				console.log('drop', event);
 				if (event.dataTransfer.files.length) {
 					insertImages(view, pos.pos, event.dataTransfer.files);
 					return true;

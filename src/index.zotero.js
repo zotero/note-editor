@@ -147,8 +147,6 @@ class EditorInstance {
 	}
 
 	_messageHandler = (event) => {
-		// console.log('Message received from the main script', event);
-
 		if (event.data.instanceID !== this.instanceID) {
 			return;
 		}
@@ -326,8 +324,6 @@ class EditorInstance {
 }
 
 window.addEventListener('message', function (e) {
-	console.log('Editor: Message received from the main script');
-	console.log(e);
 	let message = e.data.message;
 	let instanceID = e.data.instanceID;
 

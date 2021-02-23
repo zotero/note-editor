@@ -23,6 +23,15 @@ export function buildToHTML(schema) {
 			}
 			node.parentNode.insertBefore(document.createTextNode('\n'), node.nextSibling);
 		}
+
+		nodes = tmp.querySelectorAll('li');
+		for (let node of nodes) {
+			if (node.children.length === 1
+				&& node.firstElementChild.nodeName === 'P') {
+				node.firstElementChild.replaceWith(...node.firstElementChild.childNodes);
+			}
+		}
+
 		let html = tmp.innerHTML.trim();
 		return `<div data-schema-version="${schema.version}">${html}</div>`;
 	};

@@ -70,7 +70,7 @@ function CitationPopup({ parentRef, pluginState }) {
 					ref={popupRef}
 					className={cx('citation-popup page-popup')}
 				>
-					{pluginState.enableOpen && <div className="button toolbarButton" onClick={handleOpen}>Show on Page</div>}
+					{pluginState.enableOpen && <div className="button toolbarButton" onClick={handleOpen}>Go to Page</div>}
 					<div className="button toolbarButton" onClick={handleShowItem}>Show Item</div>
 					<div className="button toolbarButton" onClick={handleEdit}>Edit Citation</div>
 				</div>

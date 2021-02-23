@@ -148,20 +148,20 @@ $indent-width: 30;
 
 @for $i from 1 through $max-indent-level {
 	[data-indent='#{$i}']:not([dir]) {
-		margin-left: ($indent-width * $i) + px;
+		padding-left: ($indent-width * $i) + px !important;
 	}
 }
 
 /* rtl:begin:ignore */
 @for $i from 1 through $max-indent-level {
 	[dir='ltr'][data-indent='#{$i}'] {
-		margin-left: ($indent-width * $i) + px;
+		padding-left: ($indent-width * $i) + px !important;
 	}
 }
 
 @for $i from 1 through $max-indent-level {
 	[dir='rtl'][data-indent='#{$i}'] {
-		margin-right: ($indent-width * $i) + px;
+		padding-right: ($indent-width * $i) + px !important;
 	}
 }
 

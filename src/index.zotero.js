@@ -312,7 +312,7 @@ class EditorInstance {
 			[
 				{
 					name: 'openBackup',
-					label: 'View note backup',
+					label: 'View Note Backup',
 					enabled: this._hasBackup
 				}
 			]

@@ -15,8 +15,10 @@
 			height: 22px;
 			margin-top: 3px;
 			border: 1px solid #c5c5c5;
+			border-radius: 4px;
 
 			input {
+				border-radius: 4px;
 				width: 100%;
 				border: none;
 				outline: none;
@@ -37,6 +39,7 @@
 
 
 			.button {
+				border-radius: 4px;
 				cursor: default;
 				display: flex;
 				align-items: center;

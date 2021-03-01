@@ -4,6 +4,7 @@ import React from 'react';
 import Button from './toolbar-elements/button';
 import ColorPicker from './toolbar-elements/color-picker';
 import Dropdown from './toolbar-elements/dropdown';
+import cx from 'classnames';
 
 function Line({ children }) {
 	return (
@@ -31,7 +32,7 @@ function Toolbar({ enableReturnButton, menuState, linkState, searchState, onClic
 						<Button state={menuState.strong} icon="mce-i-bold" title="Bold"/>
 						<Button state={menuState.em} icon="mce-i-italic" title="Italic"/>
 						<Button state={menuState.underline} icon="mce-i-underline" title="Underline"/>
-						<Button state={menuState.strike} icon="mce-i-strikethrough" title="Strikethrough"/>
+						{/*<Button state={menuState.strike} icon="mce-i-strikethrough" title="Strikethrough"/>*/}
 					</Group>
 					<Group>
 						<Button state={menuState.subscript} icon="mce-i-subscript" title="Subscript"/>
@@ -46,8 +47,17 @@ function Toolbar({ enableReturnButton, menuState, linkState, searchState, onClic
 					</Group>
 					<Group>
 						<Button state={menuState.blockquote} icon="mce-i-blockquote" title="Blockquote"/>
-						<Button state={{ isActive: linkState.isActive, run: () => linkState.popup.toggle() }} icon="mce-i-link"
-						        title="Link"/>
+						<Button state={{ isActive: linkState.isActive, run: () => linkState.popup.toggle() }} icon="mce-i-link" title="Link"/>
+						<div
+							className={cx('toolbar-button', { active: false })}
+							title="Insert citation"
+							onMouseDown={(e) => {
+								e.preventDefault();
+								menuState.citation.run();
+							}}
+						>
+							<div className="citation-icon"/>
+						</div>
 					</Group>
 				</Line>
 				<Line>

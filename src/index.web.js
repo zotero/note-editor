@@ -266,6 +266,7 @@ let html1 = `
 1
 2
 3
+<p><a href="http://">Link</a></p>
 
 </pre>
 <blockquote><p style="">Blockquote (supports any node)</p>

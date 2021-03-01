@@ -60,12 +60,12 @@ class Drag {
 			}
 
 			if (this.node.nodeName === 'LI') {
-				left += 17;
+				left += 22;
 			}
 
 			this.dragHandleNode.style.display = 'block';
-			this.dragHandleNode.style.top = top + 'px';
-			this.dragHandleNode.style.left = left - 17 + 'px';
+			this.dragHandleNode.style.top = top - 2 + 'px';
+			this.dragHandleNode.style.left = left - 22 + 'px';
 		}, 50);
 	}
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="18px" viewBox="0 0 16 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 63.1 (92452) - https://sketch.com -->
+    <title>Artboard</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-2" transform="translate(0, 1)">
+            <rect id="Rectangle" fill="#595959" x="4" y="7" width="8" height="2" rx="1"></rect>
+            <rect id="Rectangle" fill="#595959" transform="translate(8.000000, 8.000000) rotate(-90.000000) translate(-8.000000, -8.000000) " x="4" y="7" width="8" height="2" rx="1"></rect>
+            <path d="M3.96582031,0 L0.25,0 C0.111928813,2.53632657e-17 -1.69088438e-17,0.111928813 0,0.25 L0,14.6435547 C1.69088438e-17,14.7816259 0.111928813,14.8935547 0.25,14.8935547 L3.96582031,14.8935547 L3.96582031,14.8935547" id="Path-2" stroke="#595959" stroke-width="2" stroke-linecap="round"></path>
+            <path d="M15.9658203,0 L12.25,0 C12.1119288,2.53632657e-17 12,0.111928813 12,0.25 L12,14.6435547 C12,14.7816259 12.1119288,14.8935547 12.25,14.8935547 L15.9658203,14.8935547 L15.9658203,14.8935547" id="Path-2-Copy" stroke="#595959" stroke-width="2" stroke-linecap="round" transform="translate(13.982910, 7.446777) rotate(-180.000000) translate(-13.982910, -7.446777) "></path>
+        </g>
+    </g>
+</svg>

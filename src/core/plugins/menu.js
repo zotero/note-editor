@@ -8,7 +8,7 @@ import * as commands from '../commands';
 import { schema } from '../schema';
 
 import { TextSelection } from 'prosemirror-state';
-import nodeIsActive, { getActiveColor } from '../utils';
+import nodeIsActive, { getActiveColor, randomString } from '../utils';
 
 
 let markActive3 = type => (state) => {
@@ -182,6 +182,25 @@ class Menu {
 			isActive: commands.hasAttr(state, 'dir', 'rtl'),
 			run() {
 				commands.toggleDir('rtl')(state, dispatch);
+			}
+		};
+
+		this.citation = {
+			isActive: false,
+			run() {
+				let citation = {
+					citationItems: [],
+					properties: {}
+				};
+
+				let nodeID = randomString();
+				let citationNode = schema.nodes.citation.create({ nodeID, citation });
+				const { selection } = state;
+				const { from } = selection;
+				dispatch(state.tr.insert(from, citationNode));
+				// TODO: Fix temporary work-around
+				window._currentEditorInstance._postMessage({ action: 'openCitationPopup', nodeID, citation });
+
 			}
 		};
 	}

@@ -1,25 +1,15 @@
 
 .link-popup {
-	position: absolute;
-	z-index: 100;
-	display: flex;
-	font-size: 14px;
-	background-color: white;
-	border: 1px solid #d9d9d9;
-	padding: 7px 3px;
-	padding-left: 6px;
-	//height: 32px;
-	width: 250px;
-
 	.link {
+		width: 150px;
 		display: flex;
 		flex: 1;
-		overflow-x: hidden;
+		overflow: hidden;
 		align-items: center;
 
 		a {
 			text-overflow: ellipsis;
-			overflow-x: hidden;
+			overflow: hidden;
 			white-space: nowrap;
 		}
 
@@ -32,20 +22,6 @@
 	}
 
 	.button {
-		cursor: default;
-		display: flex;
-		align-items: center;
-		//padding: 0 3px;
-		margin-left: 2px;
 		border: 1px solid #c5c5c5;
-		height: 100%;
-		font-size: 12px;
-
-		//&:hover {
-		//  background: #555c66;
-		//  color: white;
-		//  border-color: transparent;
-		//}
-
 	}
 }

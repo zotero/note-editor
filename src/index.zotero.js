@@ -42,6 +42,7 @@ Element.prototype.addEventListener = function (name, fn) {
 
 class EditorInstance {
 	constructor(options) {
+		window._currentEditorInstance = this;
 		this.instanceID = options.instanceID;
 		this._readOnly = options.readOnly;
 		this._disableUI = options.disableUI;

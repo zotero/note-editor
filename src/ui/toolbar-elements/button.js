@@ -13,7 +13,7 @@ export default function Button({ state, icon, title }) {
 				state.run();
 			}}
 		>
-			<div className={cx('mce-ico', icon)}/>
+			{icon}
 		</div>
 	);
 }

@@ -7,11 +7,11 @@
 	cursor: default;
 	display: flex;
 	justify-content: space-between;
+	padding: 3px 5px;
 
 	.return-button {
 		display: flex;
 		align-items: center;
-		margin: 2px;
 
 		&::before {
 			content: "";
@@ -36,39 +36,34 @@
 		}
 	}
 
-	.lines {
+	.middle {
 		display: flex;
 		flex-wrap: wrap;
-
-		.line:nth-of-type(1) {
-			padding-right: 10px;
-		}
-
-		.line {
-			display: flex;
-			height: 28px;
-		}
-
-		.group {
-			display: flex;
-			align-items: center;
-			border-left: 1px solid #d9d9d9;
-			padding-left: 2px;
-		}
+		align-items: center;
+		width: 100%;
+		max-width: 350px;
+		justify-content: space-between;
 	}
+
 }
 
 .toolbar-button {
 	font-size: 12px;
-	color: #595959;
-	border: 1px solid transparent;
-	padding: 2px;
-	margin-right: 2px;
-	justify-content: center;
+	color: #404040;
+	//margin-right: 2px;
+
+	width: 24px;
+	height: 24px;
+	display: flex;
 	align-items: center;
+	justify-content: space-around;
+
+	&:not(:first-child) {
+		margin-left: 2px;
+	}
 
 	&:hover {
-		border-color: #c5c5c5;
+		background-color: #F0F0F0;
 	}
 
 	&:focus {
@@ -77,42 +72,43 @@
 
 	&:active,
 	&.active {
-		-webkit-box-shadow: none;
-		box-shadow: none;
-		background: #555c66;
+		background-color: #404040;
 		color: white;
-		border-color: transparent;
 	}
 }
 
 .dropdown {
-	min-width: 92px;
-
 	.face {
-		height: 22px;
 		display: flex;
+		align-items: center;
+		height: 24px;
 		margin-right: 2px;
 		padding: 0 2px;
-		align-items: center;
-		border: 1px solid transparent;
 
 		.down-button {
 			padding-left: 5px;
 			padding-right: 3px;
+
+			.arrow-down {
+				line-height: 20px;
+				vertical-align: middle;
+				display: inline-block;
+				height: 0;
+				border-top: 4px solid #b5bcc2;
+				border-right: 4px solid transparent;
+				border-left: 4px solid transparent;
+				content: "";
+			}
 		}
 
 		&:hover {
-			border-color: #c5c5c5;
+			background-color: #F0F0F0;
 		}
 
 	}
 
 	&.active .face {
-		-webkit-box-shadow: none;
-		box-shadow: none;
-		background: #555c66;
-		color: white;
-		border-color: transparent;
+
 	}
 
 	.popup {
@@ -135,11 +131,11 @@
 
 
 			&:hover {
-				background: #ededee;
+				background-color: #F0F0F0;
 			}
 
 			&.active {
-				background-color: #555c66;
+				background-color: #404040;
 				color: white;
 			}
 

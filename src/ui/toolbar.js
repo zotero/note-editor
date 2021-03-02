@@ -5,18 +5,16 @@ import Button from './toolbar-elements/button';
 import ColorPicker from './toolbar-elements/color-picker';
 import Dropdown from './toolbar-elements/dropdown';
 import cx from 'classnames';
-
-function Line({ children }) {
-	return (
-		<div className="line">{children}</div>
-	);
-}
-
-function Group({ children }) {
-	return (
-		<div className="group">{children}</div>
-	);
-}
+import {
+	IconAlignLeft,
+	IconBold,
+	IconCitation,
+	IconItalic,
+	IconLink,
+	IconRemoveFormatting,
+	IconSearch,
+	IconUnderline
+} from './icons';
 
 function Toolbar({ enableReturnButton, menuState, linkState, searchState, onClickReturn }) {
 	function handleMouseDown(event) {
@@ -26,60 +24,25 @@ function Toolbar({ enableReturnButton, menuState, linkState, searchState, onClic
 	return (
 		<div className="toolbar" onMouseDown={handleMouseDown}>
 			{enableReturnButton ? <div className="toolbar-button return-button" onClick={onClickReturn}></div> : <div/>}
-			<div className="lines">
-				<Line>
-					<Group>
-						<Button state={menuState.strong} icon="mce-i-bold" title="Bold"/>
-						<Button state={menuState.em} icon="mce-i-italic" title="Italic"/>
-						<Button state={menuState.underline} icon="mce-i-underline" title="Underline"/>
-						{/*<Button state={menuState.strike} icon="mce-i-strikethrough" title="Strikethrough"/>*/}
-					</Group>
-					<Group>
-						<Button state={menuState.subscript} icon="mce-i-subscript" title="Subscript"/>
-						<Button state={menuState.superscript} icon="mce-i-superscript" title="Superscript"/>
-					</Group>
-					<Group>
-						<ColorPicker state={menuState.textColor} title="Text color"/>
-						<ColorPicker state={menuState.backgroundColor} isBackground={true} title="Background color"/>
-					</Group>
-					<Group>
-						<Button state={menuState.clearFormatting} icon="mce-i-removeformat" title="Clear formatting"/>
-					</Group>
-					<Group>
-						<Button state={menuState.blockquote} icon="mce-i-blockquote" title="Blockquote"/>
-						<Button state={{ isActive: linkState.isActive, run: () => linkState.popup.toggle() }} icon="mce-i-link" title="Link"/>
-						<div
-							className={cx('toolbar-button', { active: false })}
-							title="Insert citation"
-							onMouseDown={(e) => {
-								e.preventDefault();
-								menuState.citation.run();
-							}}
-						>
-							<div className="citation-icon"/>
-						</div>
-					</Group>
-				</Line>
-				<Line>
-					<Group>
-						<Dropdown blocks={menuState.blocks}/>
-					</Group>
-					<Group>
-						<Button state={menuState.alignLeft} icon="mce-i-alignleft" title="Align left"/>
-						<Button state={menuState.alignCenter} icon="mce-i-aligncenter" title="Align center"/>
-						<Button state={menuState.alignRight} icon="mce-i-alignright" title="Align right"/>
-					</Group>
-					<Group>
-						<Button state={menuState.bulletList} icon="mce-i-bullist" title="Bullet list"/>
-						<Button state={menuState.orderedList} icon="mce-i-numlist" title="Numbered list"/>
-						<Button state={menuState.outdent} icon="mce-i-outdent" title="Decrease indent"/>
-						<Button state={menuState.indent} icon="mce-i-indent" title="Increase indent"/>
-					</Group>
-					<Group>
-						<Button state={{ isActive: searchState.active, run: () => searchState.setActive(!searchState.active) }}
-						        icon="mce-i-searchreplace" title="Find and replace"/>
-					</Group>
-				</Line>
+			<div className="middle">
+				<Dropdown blocks={menuState.blocks}/>
+				<Button state={menuState.strong} icon={<IconBold/>} title="Bold"/>
+				<Button state={menuState.em} icon={<IconItalic/>} title="Italic"/>
+				<Button state={menuState.underline} icon={<IconUnderline/>} title="Underline"/>
+				<Button state={{ isActive: linkState.isActive, run: () => linkState.popup.toggle() }} icon={<IconLink/>} title="Link"/>
+				<Button state={menuState.clearFormatting} icon={<IconRemoveFormatting/>} title="Clear formatting"/>
+				<div
+					className={cx('toolbar-button', { active: false })}
+					title="Insert citation"
+					onMouseDown={(e) => {
+						e.preventDefault();
+						menuState.citation.run();
+					}}
+				>
+					<span className="icon">{<IconCitation/>}</span>
+				</div>
+				<Button state={menuState.alignLeft} icon={<IconAlignLeft/>} title="Align left"/>
+				<Button state={{ isActive: searchState.active, run: () => searchState.setActive(!searchState.active) }} icon={<IconSearch/>} title="Find and replace"/>
 			</div>
 			<div></div>
 		</div>

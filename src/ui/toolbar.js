@@ -41,7 +41,7 @@ function Toolbar({ enableReturnButton, menuState, linkState, searchState, onClic
 				>
 					<span className="icon">{<IconCitation/>}</span>
 				</div>
-				<Button state={menuState.alignLeft} icon={<IconAlignLeft/>} title="Align left"/>
+				{/*<Button state={menuState.alignLeft} icon={<IconAlignLeft/>} title="Align left"/>*/}
 				<Button state={{ isActive: searchState.active, run: () => searchState.setActive(!searchState.active) }} icon={<IconSearch/>} title="Find and replace"/>
 			</div>
 			<div></div>

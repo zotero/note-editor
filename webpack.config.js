@@ -100,7 +100,7 @@ const configWeb = {
 
 const configZotero = {
 	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-	devtool: 'source-map',
+	devtool: false,
 	entry: [
 		'./src/index.zotero.js',
 		'./src/stylesheets/main.scss'

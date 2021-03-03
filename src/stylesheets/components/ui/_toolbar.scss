@@ -7,7 +7,7 @@
 	cursor: default;
 	display: flex;
 	justify-content: space-between;
-	padding: 7px 5px;
+	padding: 4px 5px;
 
 	.return-button {
 		display: flex;
@@ -41,7 +41,7 @@
 		flex-wrap: wrap;
 		align-items: center;
 		width: 100%;
-		max-width: 320px;
+		max-width: 300px;
 		justify-content: space-between;
 	}
 
@@ -52,14 +52,14 @@
 	color: #404040;
 	//margin-right: 2px;
 
-	width: 24px;
-	height: 24px;
+	width: 26px;
+	height: 26px;
 	display: flex;
 	align-items: center;
 	justify-content: space-around;
 
 	&:not(:first-child) {
-		margin-left: 2px;
+		margin-left: 1px;
 	}
 
 	&:hover {
@@ -81,9 +81,9 @@
 	.face {
 		display: flex;
 		align-items: center;
-		height: 24px;
-		margin-right: 2px;
-		padding: 0 2px;
+		height: 26px;
+		margin-right: 1px;
+		padding: 0 2px 0 4px;
 
 		.down-button {
 			padding-left: 5px;

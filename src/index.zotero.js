@@ -44,7 +44,9 @@ class EditorInstance {
 	constructor(options) {
 		window._currentEditorInstance = this;
 		this.instanceID = options.instanceID;
+		this._viewMode = options.viewMode;
 		this._readOnly = options.readOnly;
+		this._unsaved = options.unsaved;
 		this._disableUI = options.disableUI;
 		this._placeholder = options.placeholder;
 		this._dir = window.dir = options.dir;
@@ -74,6 +76,7 @@ class EditorInstance {
 		this._editorCore = new EditorCore({
 			value,
 			readOnly: this._readOnly,
+			unsaved: this._unsaved,
 			placeholder: this._placeholder,
 			onSubscribeProvider: (subscription) => {
 				let { id, type, nodeID, data } = subscription;
@@ -129,11 +132,19 @@ class EditorInstance {
 			<Editor
 				readOnly={this._readOnly}
 				disableUI={this._disableUI}
+				// TODO: Rename this to something like 'inContextPane`
 				enableReturnButton={this._enableReturnButton}
+				viewMode={this._viewMode}
 				showUpdateNotice={this._editorCore.unsupportedSchema}
 				editorCore={this._editorCore}
 				onClickReturn={() => {
 					this._postMessage({ action: 'return' });
+				}}
+				onShowNote={() => {
+					this._postMessage({ action: 'showNote' });
+				}}
+				onOpenWindow={() => {
+					this._postMessage({ action: 'openWindow' });
 				}}
 			/>,
 			document.getElementById('editor-container')
@@ -208,13 +219,13 @@ class EditorInstance {
 				}
 				return;
 			}
-			case 'showInLibrary': {
-				if (node.type.name === 'highlight') {
-					let annotation = node.attrs.annotation;
-					this._postMessage({ action: 'showInLibrary', uri: annotation.uri });
-				}
-				return;
-			}
+			// case 'showInLibrary': {
+			// 	if (node.type.name === 'highlight') {
+			// 		let annotation = node.attrs.annotation;
+			// 		this._postMessage({ action: 'showInLibrary', uri: annotation.uri });
+			// 	}
+			// 	return;
+			// }
 			case 'openBackup': {
 				this._postMessage({ action: 'openBackup' });
 				return;
@@ -277,21 +288,21 @@ class EditorInstance {
 				}
 			],
 			[
-				{
-					name: 'editHighlight',
-					label: 'Edit',
-					enabled: node.type.name === 'highlight'
-				},
-				{
-					name: 'showInLibrary',
-					label: 'Show in Library',
-					enabled: node.type.name === 'highlight'
-				},
-				{
-					name: 'openAnnotation',
-					label: 'Show in PDF',
-					enabled: node.type.name === 'highlight'
-				},
+				// {
+				// 	name: 'editHighlight',
+				// 	label: 'Edit',
+				// 	enabled: node.type.name === 'highlight'
+				// },
+				// {
+				// 	name: 'showInLibrary',
+				// 	label: 'Show in Library',
+				// 	enabled: node.type.name === 'highlight'
+				// },
+				// {
+				// 	name: 'openAnnotation',
+				// 	label: 'Show in PDF',
+				// 	enabled: node.type.name === 'highlight'
+				// },
 				{
 					name: 'insertCitation',
 					label: 'Insert Citation',
@@ -334,17 +345,7 @@ window.addEventListener('message', function (e) {
 			currentInstance.uninit();
 		}
 
-		currentInstance = new EditorInstance({
-			instanceID,
-			value: message.value,
-			readOnly: message.readOnly,
-			disableUI: message.disableUI,
-			placeholder: message.placeholder,
-			dir: message.dir,
-			font: message.font,
-			hasBackup: message.hasBackup,
-			enableReturnButton: message.enableReturnButton
-		});
+		currentInstance = new EditorInstance({ instanceID, ...message });
 	}
 });
 

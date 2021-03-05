@@ -1,22 +1,14 @@
+'use strict';
+
 import cx from 'classnames';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Button } from './button';
 
-const blockTypes = [
-	['paragraph', 'Paragraph', 'Paragraph'],
-	['heading1', 'Heading 1', <h1>Heading 1</h1>],
-	['heading2', 'Heading 2', <h2>Heading 2</h2>],
-	['heading3', 'Heading 3', <h3>Heading 3</h3>],
-	['code', 'Preformatted', <code>Preformatted</code>]
-];
-
-const POPUP_WIDTH = 154;
-
-export default function Dropdown({ blocks }) {
-	const [isShowingList, setIsShowingList] = useState(false);
-	const [popupPosition, setPopupPosition] = useState(null);
+export default function Dropdown({ className, icon, title, children }) {
+	const [show, setShow] = useState(false);
 	const rootRef = useRef();
 
-	const handleMouseDownCallback = useCallback(handleWindowMousedown, [blocks]);
+	const handleMouseDownCallback = useCallback(handleWindowMouseDown, [1]);
 
 	useEffect(() => {
 		window.addEventListener('mousedown', handleMouseDownCallback);
@@ -25,52 +17,27 @@ export default function Dropdown({ blocks }) {
 		};
 	}, [handleMouseDownCallback]);
 
-	function handleWindowMousedown(event) {
+	function handleWindowMouseDown(event) {
 		let parent = event.target;
 		while (parent && parent !== rootRef.current) parent = parent.parentNode;
 		if (!parent) {
-			setPopupPosition(null);
+			setShow(false);
 		}
 	}
 
-	function openPopup() {
-		if (rootRef.current) {
-			let rect = rootRef.current.getBoundingClientRect();
-			let left = rect.left;
-			let top = rect.top + rootRef.current.offsetHeight;
-			setPopupPosition({
-				left,
-				top
-			});
-		}
+	function handleButtonDown(event) {
+		setShow(!show);
 	}
 
-	function handleValueClick(event) {
-		openPopup();
-	}
-
-	function handleItemPick(type) {
-		setPopupPosition(null);
-		blocks[type].run();
-	}
-
-	function getActiveBlockName() {
-		return (blockTypes.find(([type]) => blocks[type].isActive) || blockTypes[0])[1];
+	function handlePopupClick() {
+		setShow(false);
 	}
 
 	return (
-		<div ref={rootRef} className={cx('dropdown', { active: !!popupPosition })}>
-			<div className="face" onClick={handleValueClick}>
-				<div className="value">{getActiveBlockName()}</div>
-				<div className="down-button">
-					<div className="arrow-down"/>
-				</div>
-			</div>
-			{popupPosition && <div className="popup" style={{ ...popupPosition }}>
-				{blockTypes.map(([type, name, element], index) => (
-					<div key={index} className={cx('dropdown-item', { active: blocks[type].isActive })}
-					     onClick={() => handleItemPick(type)}>{element}</div>
-				))}
+		<div ref={rootRef} className={cx('dropdown', className)}>
+			<Button icon={icon} title={title} active={show} onMouseDown={handleButtonDown}/>
+			{show && <div className="popup" onClick={handlePopupClick}>
+				{children}
 			</div>}
 		</div>
 	);

@@ -42,6 +42,7 @@ import { drag } from './plugins/drag';
 class EditorCore {
 	constructor(options) {
 		this.readOnly = options.readOnly;
+		this.unsaved = options.unsaved;
 		this.docChanged = false;
 		this.dimensionsStore = { data: {} };
 		this.unsupportedSchema = false;
@@ -174,6 +175,7 @@ class EditorCore {
 				if (transaction.docChanged
 					&& toHTML(this.state.doc.content) !== toHTML(newState.doc.content)) {
 					that.docChanged = true;
+					that.unsaved = false;
 					updateNote();
 				}
 				this.updateState(newState);
@@ -224,6 +226,7 @@ class EditorCore {
 
 	updatePluginState(state) {
 		this.pluginState = {
+			core: {unsaved: this.unsaved},
 			menu: menuKey.getState(state),
 			link: linkKey.getState(state),
 			search: searchKey.getState(state),

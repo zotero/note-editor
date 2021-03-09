@@ -87,6 +87,7 @@ function main(html) {
 		container: null,
 		value: html,
 		readOnly: false,
+		unsaved: true,
 		placeholder: 'This is a placeholder',
 		onSubscribeProvider(subscriber) {
 			console.log('onSubscribeProvider', subscriber);
@@ -227,16 +228,23 @@ function main(html) {
 			disableUI={false}
 			showUpdateNotice={true}
 			enableReturnButton={true}
+			viewMode={'pdf'}
 			editorCore={editorCore}
 			onClickReturn={() => {
 				console.log('Clicked return');
+			}}
+			onShowNote={() => {
+				console.log('Show Note');
+			}}
+			onOpenWindow={() => {
+				console.log('Open Window');
 			}}
 		/>,
 		document.getElementById('editor-container')
 	);
 
 	window.editorCore = editorCore;
-}
+};
 
 let html1 = `
 <h1>Nodes:     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1</h1>

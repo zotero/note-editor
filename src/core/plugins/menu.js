@@ -1,7 +1,7 @@
 import { Plugin, PluginKey } from 'prosemirror-state';
 
 
-import { toggleMark, setBlockType, wrapIn } from 'prosemirror-commands';
+import { toggleMark, setBlockType, wrapIn, lift } from 'prosemirror-commands';
 import { wrapInList } from 'prosemirror-schema-list';
 
 import * as commands from '../commands';
@@ -9,6 +9,8 @@ import { schema } from '../schema';
 
 import { TextSelection } from 'prosemirror-state';
 import nodeIsActive, { getActiveColor, randomString } from '../utils';
+import { NodeRange } from 'prosemirror-model';
+import { findWrapping, liftTarget } from 'prosemirror-transform';
 
 
 let markActive3 = type => (state) => {
@@ -32,6 +34,36 @@ function hasMarkup(node, type, attrs) {
 	return node.type === type && (!attrs || Object.keys(attrs).every(key => attrs[key] === node.attrs[key]));
 }
 
+function clear() {
+  return function (state, dispatch) {
+    let { tr } = state;
+    let marks = ['strong', 'em', 'underline', 'strike', 'textColor', 'backgroundColor', 'code'];
+    let nodes = ['heading'];
+
+    marks.forEach(mark => {
+      let { from, to } = tr.selection;
+      if (state.schema.marks[mark]) {
+        tr.removeMark(from, to, state.schema.marks[mark]);
+      }
+    });
+
+    nodes.forEach(nodeName => {
+      let formattedNodeType = state.schema.nodes[nodeName];
+      let { $from, $to } = tr.selection;
+      tr.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
+        if (node.type === formattedNodeType) {
+	        tr.setNodeMarkup(pos, state.schema.nodes.paragraph);
+          return false;
+        }
+        return true;
+      });
+    });
+
+    tr.setStoredMarks([]);
+    dispatch(tr);
+    return true;
+  };
+}
 
 class Menu {
 	constructor(state) {
@@ -47,7 +79,7 @@ class Menu {
 		};
 	}
 
-	buildBlock(nodeType, attrs) {
+	buildBlock(nodeType, attrs, setInactive) {
 		let command = setBlockType(nodeType, attrs);
 		let isActive;
 
@@ -61,12 +93,86 @@ class Menu {
 		}
 
 		return {
-			isActive,
+			isActive: isActive && !setInactive,
 			run: () => {
+				if (isActive) {
+					command = setBlockType(schema.nodes.paragraph, attrs);
+				}
 				command(this.view.state, this.view.dispatch);
 			}
 		};
 	}
+
+	isBlockquoteActive(state) {
+		let { selection } = state;
+		let $from = selection.$from;
+		let $to = selection.$to;
+		let topNode  = $from.node(1);
+		let active = true;
+		let n = 0;
+		state.doc.nodesBetween($from.before(1), $to.after(1), (parentNode, parentPos) => {
+			let node = state.doc.nodeAt(parentPos);
+			if (node.type !== schema.nodes.blockquote) {
+				active = false;
+			}
+			n++;
+			return false;
+		});
+		return active;
+	}
+
+	toggleBlockquote(state, dispatch) {
+		let { selection } = state;
+		let $from = selection.$from;
+		let $to = selection.$to;
+		if (this.isBlockquoteActive(state)) {
+
+			let $a = state.doc.resolve($from.start(1));
+			let $b = state.doc.resolve($to.end(1));
+			let range = $a.blockRange($b);
+			let target = range && liftTarget(range);
+			if (target === null) {
+				return false;
+			}
+			dispatch(state.tr.lift(range, target));
+		}
+		else {
+			if (state.selection.empty) {
+				let $a = state.doc.resolve($from.before(1));
+				let $b = state.doc.resolve($to.after(1));
+				let range = $a.blockRange($b);
+				let wrapping = range && findWrapping(range, schema.nodes.blockquote, {  });
+				if (!wrapping) {
+					return false
+				}
+				dispatch(state.tr.wrap(range, wrapping).scrollIntoView());
+			}
+			else {
+				wrapIn(schema.nodes.blockquote)(state, dispatch);
+			}
+		}
+	}
+
+	isListActive(state, type) {
+		let { selection } = state;
+		let $from = selection.$from;
+		let $to = selection.$to;
+
+		let depth = $from.depth;
+		while (depth > 0) {
+			let node = $from.node(depth);
+			if (node.type === type) {
+				return true;
+			}
+
+			if ([schema.nodes.bulletList, schema.nodes.orderedList].includes(node.type)) {
+				return false;
+			}
+			depth--;
+		}
+
+		return false;
+}
 
 	update(newState) {
 		let dispatch;
@@ -100,20 +206,38 @@ class Menu {
 		this.clearFormatting = {
 			isActive: false,
 			run() {
-				dispatch(state.tr.removeMark(state.selection.from, state.selection.to).setStoredMarks([]));
+				clear()(state, dispatch);
 			}
 		};
 
-		this.blocks = {
-			paragraph: this.buildBlock(schema.nodes.paragraph),
-			code: this.buildBlock(schema.nodes.codeBlock),
-			heading1: this.buildBlock(schema.nodes.heading, { level: 1 }),
-			heading2: this.buildBlock(schema.nodes.heading, { level: 2 }),
-			heading3: this.buildBlock(schema.nodes.heading, { level: 3 }),
-			heading4: this.buildBlock(schema.nodes.heading, { level: 4 }),
-			heading5: this.buildBlock(schema.nodes.heading, { level: 5 }),
-			heading6: this.buildBlock(schema.nodes.heading, { level: 6 })
+		let insideList = nodeIsActive(state, schema.nodes.orderedList) || nodeIsActive(state, schema.nodes.bulletList);
+		let insideBlockquote = nodeIsActive(state, schema.nodes.blockquote);
+		this.paragraph = this.buildBlock(schema.nodes.paragraph, {}, insideList || insideBlockquote);
+		this.code = this.buildBlock(schema.nodes.codeBlock);
+		this.heading1 = this.buildBlock(schema.nodes.heading, { level: 1 });
+		this.heading2 = this.buildBlock(schema.nodes.heading, { level: 2 });
+		this.heading3 = this.buildBlock(schema.nodes.heading, { level: 3 });
+
+		this.bulletList = {
+			isActive: this.isListActive(state, schema.nodes.bulletList),
+			run() {
+				commands.toggleList(schema.nodes.bulletList, schema.nodes.listItem)(state, dispatch);
+			}
 		};
+
+		this.orderedList = {
+			isActive: this.isListActive(state, schema.nodes.orderedList),
+			run() {
+				commands.toggleList(schema.nodes.orderedList, schema.nodes.listItem)(state, dispatch);
+			}
+		};
+
+		this.blockquote = {
+			isActive: this.isBlockquoteActive(state),
+			run: () => {
+				return this.toggleBlockquote(state, dispatch);
+			}
+		}
 
 		this.alignLeft = {
 			isActive: commands.hasAttr(state, 'align', 'left'),
@@ -133,27 +257,6 @@ class Menu {
 			isActive: commands.hasAttr(state, 'align', 'right'),
 			run() {
 				commands.toggleAlignment('right')(state, dispatch);
-			}
-		};
-
-		this.blockquote = {
-			isActive: blockActive(schema.marks.blockquote)(state),
-			run() {
-				return wrapIn(schema.nodes.blockquote)(state, dispatch);
-			}
-		};
-
-		this.bulletList = {
-			isActive: nodeIsActive(state, schema.nodes.bulletList),
-			run() {
-				commands.toggleList(schema.nodes.bulletList, schema.nodes.listItem)(state, dispatch);
-			}
-		};
-
-		this.orderedList = {
-			isActive: nodeIsActive(state, schema.nodes.orderedList),
-			run() {
-				commands.toggleList(schema.nodes.orderedList, schema.nodes.listItem)(state, dispatch);
 			}
 		};
 

@@ -50,7 +50,7 @@ export function buildKeymap(schema, mapKeys) {
 	}
 
 
-	bind('Mod-z', undo);
+	bind('Mod-z', customUndo);
 	bind('Shift-Mod-z', redo);
 	bind('Backspace', undoInputRule);
 	if (!mac) bind('Mod-y', redo);
@@ -99,4 +99,12 @@ export function buildKeymap(schema, mapKeys) {
 	}
 
 	return keys;
+}
+
+function customUndo(state, dispatch) {
+  if(undoInputRule(state, dispatch)) {
+    return true;
+  } else {
+    return undo(state, dispatch);
+  }
 }

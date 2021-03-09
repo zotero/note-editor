@@ -220,15 +220,15 @@ class Menu {
 
 		this.bulletList = {
 			isActive: this.isListActive(state, schema.nodes.bulletList),
-			run() {
-				commands.toggleList(schema.nodes.bulletList, schema.nodes.listItem)(state, dispatch);
+			run: () => {
+				commands.toggleList(schema.nodes.bulletList, schema.nodes.listItem)(state, dispatch, this.view);
 			}
 		};
 
 		this.orderedList = {
 			isActive: this.isListActive(state, schema.nodes.orderedList),
-			run() {
-				commands.toggleList(schema.nodes.orderedList, schema.nodes.listItem)(state, dispatch);
+			run: () => {
+				commands.toggleList(schema.nodes.orderedList, schema.nodes.listItem)(state, dispatch, this.view);
 			}
 		};
 

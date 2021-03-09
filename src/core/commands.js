@@ -4,6 +4,7 @@ import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirr
 import { encodeObject, randomString, SetAttrsStep } from './utils';
 import { fromHTML, schema } from './schema';
 import { Fragment, Slice } from 'prosemirror-model';
+import { setBlockType } from 'prosemirror-commands';
 
 function getClosestListItemNode($pos) {
 	let depth = $pos.depth;
@@ -253,7 +254,10 @@ export function toggleList(listType, itemType) {
 			}
 		}
 
-		return wrapInList(listType)(state, dispatch, view);
+		setBlockType(schema.nodes.paragraph)(state, dispatch);
+		state = view.state;
+
+		return wrapInList(listType)(state, dispatch);
 	};
 }
 

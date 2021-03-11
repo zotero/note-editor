@@ -33,6 +33,7 @@ export function buildToHTML(schema) {
 		}
 
 		let html = tmp.innerHTML.trim();
+		// A different schema version results to different HTML output
 		return `<div data-schema-version="${schema.version}">${html}</div>`;
 	};
 }

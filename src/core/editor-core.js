@@ -145,7 +145,8 @@ class EditorCore {
 							options.onOpenCitationPopup(node.attrs.nodeID, node.attrs.citation);
 						}
 					}),
-					trailingParagraph(),
+					// TODO: Trailing paragraph should only be inserted when appending transaction
+					// trailingParagraph(),
 					// inlineFix(),
 					placeholder({
 						text: options.placeholder
@@ -171,6 +172,9 @@ class EditorCore {
 				})
 			},
 			dispatchTransaction(transaction) {
+				if (that.readOnly && transaction.docChanged) {
+					throw new Error('Document change should never happen in read-only mode');
+				}
 				let newState = this.state.apply(transaction);
 				if (transaction.docChanged
 					&& toHTML(this.state.doc.content) !== toHTML(newState.doc.content)) {

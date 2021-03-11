@@ -5,7 +5,7 @@
 	"scripts": {
 		"build": "NODE_ENV=production webpack --display-modules",
 		"start": "webpack-dev-server",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"No tests yet\""
 	},
 	"author": "Martynas Bagdonas",
 	"license": "AGPL-3.0",

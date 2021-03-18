@@ -339,7 +339,13 @@ window.addEventListener('message', function (e) {
 	let message = e.data.message;
 	let instanceID = e.data.instanceID;
 
-	if (message.action === 'init') {
+	if (message.action === 'crash') {
+		if (currentInstance) {
+			// TODO: Show error message in NoticeBar
+			currentInstance._editorCore.readOnly = true;
+		}
+	}
+	else if (message.action === 'init') {
 		// console.log('Initializing a new instance', message);
 		if (currentInstance) {
 			currentInstance.uninit();

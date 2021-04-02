@@ -4,7 +4,7 @@ import marks from './marks';
 import { buildToHTML, buildFromHTML, buildClipboardSerializer } from './utils';
 
 const schema = new Schema({ nodes, marks });
-schema.version = 1;
+schema.version = 2;
 
 const toHTML = buildToHTML(schema);
 const fromHTML = buildFromHTML(schema);

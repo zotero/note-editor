@@ -1,12 +1,23 @@
 import { DOMParser, DOMSerializer, Schema } from 'prosemirror-model';
 import { schema } from './index';
-import { encodeObject } from '../utils';
+import { encodeObject, fillCitationItemsWithData } from '../utils';
 
 export function buildToHTML(schema) {
-	return function (content) {
+	return function (content, metadata) {
 		let fragment = DOMSerializer.fromSchema(schema).serializeFragment(content);
-		let tmp = document.implementation.createHTMLDocument('New').body;
-		tmp.appendChild(fragment);
+		let doc = document.implementation.createHTMLDocument('New');
+		let tmp = doc.body;
+
+		let container = doc.createElement('div');
+		// Different schema version results to different HTML output
+		let keys = Object.keys(metadata).sort()
+		for (let key of keys) {
+			let value = metadata[key];
+			container.setAttribute(key, value);
+		}
+
+		tmp.append(container);
+		container.append(fragment);
 
 		let textNodes = [
 			'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre'
@@ -19,9 +30,9 @@ export function buildToHTML(schema) {
 		let nodes = tmp.querySelectorAll([...textNodes, ...blockNodes].join(','));
 		for (let node of nodes) {
 			if (blockNodes.includes(node.nodeName.toLowerCase())) {
-				node.insertBefore(document.createTextNode('\n'), node.firstChild);
+				node.insertBefore(doc.createTextNode('\n'), node.firstChild);
 			}
-			node.parentNode.insertBefore(document.createTextNode('\n'), node.nextSibling);
+			node.parentNode.insertBefore(doc.createTextNode('\n'), node.nextSibling);
 		}
 
 		nodes = tmp.querySelectorAll('li');
@@ -32,9 +43,7 @@ export function buildToHTML(schema) {
 			}
 		}
 
-		let html = tmp.innerHTML.trim();
-		// A different schema version results to different HTML output
-		return `<div data-schema-version="${schema.version}">${html}</div>`;
+		return tmp.innerHTML.trim();
 	};
 }
 
@@ -55,7 +64,7 @@ export function buildFromHTML(schema) {
 	};
 }
 
-export function buildClipboardSerializer(provider, schema) {
+export function buildClipboardSerializer(getMetadata, provider, schema) {
 	let base = DOMSerializer.fromSchema(schema);
 	return new DOMSerializer(Object.assign({}, base.nodes, {
 		image(node) {
@@ -64,7 +73,8 @@ export function buildClipboardSerializer(provider, schema) {
 			if (data) {
 				src = data.src;
 			}
-
+			let metadata = getMetadata();
+			fillCitationItemsWithData([node.attrs.annotation.citationItem], metadata);
 			return ['img', {
 				src,
 				alt: node.attrs.alt,
@@ -80,13 +90,16 @@ export function buildClipboardSerializer(provider, schema) {
 			if (data) {
 				text = '(' + data.formattedCitation + ')';
 			}
-
+			let metadata = getMetadata();
+			fillCitationItemsWithData(node.attrs.citation.citationItems, metadata);
 			return ['span', {
 				class: 'citation',
 				'data-citation': node.attrs.citation && encodeObject(node.attrs.citation)
 			}, text];
 		},
 		highlight(node) {
+			let metadata = getMetadata();
+			fillCitationItemsWithData([node.attrs.annotation.citationItem], metadata);
 			return ['span', {
 				class: 'highlight',
 				'data-annotation': encodeObject(node.attrs.annotation)

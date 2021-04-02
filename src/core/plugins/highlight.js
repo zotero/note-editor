@@ -195,6 +195,7 @@ class Highlight {
 			citationItems: [node.attrs.annotation.citationItem],
 			properties: {}
 		};
+		// TODO: Add citation body text
 		dispatch(tr.insert(pos, [state.schema.text(' ')]));
 		this.options.onGenerateCitation(citation, pos + 1);
 	}

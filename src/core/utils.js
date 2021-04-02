@@ -152,6 +152,20 @@ export function levenshtein(a, b) {
 	return arr[aLen][bLen];
 }
 
+export function fillCitationItemsWithData(citationItems, metadata) {
+	try {
+		let items = JSON.parse(decodeURIComponent(metadata['data-citation-items']));
+		for (let citationItem of citationItems) {
+			let item = items.find(item => item.uris.some(uri => citationItem.uris.includes(uri)));
+			if (item) {
+				citationItem.itemData = item.itemData;
+			}
+		}
+	}
+	catch (e) {
+	}
+}
+
 import {
 	findParentNode,
 	findSelectedNodeOfType

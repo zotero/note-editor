@@ -15,7 +15,7 @@ class CitationView {
 			type: 'citation',
 			nodeID: node.attrs.nodeID,
 			data: {
-				citation: node.attrs.citation
+				citation: JSON.parse(JSON.stringify(node.attrs.citation))
 			},
 			listener: this.listener
 		});

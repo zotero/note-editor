@@ -1,16 +1,18 @@
 export function digestHTML(html) {
-	let metadata = {
-		schemaVersion: 0
-	};
+	let metadata = {};
 	let doc = document.implementation.createHTMLDocument('');
 	let container = doc.body;
 	container.innerHTML = html;
 
 	let metadataNode = doc.querySelector('body > div[data-schema-version]');
 	if (metadataNode) {
-		let value = parseInt(metadataNode.getAttribute('data-schema-version'));
-		if (Number.isInteger(value) && value > 0) {
-			metadata.schemaVersion = value;
+		let attrs = metadataNode.attributes;
+		for (let i = 0; i < attrs.length; i++) {
+			let attr = attrs[i];
+			// TinyMCE keeps only data attributes
+			if (attr.name.startsWith('data-')) {
+				metadata[attr.name] = attr.value;
+			}
 		}
 	}
 

@@ -5,7 +5,7 @@ import { schema, toHTML, buildClipboardSerializer } from './schema';
 import { DOMSerializer } from 'prosemirror-model';
 import { TextSelection } from 'prosemirror-state';
 import { DOMParser as DOMParser2, Pos, Node } from 'prosemirror-model';
-import { debounce, decodeObject, encodeObject, randomString } from './utils';
+import { debounce, decodeObject, encodeObject, fillCitationItemsWithData, randomString } from './utils';
 
 
 import nodeViews from './node-views';
@@ -35,6 +35,7 @@ import { placeholder } from './plugins/placeholder';
 import { highlight, highlightKey } from './plugins/highlight';
 import { citation, citationKey } from './plugins/citation';
 import { drag } from './plugins/drag';
+import { pullItemData } from './plugins/pullItemData';
 
 // TODO: Avoid resetting cursor and losing the recently typed and unsaved
 //  text when a newly synced note is set
@@ -47,13 +48,19 @@ class EditorCore {
 		this.dimensionsStore = { data: {} };
 		this.unsupportedSchema = false;
 		this.nodeViews = [];
+		this.alreadyChanged = false;
 
 		this.provider = new Provider({
-			onSubscribe: options.onSubscribeProvider,
+			onSubscribe: (subscription) => {
+				if (subscription.type === 'citation') {
+					fillCitationItemsWithData(subscription.data.citation.citationItems, this.metadata);
+				}
+				options.onSubscribeProvider(subscription);
+			},
 			onUnsubscribe: options.onUnsubscribeProvider
 		});
 
-		let clipboardSerializer = buildClipboardSerializer(this.provider, schema);
+		let clipboardSerializer = buildClipboardSerializer(() => this.metadata, this.provider, schema);
 
 		let prevHTML = null;
 		// TODO: Have a debounce maximum wait time, to prevent not saving
@@ -75,19 +82,22 @@ class EditorCore {
 
 		if (typeof options.value === 'string') {
 			let { html, metadata } = digestHTML(options.value);
+			this.metadata = metadata;
 			options.value = html;
-			if (metadata.schemaVersion > schema.version) {
+			if (this.getMetadataSchemaVersion() > schema.version) {
 				this.unsupportedSchema = true;
 				this.readOnly = true;
 			}
-			// console.log({ metadata })
+			this.setMetadataSchemaVersion(schema.version);
 			doc = DOMParser2.fromSchema(schema).parse((new DOMParser().parseFromString(options.value, 'text/html').body));
 		}
+		// Document loaded from state always uses the current schema
 		else if (typeof options.value === 'object') {
 			doc = Node.fromJSON(schema, options.value.doc);
+			this.metadata = options.value.metadata;
 		}
-		if (!doc) return;
 
+		if (!doc) return;
 
 		let state = EditorState.create({ doc });
 		let tr = schemaTransform(state);
@@ -112,6 +122,18 @@ class EditorCore {
 					}),
 					transform(),
 					nodeID(),
+					pullItemData({
+						onPull: (pulledItems) => {
+							let storedCitationItems = this.getMetadataCitationItems();
+							for (let pulledItem of pulledItems) {
+								let existingItem = storedCitationItems.find(item => item.uris.some(uri => pulledItem.uris.includes(uri)));
+								if (!existingItem) {
+									storedCitationItems.push(pulledItem);
+								}
+							}
+							this.setMetadataCitationItems(storedCitationItems);
+						}
+					}),
 					buildInputRules(schema),
 					keymap(buildKeymap(schema)),
 					keymap(baseKeymap),
@@ -142,7 +164,9 @@ class EditorCore {
 						},
 						onEdit: (node) => {
 							if (!node.attrs.nodeID) return;
-							options.onOpenCitationPopup(node.attrs.nodeID, node.attrs.citation);
+							let citation = JSON.parse(JSON.stringify(node.attrs.citation));
+							fillCitationItemsWithData(citation.citationItems, this.metadata);
+							options.onOpenCitationPopup(node.attrs.nodeID, citation);
 						}
 					}),
 					// TODO: Trailing paragraph should only be inserted when appending transaction
@@ -176,8 +200,15 @@ class EditorCore {
 					throw new Error('Document change should never happen in read-only mode');
 				}
 				let newState = this.state.apply(transaction);
+
+				// Delete unused citation items data on the first save
+				if (!that.alreadyChanged) {
+					that.deleteUnusedCitationItems(newState);
+					that.alreadyChanged = true;
+				}
+
 				if (transaction.docChanged
-					&& toHTML(this.state.doc.content) !== toHTML(newState.doc.content)) {
+					&& toHTML(this.state.doc.content, that.metadata) !== toHTML(newState.doc.content, that.metadata)) {
 					that.docChanged = true;
 					that.unsaved = false;
 					updateNote();
@@ -228,6 +259,75 @@ class EditorCore {
 		this.updatePluginState(this.view.state);
 	}
 
+	getMetadataSchemaVersion() {
+		return parseInt(this.metadata['data-schema-version']);
+	}
+
+	setMetadataSchemaVersion(version) {
+		this.metadata['data-schema-version'] = version.toString();
+	}
+
+	getMetadataCitationItems() {
+		try {
+			let data = JSON.parse(decodeURIComponent(this.metadata['data-citation-items']));
+			if (Array.isArray(data)) {
+				return data;
+			}
+		}
+		catch (e) {
+		}
+		return [];
+	}
+
+	setMetadataCitationItems(citationItems) {
+		if (citationItems.length) {
+			this.metadata['data-citation-items'] = encodeURIComponent(JSON.stringify(citationItems));
+		}
+		else {
+			delete this.metadata['data-citation-items'];
+		}
+	}
+
+	deleteUnusedCitationItems(state) {
+		let storedCitationItems = this.getMetadataCitationItems();
+
+		state.tr.doc.descendants((node, pos) => {
+			try {
+				let citationItems;
+				if (node.type.attrs.citation) {
+					citationItems = node.attrs.citation.citationItems
+				}
+				else if (node.type.attrs.annotation) {
+					citationItems = [node.attrs.annotation.citationItem];
+				}
+
+				if (citationItems) {
+					for (let citationItem of citationItems) {
+						let { uris } = citationItem;
+						let item = storedCitationItems.find(item => item.uris.some(uri => uris.includes(uri)));
+						if (item) {
+							item.used = true;
+						}
+					}
+				}
+			}
+			catch (e) {
+			}
+		});
+
+		for (let i = storedCitationItems.length - 1; i >= 0; i--) {
+			let item = storedCitationItems[i];
+			if (!item.used) {
+				storedCitationItems.splice(i, 1);
+			}
+			else {
+				delete item.used;
+			}
+		}
+
+		this.setMetadataCitationItems(storedCitationItems);
+	}
+
 	updatePluginState(state) {
 		this.pluginState = {
 			core: {unsaved: this.unsaved},
@@ -268,7 +368,7 @@ class EditorCore {
 	}
 
 	getHTML() {
-		return toHTML(this.view.state.doc.content);
+		return toHTML(this.view.state.doc.content, this.metadata);
 	}
 
 	focus() {
@@ -282,6 +382,7 @@ class EditorCore {
 
 		return {
 			state: {
+				metadata: this.metadata,
 				doc: this.view.state.doc.toJSON()
 			},
 			html: this.getHTML() || null

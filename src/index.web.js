@@ -247,6 +247,7 @@ function main(html) {
 };
 
 let html1 = `
+<div data-schema-version="2" data-test="test" atest="123">
 <h1>Nodes:     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1</h1>
 <p><a href="werwer">Link starts <img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/>link ends</a></p>
 <p><code>Inline code starts <img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/><strong>strong</strong> <a href="test">link</a> inline code ends</code></p>
@@ -268,6 +269,8 @@ let html1 = `
 
 
 <p><span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2FSW46XL4F%22%5D%2C%22locator%22%3A%22192%22%7D%5D%2C%22properties%22%3A%7B%7D%7D">(Hsu et al., 2013)</span></p>
+
+<p><span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F3820982%2Fitems%2F5WHB5RZX%22%5D%2C%22itemData%22%3A%7B%22id%22%3A1780%2C%22type%22%3A%22article-journal%22%2C%22container-title%22%3A%22n%20engl%20j%20med%22%2C%22language%22%3A%22en%22%2C%22page%22%3A%223%22%2C%22source%22%3A%22Zotero%22%2C%22title%22%3A%22Not%20a%20Perfect%20Storm%20%E2%80%94%20Covid-19%20and%20the%20Importance%20of%20Language%22%2C%22author%22%3A%5B%7B%22family%22%3A%22Brandt%22%2C%22given%22%3A%22Allan%20M%22%7D%2C%7B%22family%22%3A%22Botelho%22%2C%22given%22%3A%22Alyssa%22%7D%5D%2C%22issued%22%3A%7B%22date-parts%22%3A%5B%5B%222020%22%5D%5D%7D%7D%2C%22locator%22%3A%221494%22%7D%5D%2C%22properties%22%3A%7B%7D%7D">(Brandt and Botelho, 2020, p. 1494)</span></p>
 
 
 <pre dir="rtl">Preformatted/code block - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code>
@@ -438,7 +441,7 @@ let html1 = `
     <dd>A giant owl-like creature.</dd>
 </dl>
 
-
+</div>
 `;
 
 

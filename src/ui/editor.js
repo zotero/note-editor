@@ -40,7 +40,10 @@ function Editor(props) {
 				onOpenWindow={props.onOpenWindow}
 			/>}
 			<Findbar searchState={editorState.search} active={editorState.search.active}/>
-			{props.showUpdateNotice && <Noticebar>Please update Zotero to edit the note</Noticebar>}
+			{props.showUpdateNotice
+				&& <Noticebar>This note was edited with a newer version of Zotero.<br/>
+				Please update Zotero to make changes.</Noticebar>
+			}
 			<div className="editor-core" ref={editorRef}>
 				<div className="relative-container">
 					{refReady && !props.disableUI && <Fragment>

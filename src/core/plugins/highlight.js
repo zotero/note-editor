@@ -225,10 +225,13 @@ function unlinkHighlights(tr) {
 					.replace(/<\/?(b|i|sub|sup)>/g, '')
 					.replace(/[\s\.-]/g, '');
 
-					let dist = levenshtein(text, originalText);
+					// TODO: Needs further optimizations
+					if (text.replace(/\s/g, '') !== originalText.replace(/\s/g, '')) {
+						let dist = levenshtein(text, originalText);
 
-					if (dist && dist / originalText.length > 0.1) {
-						drifted = true;
+						if (dist && dist / originalText.length > 0.1) {
+							drifted = true;
+						}
 					}
 				}
 
@@ -288,6 +291,9 @@ export function highlight(options) {
 			};
 		},
 		appendTransaction(transactions, oldState, newState) {
+			if (!transactions.some(tr => tr.docChanged)) {
+				return null;
+			}
 			let { tr: trr } = newState;
 			let updated = false;
 			if (newState.selection.empty) {

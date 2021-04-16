@@ -119,6 +119,14 @@ class Citation {
 			let dom = this.view.nodeDOM(pos);
 			let rect = dom.getBoundingClientRect();
 
+
+			let enableOpen = false;
+			try {
+				enableOpen = node.attrs.citation.citationItems[0].locator;
+			}
+			catch(e) {
+			}
+
 			this.popup = {
 				isActive: true,
 				left,
@@ -127,7 +135,7 @@ class Citation {
 				isMultiline,
 				pos: from,
 				rect,
-				enableOpen: node.attrs.citation && node.attrs.citation.citationItems && node.attrs.citation.citationItems[0].locator,
+				enableOpen,
 				showItem: () => {
 					this.options.onShowItem(node);
 				},

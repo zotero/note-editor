@@ -1,5 +1,5 @@
-export function digestHTML(html) {
-	let metadata = {};
+export function preprocessHTML(html) {
+	let metadataAttributes = {};
 	let doc = document.implementation.createHTMLDocument('');
 	let container = doc.body;
 	container.innerHTML = html;
@@ -11,7 +11,7 @@ export function digestHTML(html) {
 			let attr = attrs[i];
 			// TinyMCE keeps only data attributes
 			if (attr.name.startsWith('data-')) {
-				metadata[attr.name] = attr.value;
+				metadataAttributes[attr.name] = attr.value;
 			}
 		}
 	}
@@ -52,7 +52,7 @@ export function digestHTML(html) {
 
 	walk(container);
 
-	return { html: container.innerHTML, metadata };
+	return { html: container.innerHTML, metadataAttributes };
 }
 
 // Additional transformations that can't be described with schema alone

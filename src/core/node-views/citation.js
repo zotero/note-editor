@@ -1,24 +1,29 @@
+import { formatCitation } from '../utils';
+
 class CitationView {
 	constructor(node, view, getPos, options) {
-		this.provider = options.provider;
 		this.dom = document.createElement('span');
 		this.dom.className = 'citation';
-		this.dom.innerHTML = '{citation}';
 
-		this.listener = (data) => {
-			this.dom.innerHTML = data.formattedCitation
-				? `(${data.formattedCitation})`
-				: '{citation}';
-		};
-
-		this.provider.subscribe({
-			type: 'citation',
-			nodeID: node.attrs.nodeID,
-			data: {
-				citation: JSON.parse(JSON.stringify(node.attrs.citation))
-			},
-			listener: this.listener
-		});
+		let formattedCitation = '{citation}';
+		try {
+			let citation = JSON.parse(JSON.stringify(node.attrs.citation));
+			options.metadata.fillCitationItemsWithData(citation.citationItems);
+			let missingItemData = citation.citationItems.find(x => !x.itemData);
+			if (missingItemData) {
+				formattedCitation = node.textContent;
+			}
+			else {
+				let text = formatCitation(citation);
+				if (text) {
+					formattedCitation = '(' + text + ')';
+				}
+			}
+		}
+		catch (e) {
+			console.log(e);
+		}
+		this.dom.innerHTML = formattedCitation;
 	}
 
 	selectNode() {
@@ -30,7 +35,6 @@ class CitationView {
 	}
 
 	destroy() {
-		this.provider.unsubscribe(this.listener);
 	}
 }
 

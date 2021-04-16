@@ -141,6 +141,7 @@ class Link {
 						dispatch(tr);
 						return false;
 					}
+					// TODO: `return true` is not necessary here and everywhere else
 					return true;
 				});
 			}

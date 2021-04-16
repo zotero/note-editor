@@ -93,14 +93,15 @@ class EditorInstance {
 			onSyncAttachmentKeys: (attachmentKeys) => {
 				this._postMessage({ action: 'syncAttachmentKeys', attachmentKeys });
 			},
-			onUpdate: (html) => {
-				this._postMessage({ action: 'update', noteData: this._editorCore.getData() });
-			},
-			onGenerateCitation: (citation, pos) => {
-				this._postMessage({ action: 'generateCitation', citation, pos });
+			onUpdate: (system) => {
+				let noteData = this._editorCore.getData();
+				this._postMessage({ action: 'update', noteData, system });
 			},
 			onInsertObject: (type, data, pos) => {
 				this._postMessage({ action: 'insertObject', type, data, pos });
+			},
+			onUpdateCitationItemsList: (list) => {
+				this._postMessage({ action: 'updateCitationItemsList', list });
 			},
 			onOpenURL: (url) => {
 				this._postMessage({ action: 'openURL', url });
@@ -175,6 +176,11 @@ class EditorInstance {
 				this._editorCore.setCitation(nodeID, citation, formattedCitation);
 				return;
 			}
+			case 'updateCitationItems': {
+				let { citationItems } = message;
+				this._editorCore.updateCitationItems(citationItems);
+				return;
+			}
 			case 'attachImportedImage': {
 				let { nodeID, attachmentKey } = message;
 				this._editorCore.attachImportedImage(nodeID, attachmentKey);
@@ -194,6 +200,7 @@ class EditorInstance {
 				this._editorCore.focus();
 				return;
 			}
+			// TODO: Rename to 'setFont'
 			case 'updateFont': {
 				let { font } = message;
 				this._setFont(font);

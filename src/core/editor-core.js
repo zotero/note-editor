@@ -1,103 +1,102 @@
-import applyDevTools from 'prosemirror-dev-tools';
-import { EditorState, NodeSelection, Plugin, SelectionRange } from 'prosemirror-state';
+import { EditorState } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import { schema, toHTML, buildClipboardSerializer } from './schema';
-import { DOMSerializer } from 'prosemirror-model';
-import { TextSelection } from 'prosemirror-state';
-import { DOMParser as DOMParser2, Pos, Node } from 'prosemirror-model';
-import { debounce, decodeObject, encodeObject, fillCitationItemsWithData, randomString } from './utils';
+import { DOMParser as DOMParser2, Node } from 'prosemirror-model';
+import { dropCursor } from 'prosemirror-dropcursor';
+import { gapCursor } from 'prosemirror-gapcursor';
+import { keymap } from 'prosemirror-keymap';
+import { history } from 'prosemirror-history';
+import { baseKeymap } from 'prosemirror-commands';
+import { tableEditing } from 'prosemirror-tables';
+import applyDevTools from 'prosemirror-dev-tools';
 
+import { schema, toHTML, buildClipboardSerializer } from './schema';
+import Metadata from './schema/metadata';
+import { schemaTransform, preprocessHTML } from './schema/transformer';
 
 import nodeViews from './node-views';
-import { attachImportedImage, insertHTML, setCitation } from './commands';
-import { columnResizing, tableEditing } from 'prosemirror-tables';
+import { debounce } from './utils';
+import { buildKeymap } from './keymap';
+import { buildInputRules } from './input-rules';
+import { attachImportedImage, insertHTML, reformatCitations, setCitation } from './commands';
+import Provider from './provider';
 
-import { dropCursor } from 'prosemirror-dropcursor';
 import { menu, menuKey } from './plugins/menu';
 import { link, linkKey } from './plugins/link';
 import { search, searchKey } from './plugins/search';
 import { image, imageKey } from './plugins/image';
-
-import { gapCursor } from 'prosemirror-gapcursor';
-import { keymap } from 'prosemirror-keymap';
-import { history } from 'prosemirror-history';
-import { buildKeymap } from './keymap';
-import { baseKeymap } from 'prosemirror-commands';
-import { buildInputRules } from './input-rules';
-import { trailingParagraph } from './plugins/trailing-paragraph';
-import { nodeID } from './plugins/node-id';
-import Provider from './provider';
-import { schemaTransform, digestHTML } from './schema/transformer';
 import { readOnly } from './plugins/read-only';
 import { transform } from './plugins/schema-transform';
 import { dropPaste } from './plugins/drop-paste';
 import { placeholder } from './plugins/placeholder';
 import { highlight, highlightKey } from './plugins/highlight';
 import { citation, citationKey } from './plugins/citation';
+import { nodeID } from './plugins/node-id';
 import { drag } from './plugins/drag';
-import { pullItemData } from './plugins/pullItemData';
+import { pullItemData } from './plugins/pull-item-data';
+import { trailingParagraph } from './plugins/trailing-paragraph';
 
 // TODO: Avoid resetting cursor and losing the recently typed and unsaved
 //  text when a newly synced note is set
 
+// TODO: Improve resistance to JSON data in attributes corruption,
+//  make sure small issue can't disable the whole editor
+
+// About citation items:
+// - Citation itemData can be stored inside citation/highlight/image
+//   node or inside metadata container
+// - When copying citation/highlight/image `citationItems` are filled
+//   with itemData from metadata container to allow transferring it
+//   to another editor instance
+// - When note is modified `pullItemData` is triggered that pulls
+//   all itemData into metadata container
+// - If citation/highlight/image is pasted into TinyMCE editor, the
+//   item data stays inside citation node, until the note is edited
+//   in note-editor
+// - On load, metadata `citationItems` and formatted
+//   citations in body are updated automatically
+// - On load, unused metadata citation items are deleted,
+//   although the note is not updated
+
 class EditorCore {
 	constructor(options) {
+		this.options = options;
 		this.readOnly = options.readOnly;
 		this.unsaved = options.unsaved;
 		this.docChanged = false;
 		this.dimensionsStore = { data: {} };
 		this.unsupportedSchema = false;
 		this.nodeViews = [];
-		this.alreadyChanged = false;
+		this.metadata = new Metadata();
 
+		// TODO: Discontinue provider and implement lazy loading for images
 		this.provider = new Provider({
 			onSubscribe: (subscription) => {
-				if (subscription.type === 'citation') {
-					fillCitationItemsWithData(subscription.data.citation.citationItems, this.metadata);
-				}
 				options.onSubscribeProvider(subscription);
 			},
 			onUnsubscribe: options.onUnsubscribeProvider
 		});
 
-		let clipboardSerializer = buildClipboardSerializer(() => this.metadata, this.provider, schema);
-
-		let prevHTML = null;
-		// TODO: Have a debounce maximum wait time, to prevent not saving
-		//  it too long and therefore losing more text
-		let updateNote = debounce(() => {
-			if (this.readOnly) {
-				return;
-			}
-			let html = this.getHTML() || null;
-			if (html !== prevHTML) {
-				prevHTML = html;
-				options.onUpdate(html);
-				this.docChanged = false;
-			}
-		}, 1000);
-
 		let doc;
-
-
 		if (typeof options.value === 'string') {
-			let { html, metadata } = digestHTML(options.value);
-			this.metadata = metadata;
-			options.value = html;
-			if (this.getMetadataSchemaVersion() > schema.version) {
+			let { html, metadataAttributes } = preprocessHTML(options.value);
+			this.metadata.parseAttributes(metadataAttributes);
+			if (this.metadata.schemaVersion > schema.version) {
 				this.unsupportedSchema = true;
 				this.readOnly = true;
 			}
-			this.setMetadataSchemaVersion(schema.version);
-			doc = DOMParser2.fromSchema(schema).parse((new DOMParser().parseFromString(options.value, 'text/html').body));
+			doc = DOMParser2
+			.fromSchema(schema)
+			.parse((new DOMParser().parseFromString(html, 'text/html').body));
 		}
 		// Document loaded from state always uses the current schema
 		else if (typeof options.value === 'object') {
+			this.metadata.fromJSON(options.value.metadata);
 			doc = Node.fromJSON(schema, options.value.doc);
-			this.metadata = options.value.metadata;
 		}
 
-		if (!doc) return;
+		if (!doc) {
+			return;
+		}
 
 		let state = EditorState.create({ doc });
 		let tr = schemaTransform(state);
@@ -115,6 +114,7 @@ class EditorCore {
 			},
 			state: EditorState.create({
 				doc,
+
 				plugins: [
 					readOnly({ enable: this.readOnly }),
 					dropPaste({
@@ -122,16 +122,14 @@ class EditorCore {
 					}),
 					transform(),
 					nodeID(),
+					// Pulls item data into metadata when doc is being modified,
+					// therefore the updated metadata is already available when serializing
 					pullItemData({
-						onPull: (pulledItems) => {
-							let storedCitationItems = this.getMetadataCitationItems();
-							for (let pulledItem of pulledItems) {
-								let existingItem = storedCitationItems.find(item => item.uris.some(uri => pulledItem.uris.includes(uri)));
-								if (!existingItem) {
-									storedCitationItems.push(pulledItem);
-								}
+						onPull: (citationItems) => {
+							let updated = this.metadata.addPulledCitationItems(citationItems);
+							if (updated) {
+								this.updateCitationItemsList();
 							}
-							this.setMetadataCitationItems(storedCitationItems);
 						}
 					}),
 					buildInputRules(schema),
@@ -146,14 +144,14 @@ class EditorCore {
 					}),
 					highlight({
 						onOpen: options.onOpenAnnotation,
-						onGenerateCitation: options.onGenerateCitation
+						metadata: this.metadata
 					}),
 					image({
 						dimensionsStore: this.dimensionsStore,
 						onSyncAttachmentKeys: options.onSyncAttachmentKeys,
 						onImportImages: options.onImportImages,
 						onOpen: options.onOpenAnnotation,
-						onGenerateCitation: options.onGenerateCitation
+						metadata: this.metadata
 					}),
 					citation({
 						onShowItem: (node) => {
@@ -165,7 +163,7 @@ class EditorCore {
 						onEdit: (node) => {
 							if (!node.attrs.nodeID) return;
 							let citation = JSON.parse(JSON.stringify(node.attrs.citation));
-							fillCitationItemsWithData(citation.citationItems, this.metadata);
+							this.metadata.fillCitationItemsWithData(citation.citationItems);
 							options.onOpenCitationPopup(node.attrs.nodeID, citation);
 						}
 					}),
@@ -181,39 +179,41 @@ class EditorCore {
 					history()
 				]
 			}),
-			clipboardSerializer,
+
+			clipboardSerializer: buildClipboardSerializer(this.provider, schema, this.metadata),
+
 			nodeViews: {
 				image: nodeViews.image({
 					provider: this.provider,
 					onDimensions: (node, width, height) => {
-						// TODO: Dimension can also be updated if user modified the document just seconds a go
+						// TODO: Update dimensions immediately (still in single transaction)
 						this.dimensionsStore.data[node.attrs.nodeID] = [width, height];
 					},
 					onOpenURL: options.onOpenURL.bind(this)
 				}),
 				citation: nodeViews.citation({
-					provider: this.provider
+					metadata: this.metadata
 				})
 			},
-			dispatchTransaction(transaction) {
-				if (that.readOnly && transaction.docChanged) {
-					throw new Error('Document change should never happen in read-only mode');
-				}
-				let newState = this.state.apply(transaction);
-
-				// Delete unused citation items data on the first save
-				if (!that.alreadyChanged) {
-					that.deleteUnusedCitationItems(newState);
-					that.alreadyChanged = true;
+			dispatchTransaction(tr) {
+				if (that.readOnly && tr.docChanged) {
+					throw new Error('Trying to update read-only document');
 				}
 
-				if (transaction.docChanged
-					&& toHTML(this.state.doc.content, that.metadata) !== toHTML(newState.doc.content, that.metadata)) {
+				let newState = this.state.apply(tr);
+				this.updateState(newState);
+
+				if (tr.docChanged) {
 					that.docChanged = true;
 					that.unsaved = false;
-					updateNote();
+
+					if (tr.getMeta('system')) {
+						that.update(true);
+					}
+					else {
+						that.debouncedUpdate();
+					}
 				}
-				this.updateState(newState);
 
 				that.updatePluginState(this.state);
 				that.onUpdateState && that.onUpdateState();
@@ -221,20 +221,6 @@ class EditorCore {
 			handleDOMEvents: {
 				mousedown: (view, event) => {
 					if (event.button === 2) {
-						// let pos = view.posAtDOM(event.target);
-						//
-						//
-						// // let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
-						// if (pos) {
-						//   let $pos = view.state.doc.resolve(pos);
-						//   let node = view.state.doc.nodeAt(pos);
-						//   if (!node) {
-						//     node = $pos.parent;
-						//   }
-						//   if (node.isText) {
-						//     node = $pos.node()
-						//   }
-
 						setTimeout(() => {
 							const { $from } = view.state.selection;
 							let node = view.state.doc.nodeAt($from.pos);
@@ -253,79 +239,64 @@ class EditorCore {
 			}
 		});
 
-		// DevTools might freeze the editor and throw random errors
-		// applyDevTools(this.view);
 		this.view.editorCore = this;
+
+		// Automatic actions that modify document or metadata
+		if (!this.readOnly) {
+			// Undo stack is empty therefore unused citation items can be
+			// deleted, although this by it self doesn't trigger doc saving
+			this.metadata.deleteUnusedCitationItems(this.view.state);
+
+			// Trigger `updateCitationItemsList` after `initialized` event.
+			setTimeout(() => {
+				this.updateCitationItemsList();
+			}, 0);
+
+			// TODO: Consider to automatically update formatted citations if they don't match
+			// TODO: Consider to add `citationItem` to image and highlight annotations if it's missing
+		}
+
+		// DevTools can freeze editor and throw random errors!
+		// applyDevTools(this.view);
+
 		this.updatePluginState(this.view.state);
 	}
 
-	getMetadataSchemaVersion() {
-		return parseInt(this.metadata['data-schema-version']);
+	update = (system) => {
+		if (this.readOnly) {
+			return;
+		}
+		this.options.onUpdate(system);
+		this.docChanged = false;
+	};
+
+	// TODO: Have a debounce maximum wait time, to prevent not saving
+	//  it too long and therefore losing more text
+	debouncedUpdate = debounce(() => {
+		this.update();
+	}, 1000);
+
+	// In response to this method `updateCitationItems` updates metadata
+	// and formatted citations
+	updateCitationItemsList() {
+		let list = this.metadata.citationItems.map(ci => ({ uris: ci.uris }));
+
+		// Add missing metadata citationItems that were produced by copying
+		// citations/highlights/images not over note-editor.
+		let missing = this.metadata.getMissingCitationItems(this.view.state);
+		list = [...list, ...missing];
+
+		this.options.onUpdateCitationItemsList(list);
 	}
 
-	setMetadataSchemaVersion(version) {
-		this.metadata['data-schema-version'] = version.toString();
-	}
-
-	getMetadataCitationItems() {
-		try {
-			let data = JSON.parse(decodeURIComponent(this.metadata['data-citation-items']));
-			if (Array.isArray(data)) {
-				return data;
-			}
+	// Automatically updates doc, but might not update views if body doesn't change
+	updateCitationItems(citationItems) {
+		let updatedCitationItems = this.metadata.updateCitationItems(citationItems);
+		if (updatedCitationItems) {
+			let { state, dispatch } = this.view;
+			// Trigger 'system' initiated update that doesn't update note dateModified
+			reformatCitations(updatedCitationItems, this.metadata)(state, dispatch);
 		}
-		catch (e) {
-		}
-		return [];
-	}
-
-	setMetadataCitationItems(citationItems) {
-		if (citationItems.length) {
-			this.metadata['data-citation-items'] = encodeURIComponent(JSON.stringify(citationItems));
-		}
-		else {
-			delete this.metadata['data-citation-items'];
-		}
-	}
-
-	deleteUnusedCitationItems(state) {
-		let storedCitationItems = this.getMetadataCitationItems();
-
-		state.tr.doc.descendants((node, pos) => {
-			try {
-				let citationItems;
-				if (node.type.attrs.citation) {
-					citationItems = node.attrs.citation.citationItems
-				}
-				else if (node.type.attrs.annotation) {
-					citationItems = [node.attrs.annotation.citationItem];
-				}
-
-				if (citationItems) {
-					for (let citationItem of citationItems) {
-						let { uris } = citationItem;
-						let item = storedCitationItems.find(item => item.uris.some(uri => uris.includes(uri)));
-						if (item) {
-							item.used = true;
-						}
-					}
-				}
-			}
-			catch (e) {
-			}
-		});
-
-		for (let i = storedCitationItems.length - 1; i >= 0; i--) {
-			let item = storedCitationItems[i];
-			if (!item.used) {
-				storedCitationItems.splice(i, 1);
-			}
-			else {
-				delete item.used;
-			}
-		}
-
-		this.setMetadataCitationItems(storedCitationItems);
 	}
 
 	updatePluginState(state) {
@@ -382,10 +353,10 @@ class EditorCore {
 
 		return {
 			state: {
-				metadata: this.metadata,
+				metadata: this.metadata.toJSON(),
 				doc: this.view.state.doc.toJSON()
 			},
-			html: this.getHTML() || null
+			html: this.getHTML()
 		};
 	}
 }

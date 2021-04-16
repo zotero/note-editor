@@ -1,6 +1,6 @@
 import { Plugin, PluginKey } from 'prosemirror-state';
 import { ReplaceAroundStep, ReplaceStep } from 'prosemirror-transform';
-import { SetAttrsStep } from '../utils';
+import { formatCitation, SetAttrsStep } from '../utils';
 import { highlightKey } from './highlight';
 import { Slice } from 'prosemirror-model';
 
@@ -74,21 +74,23 @@ class Image {
 			let next = this.view.state.doc.resolve(pos);
 
 			let citation = null;
-			for (let i = index + 1; i < parent.childCount; i++) {
-				let child = parent.child(i);
-				if (child.type.name === 'citation') {
-					if (this.citationHasItem(child.attrs.citation, node.attrs.annotation.citationItem)) {
-						citation = child;
-					}
-					break;
-				}
-				else if (child.type.name === 'text') {
-					if (child.text.trim().length) {
+			if (node.attrs.annotation.citationItem) {
+				for (let i = index + 1; i < parent.childCount; i++) {
+					let child = parent.child(i);
+					if (child.type.name === 'citation') {
+						if (this.citationHasItem(child.attrs.citation, node.attrs.annotation.citationItem)) {
+							citation = child;
+						}
 						break;
 					}
-				}
-				else if (child.type.name !== 'hardBreak') {
-					break;
+					else if (child.type.name === 'text') {
+						if (child.text.trim().length) {
+							break;
+						}
+					}
+					else if (child.type.name !== 'hardBreak') {
+						break;
+					}
 				}
 			}
 
@@ -100,7 +102,7 @@ class Image {
 				isMultiline,
 				pos: from,
 				rect,
-				enableAddCitation: !citation,
+				enableAddCitation: !citation && !!node.attrs.annotation.citationItem,
 				open: this.open.bind(this),
 				unlink: this.unlink.bind(this),
 				addCitation: this.addCitation.bind(this)
@@ -135,19 +137,29 @@ class Image {
 	}
 
 	addCitation() {
-		// TODO: The way how this works is too complicated
 		let { state, dispatch } = this.view;
 		let { tr } = state;
 		let { $to } = state.selection;
 		let { node } = getNode(state);
 		let pos = $to.pos;
 
+		let citationItem = JSON.parse(JSON.stringify(node.attrs.annotation.citationItem));
+		this.options.metadata.fillCitationItemsWithData([citationItem]);
 		let citation = {
-			citationItems: [node.attrs.annotation.citationItem],
+			citationItems: [citationItem],
 			properties: {}
 		};
-		dispatch(tr.insert(pos, [state.schema.nodes.hardBreak.create()]));
-		this.options.onGenerateCitation(citation, pos + 1);
+
+		let formattedCitation = formatCitation(citation);
+		let citationNode = state.schema.nodes.citation.create({
+				...node.attrs,
+				citation
+			},
+			[
+				state.schema.text('(' + formattedCitation + ')')
+			]
+		);
+		dispatch(tr.insert(pos, [state.schema.text(' '), citationNode]));
 	}
 
 	citationHasItem(citation, citationItem) {

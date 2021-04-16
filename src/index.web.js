@@ -145,8 +145,10 @@ function main(html) {
 			console.log('onOpenURL(core)', url);
 			window.open(url, '_blank');
 		},
-		onUpdate(html) {
-			console.log('onUpdate', html.length);
+		onUpdate(system) {
+			let noteData = editorCore.getData();
+			let { html } = noteData;
+			console.log('onUpdate', html.length, system);
 
 			html = html.replace(/(data-annotation=".{5})(.*?)(.{5}")/g, '$1...$3');
 			html = html.replace(/(data-citation=".{5})(.*?)(.{5}")/g, '$1...$3');
@@ -155,21 +157,6 @@ function main(html) {
 			document.getElementById('dev').classList.remove('prettyprinted');
 			document.getElementById('dev').innerText = d;
 			PR.prettyPrint();
-		},
-		onGenerateCitation: (annotation, pos) => {
-			console.log('generateCitation', annotation, pos);
-
-			// let citation = {
-			//   citationItems: [
-			//     {
-			//       uri: 'uri1',
-			//       backupText: 'a citation'
-			//     }
-			//   ],
-			//   properties: {}
-			// };
-			//
-			// editorCore.insertCitations([citation], pos);
 		},
 		onInsertObject(type, data, pos) {
 			console.log('onInsertObject', type, data, pos);
@@ -193,6 +180,9 @@ function main(html) {
 
 				editorCore.insertCitations(citations, pos);
 			}
+		},
+		onUpdateCitationItemsList(list) {
+			console.log('onUpdateCitationItemsList', list);
 		},
 		onOpenAnnotation(annotation) {
 			console.log('onOpenAnnotation', annotation);

@@ -10,7 +10,8 @@ function extract(state) {
 			if (node.type.attrs.citation) {
 				citationItems = node.attrs.citation.citationItems
 			}
-			else if (node.type.attrs.annotation) {
+			else if (node.type.attrs.annotation
+				&& node.attrs.annotation.citationItem) {
 				citationItems = [node.attrs.annotation.citationItem];
 			}
 
@@ -29,7 +30,9 @@ function extract(state) {
 					tr.setNodeMarkup(pos, null, node.attrs);
 				}
 			}
-		} catch(e) {
+		}
+		catch(e) {
+			console.log(e);
 		}
 	});
 

@@ -1,7 +1,14 @@
 import { TextSelection } from 'prosemirror-state';
 import { findParentNode } from 'prosemirror-utils';
 import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
-import { encodeObject, randomString, SetAttrsStep } from './utils';
+import {
+	encodeObject,
+	formatCitation,
+	formatCitationItem,
+	formatCitationItemPreview,
+	randomString,
+	SetAttrsStep
+} from './utils';
 import { fromHTML, schema } from './schema';
 import { Fragment, Slice } from 'prosemirror-model';
 import { setBlockType } from 'prosemirror-commands';
@@ -261,8 +268,9 @@ export function toggleList(listType, itemType) {
 	};
 }
 
-export function setCitation(nodeID, citation, formattedCitation) {
+export function setCitation(nodeID, citation) {
 	return function (state, dispatch) {
+		let formattedCitation = formatCitation(citation);
 		state.doc.descendants((node, pos) => {
 			if (node.attrs.nodeID === nodeID) {
 				if (citation.citationItems.length) {
@@ -283,6 +291,55 @@ export function setCitation(nodeID, citation, formattedCitation) {
 			}
 			return true;
 		});
+	};
+}
+
+// Note: Node views are updated only because of toDOM result or decoration
+// changes, which means in our case `reformatCitations` is not enough to
+// trigger the node view updates if the formatted text doesn't change and
+// only citation item data in metadata changes
+// More: https://discuss.prosemirror.net/t/force-nodes-of-specific-type-to-re-render/2480/2
+export function reformatCitations(updatedCitationItems, metadata) {
+	return function (state, dispatch) {
+		let replacements = [];
+		state.doc.descendants((node, pos) => {
+			if (node.type === schema.nodes.citation) {
+				try {
+					let updated = false;
+					for (let citationItem of node.attrs.citation.citationItems) {
+						let existingItem = updatedCitationItems
+						.find(item => item.uris.some(uri => citationItem.uris.includes(uri)));
+						if (existingItem) {
+							updated = true;
+							break;
+						}
+					}
+					if (updated) {
+						let citation = JSON.parse(JSON.stringify(node.attrs.citation));
+						metadata.fillCitationItemsWithData(citation.citationItems);
+						let from = pos + 1;
+						let to = pos + node.nodeSize - 1;
+						let formattedCitation = formatCitation(citation);
+						replacements.push({ from, to, formattedCitation });
+					}
+				}
+				catch (e) {
+					console.log(e);
+				}
+			}
+			return true;
+		});
+
+		let { tr } = state;
+		for (let replacement of replacements) {
+			let { from, to, formattedCitation } = replacement;
+			let text = '(' + formattedCitation + ')';
+			tr.insertText(text, tr.mapping.map(from), tr.mapping.map(to));
+		}
+		if (replacements.length) {
+			tr.setMeta('system', true);
+			dispatch(tr);
+		}
 	};
 }
 

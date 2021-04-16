@@ -1,6 +1,8 @@
 import { DOMParser, DOMSerializer, Schema } from 'prosemirror-model';
 import { schema } from './index';
-import { encodeObject, fillCitationItemsWithData } from '../utils';
+import { encodeObject } from '../utils';
+
+// Note: TinyMCE is automatically removing div nodes without text and triggering immediate update/sync
 
 export function buildToHTML(schema) {
 	return function (content, metadata) {
@@ -9,10 +11,11 @@ export function buildToHTML(schema) {
 		let tmp = doc.body;
 
 		let container = doc.createElement('div');
-		// Different schema version results to different HTML output
-		let keys = Object.keys(metadata).sort()
+
+		let metadataAttributes = metadata.serializeAttributes();
+		let keys = Object.keys(metadataAttributes).sort()
 		for (let key of keys) {
-			let value = metadata[key];
+			let value = metadataAttributes[key];
 			container.setAttribute(key, value);
 		}
 
@@ -64,7 +67,7 @@ export function buildFromHTML(schema) {
 	};
 }
 
-export function buildClipboardSerializer(getMetadata, provider, schema) {
+export function buildClipboardSerializer(provider, schema, metadata) {
 	let base = DOMSerializer.fromSchema(schema);
 	return new DOMSerializer(Object.assign({}, base.nodes, {
 		image(node) {
@@ -73,36 +76,46 @@ export function buildClipboardSerializer(getMetadata, provider, schema) {
 			if (data) {
 				src = data.src;
 			}
-			let metadata = getMetadata();
-			fillCitationItemsWithData([node.attrs.annotation.citationItem], metadata);
+			let annotation;
+			if (node.attrs.annotation) {
+				annotation = JSON.parse(JSON.stringify(node.attrs.annotation));
+				if (annotation.citationItem) {
+					metadata.fillCitationItemsWithData([annotation.citationItem]);
+				}
+			}
 			return ['img', {
 				src,
 				alt: node.attrs.alt,
 				title: node.attrs.title,
 				width: node.attrs.width,
 				height: node.attrs.height,
-				'data-annotation': node.attrs.annotation && encodeObject(node.attrs.annotation)
+				'data-annotation': annotation && encodeObject(annotation)
 			}];
 		},
 		citation(node) {
-			let text = '';
-			let data = provider.getCachedData(node.attrs.nodeID, 'citation');
-			if (data) {
-				text = '(' + data.formattedCitation + ')';
+			let citation;
+			if (node.attrs.citation) {
+				citation = JSON.parse(JSON.stringify(node.attrs.citation));
+				if (Array.isArray(citation.citationItems)) {
+					metadata.fillCitationItemsWithData(citation.citationItems);
+				}
 			}
-			let metadata = getMetadata();
-			fillCitationItemsWithData(node.attrs.citation.citationItems, metadata);
 			return ['span', {
 				class: 'citation',
-				'data-citation': node.attrs.citation && encodeObject(node.attrs.citation)
-			}, text];
+				'data-citation': citation && encodeObject(citation)
+			}, 0];
 		},
 		highlight(node) {
-			let metadata = getMetadata();
-			fillCitationItemsWithData([node.attrs.annotation.citationItem], metadata);
+			let annotation;
+			if (node.attrs.annotation) {
+				annotation = JSON.parse(JSON.stringify(node.attrs.annotation));
+				if (annotation.citationItem) {
+					metadata.fillCitationItemsWithData([annotation.citationItem]);
+				}
+			}
 			return ['span', {
 				class: 'highlight',
-				'data-annotation': encodeObject(node.attrs.annotation)
+				'data-annotation': annotation && encodeObject(annotation)
 			}, 0];
 		}
 	}), base.marks);

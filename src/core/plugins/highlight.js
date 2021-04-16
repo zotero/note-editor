@@ -1,7 +1,7 @@
 import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { fromHTML, schema } from '../schema';
 import { toggleMark } from 'prosemirror-commands';
-import { levenshtein, randomString, SetAttrsStep } from '../utils';
+import { formatCitation, levenshtein, randomString, SetAttrsStep } from '../utils';
 import { Fragment, NodeRange, Slice } from 'prosemirror-model';
 import { TextNode } from 'prosemirror-model/src/node';
 import { liftTarget, ReplaceAroundStep, ReplaceStep } from 'prosemirror-transform';
@@ -127,21 +127,25 @@ class Highlight {
 			let next = this.view.state.doc.resolve(pos);
 
 			let citation = null;
-			for (let i = index + 1; i < parent.childCount; i++) {
-				let child = parent.child(i);
-				if (child.type.name === 'citation') {
-					if (this.citationHasItem(child.attrs.citation, node.attrs.annotation.citationItem)) {
-						citation = child;
-					}
-					break;
-				}
-				else if (child.type.name === 'text') {
-					if (child.text.trim().length) {
+
+			// TODO: Add part of this into try / catch to make sure bad data doesn't prevent showing popup here and in other places
+			if (node.attrs.annotation.citationItem) {
+				for (let i = index + 1; i < parent.childCount; i++) {
+					let child = parent.child(i);
+					if (child.type.name === 'citation') {
+						if (this.citationHasItem(child.attrs.citation, node.attrs.annotation.citationItem)) {
+							citation = child;
+						}
 						break;
 					}
-				}
-				else {
-					break;
+					else if (child.type.name === 'text') {
+						if (child.text.trim().length) {
+							break;
+						}
+					}
+					else {
+						break;
+					}
 				}
 			}
 
@@ -184,20 +188,29 @@ class Highlight {
 	}
 
 	addCitation() {
-		// TODO: The way how this works is too complicated
 		let { state, dispatch } = this.view;
 		let { tr } = state;
 		let { $from } = state.selection;
 		let node = $from.parent;
 		let pos = $from.pos - $from.parentOffset + node.nodeSize - 1;
 
+		let citationItem = JSON.parse(JSON.stringify(node.attrs.annotation.citationItem));
+		this.options.metadata.fillCitationItemsWithData([citationItem]);
 		let citation = {
-			citationItems: [node.attrs.annotation.citationItem],
+			citationItems: [citationItem],
 			properties: {}
 		};
-		// TODO: Add citation body text
-		dispatch(tr.insert(pos, [state.schema.text(' ')]));
-		this.options.onGenerateCitation(citation, pos + 1);
+
+		let formattedCitation = formatCitation(citation);
+		let citationNode = state.schema.nodes.citation.create({
+				...node.attrs,
+				citation
+			},
+			[
+				state.schema.text('(' + formattedCitation + ')')
+			]
+		);
+		dispatch(tr.insert(pos, [state.schema.text(' '), citationNode]));
 	}
 
 	citationHasItem(citation, citationItem) {

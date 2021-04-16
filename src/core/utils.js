@@ -152,19 +152,121 @@ export function levenshtein(a, b) {
 	return arr[aLen][bLen];
 }
 
-export function fillCitationItemsWithData(citationItems, metadata) {
-	try {
-		let items = JSON.parse(decodeURIComponent(metadata['data-citation-items']));
-		for (let citationItem of citationItems) {
-			let item = items.find(item => item.uris.some(uri => citationItem.uris.includes(uri)));
-			if (item) {
-				citationItem.itemData = item.itemData;
-			}
+// https://stackoverflow.com/a/6713782
+// Only used to compare JSON-ready data
+export function basicDeepEqual(x, y) {
+	if (x === y) return true;
+	// if both x and y are null or undefined and exactly the same
+	if (!(x instanceof Object) || !(y instanceof Object)) return false;
+	// if they are not strictly equal, they both need to be Objects
+	if (x.constructor !== y.constructor) return false;
+	// they must have the exact same prototype chain, the closest we can do is
+	// test there constructor.
+
+	for (var p in x) {
+		if (!x.hasOwnProperty(p)) continue;
+		// other properties were tested using x.constructor === y.constructor
+		if (!y.hasOwnProperty(p)) return false;
+		// allows to compare x[ p ] and y[ p ] when set to undefined
+		if (x[p] === y[p]) continue;
+		// if they have the same strict value or identity then they are equal
+		if (typeof (x[p]) !== 'object') return false;
+		// Numbers, Strings, Functions, Booleans must be strictly equal
+		if (!basicDeepEqual(x[p], y[p])) return false;
+		// Objects and Arrays must be tested recursively
+	}
+
+	for (p in y) {
+		if (y.hasOwnProperty(p) && !x.hasOwnProperty(p)) {
+			// allows x[ p ] to be set to undefined
+			return false;
 		}
 	}
-	catch (e) {
-	}
+	return true;
 }
+
+
+/**
+ * Build citation item preview string (based on _buildBubbleString in quickFormat.js)
+ */
+export function formatCitationItem(citationItem) {
+	const STARTSWITH_ROMANESQUE_REGEXP = /^[&a-zA-Z\u0e01-\u0e5b\u00c0-\u017f\u0370-\u03ff\u0400-\u052f\u0590-\u05d4\u05d6-\u05ff\u1f00-\u1fff\u0600-\u06ff\u200c\u200d\u200e\u0218\u0219\u021a\u021b\u202a-\u202e]/;
+	const ENDSWITH_ROMANESQUE_REGEXP = /[.;:&a-zA-Z\u0e01-\u0e5b\u00c0-\u017f\u0370-\u03ff\u0400-\u052f\u0590-\u05d4\u05d6-\u05ff\u1f00-\u1fff\u0600-\u06ff\u200c\u200d\u200e\u0218\u0219\u021a\u021b\u202a-\u202e]$/;
+
+	let { itemData } = citationItem;
+	let str = '';
+
+	if (!itemData) {
+		return '';
+	}
+
+	// Authors
+	let authors = itemData.author;
+	if (authors) {
+		if (authors.length === 1) {
+			str = authors[0].family || authors[0].literal;
+		}
+		else if (authors.length === 2) {
+			let a = authors[0].family || authors[0].literal;
+			let b = authors[1].family || authors[1].literal;
+			str = a + ' and ' + b;
+		}
+		else if (authors.length >= 3) {
+			str = (authors[0].family || authors[0].literal) + ' et al.';
+		}
+	}
+
+	// Title
+	if (!str && itemData.title) {
+		str = `“${itemData.title}”`;
+	}
+
+	// Date
+	if (itemData.issued
+		&& itemData.issued['date-parts']
+		&& itemData.issued['date-parts'][0]) {
+		let year = itemData.issued['date-parts'][0][0];
+		if (year && year != '0000') {
+			str += ', ' + year;
+		}
+	}
+
+	// Locator
+	if (citationItem.locator) {
+		if (citationItem.label) {
+			// TODO: Localize and use short forms
+			var label = citationItem.label;
+		}
+		else if (/[\-–,]/.test(citationItem.locator)) {
+			var label = 'pp.';
+		}
+		else {
+			var label = 'p.';
+		}
+
+		str += ', ' + label + ' ' + citationItem.locator;
+	}
+
+	// Prefix
+	if (citationItem.prefix && ENDSWITH_ROMANESQUE_REGEXP) {
+		str = citationItem.prefix
+			+ (ENDSWITH_ROMANESQUE_REGEXP.test(citationItem.prefix) ? ' ' : '')
+			+ str;
+	}
+
+	// Suffix
+	if (citationItem.suffix && STARTSWITH_ROMANESQUE_REGEXP) {
+		str += (STARTSWITH_ROMANESQUE_REGEXP.test(citationItem.suffix) ? ' ' : '')
+			+ citationItem.suffix;
+	}
+
+	return str;
+}
+
+export function formatCitation(citation) {
+	return citation.citationItems.map(x => formatCitationItem(x)).join(';');
+}
+
 
 import {
 	findParentNode,

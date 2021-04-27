@@ -122,36 +122,6 @@ export function throttle(func, wait, options) {
 	};
 }
 
-/**
- * Calculates the Levenshtein distance between two strings
- * @type Number
- */
-export function levenshtein(a, b) {
-	var aLen = a.length;
-	var bLen = b.length;
-
-	var arr = new Array(aLen + 1);
-	var i, j, cost;
-
-	for (i = 0; i <= aLen; i++) {
-		arr[i] = new Array(bLen);
-		arr[i][0] = i;
-	}
-
-	for (j = 0; j <= bLen; j++) {
-		arr[0][j] = j;
-	}
-
-	for (i = 1; i <= aLen; i++) {
-		for (j = 1; j <= bLen; j++) {
-			cost = (a[i - 1] == b[j - 1]) ? 0 : 1;
-			arr[i][j] = Math.min(arr[i - 1][j] + 1, Math.min(arr[i][j - 1] + 1, arr[i - 1][j - 1] + cost));
-		}
-	}
-
-	return arr[aLen][bLen];
-}
-
 // https://stackoverflow.com/a/6713782
 // Only used to compare JSON-ready data
 export function basicDeepEqual(x, y) {

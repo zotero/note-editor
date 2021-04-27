@@ -1,7 +1,7 @@
 import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { fromHTML, schema } from '../schema';
 import { toggleMark } from 'prosemirror-commands';
-import { formatCitation, levenshtein, randomString, SetAttrsStep } from '../utils';
+import { formatCitation, randomString, SetAttrsStep } from '../utils';
 import { Fragment, NodeRange, Slice } from 'prosemirror-model';
 import { TextNode } from 'prosemirror-model/src/node';
 import { liftTarget, ReplaceAroundStep, ReplaceStep } from 'prosemirror-transform';
@@ -223,37 +223,25 @@ class Highlight {
 }
 
 function unlinkHighlights(tr) {
-	let nodeIDs = [];
 	let updated = false;
 	tr.doc.descendants((node, pos) => {
 		if (node.type.name === 'highlight') {
 			if (node.content instanceof Fragment && node.content.content.length) {
 				let first = node.content.content[0];
 				let last = node.content.content[node.content.content.length - 1];
-				let text = node.textContent;
-				text = text.slice(1, -1).toLowerCase().replace(/[\s\.-]/g, '');
-
-				let drifted = false;
-				if (node.attrs.annotation.text) {
-					let originalText = node.attrs.annotation.text.toLowerCase()
-					.replace(/<\/?(b|i|sub|sup)>/g, '')
-					.replace(/[\s\.-]/g, '');
-
-					// TODO: Needs further optimizations
-					if (text.replace(/\s/g, '') !== originalText.replace(/\s/g, '')) {
-						let dist = levenshtein(text, originalText);
-
-						if (dist && dist / originalText.length > 0.1) {
-							drifted = true;
-						}
-					}
-				}
-
-				if (drifted || !['"', '“'].includes(first.text[0]) || !['"', '”'].includes(last.text[last.text.length - 1])) {
+				if (node.textContent.length < 2
+					|| !['"', '“'].includes(first.text[0])
+					|| !['"', '”'].includes(last.text[last.text.length - 1])) {
 					pos = tr.mapping.map(pos);
 					tr = tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0));
 					updated = true;
 				}
+			}
+			// Remove empty highlight nodes that appear when deleting whole text
+			else {
+				pos = tr.mapping.map(pos);
+				tr = tr.delete(pos, pos + node.nodeSize);
+				updated = true;
 			}
 		}
 	});
@@ -304,6 +292,7 @@ export function highlight(options) {
 				}
 			};
 		},
+		// TODO: Rewrite
 		appendTransaction(transactions, oldState, newState) {
 			if (!transactions.some(tr => tr.docChanged)) {
 				return null;

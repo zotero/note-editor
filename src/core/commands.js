@@ -214,7 +214,20 @@ export function insertHTML(pos, html) {
 				pos = state.tr.doc.content.size;
 			}
 			let { tr } = state;
-			tr = tr.insert(pos, nodes);
+
+			if (tr.doc.childCount === 1 && tr.doc.child(0).content.size === 0) {
+				pos = 1;
+			}
+
+			let $pos = tr.doc.resolve(pos);
+			if ($pos.parent && $pos.parent.type.isBlock && !$pos.parent.content.size) {
+				let range = $pos.blockRange($pos);
+				tr = tr.replaceWith(range.start, range.end, nodes)
+			}
+			else {
+				tr = tr.insert(pos, nodes);
+			}
+
 			if (negative) {
 				tr = tr.setSelection(new TextSelection(tr.doc.resolve(tr.doc.content.size))).scrollIntoView();
 			}

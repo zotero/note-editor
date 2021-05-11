@@ -234,7 +234,7 @@ export function formatCitationItem(citationItem) {
 }
 
 export function formatCitation(citation) {
-	return citation.citationItems.map(x => formatCitationItem(x)).join(';');
+	return citation.citationItems.map(x => formatCitationItem(x)).join('; ');
 }
 
 

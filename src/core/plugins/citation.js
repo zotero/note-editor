@@ -75,6 +75,20 @@ export function citation(options) {
 					pluginState.destroy();
 				}
 			};
+		},
+		props: {
+			// Work around Firefox 60 bug where wrapped `contenteditable=false`
+			// island captures cursor
+			handleKeyDown(view, event) {
+				if (event.key === 'ArrowDown') {
+					let { from, empty } = view.state.selection;
+					let node = view.state.doc.nodeAt(from);
+					if (empty && node && node.type === schema.nodes.citation) {
+						view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.tr.doc, from + node.nodeSize)));
+						event.preventDefault();
+					}
+				}
+			}
 		}
 	});
 }

@@ -1,130 +1,72 @@
 import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { schema } from '../schema';
-import { toggleMark } from 'prosemirror-commands';
-import { randomString } from '../utils';
-
-function textRange(node, from, to) {
-	const range = document.createRange();
-	range.setEnd(node, to == null ? node.nodeValue.length : to);
-	range.setStart(node, from || 0);
-	return range;
-}
-
-function singleRect(object, bias) {
-	const rects = object.getClientRects();
-	return !rects.length ? object.getBoundingClientRect() : rects[bias < 0 ? 0 : rects.length - 1];
-}
-
-function coordsAtPos(view, pos, end = false) {
-	const { node, offset } = view.docView.domFromPos(pos);
-	let side;
-	let rect;
-	if (node.nodeType === 3) {
-		if (end && offset < node.nodeValue.length) {
-			rect = singleRect(textRange(node, offset - 1, offset), -1);
-			side = 'right';
-		}
-		else if (offset < node.nodeValue.length) {
-			rect = singleRect(textRange(node, offset, offset + 1), -1);
-			side = 'left';
-		}
-	}
-	else if (node.firstChild) {
-		if (offset < node.childNodes.length) {
-			const child = node.childNodes[offset];
-			rect = singleRect(child.nodeType === 3 ? textRange(child) : child, -1);
-			side = 'left';
-		}
-		if ((!rect || rect.top === rect.bottom) && offset) {
-			const child = node.childNodes[offset - 1];
-			rect = singleRect(child.nodeType === 3 ? textRange(child) : child, 1);
-			side = 'right';
-		}
-	}
-	else {
-		rect = node.getBoundingClientRect();
-		side = 'left';
-	}
-
-	const x = rect[side];
-	return {
-		top: rect.top,
-		bottom: rect.bottom,
-		left: x,
-		right: x
-	};
-}
-
-function getHrefAtPos($pos) {
-	let start = $pos.parent.childAfter($pos.parentOffset);
-	if (start.node) {
-		let mark = start.node.marks.find(mark => mark.type.name === 'link');
-		if (mark) {
-			return mark.attrs.href;
-		}
-	}
-	return null;
-}
 
 class Link {
 	constructor(state, options) {
-		this.popup = {
-			isActive: false
-		};
-		this.onOpenURL = options.onOpenURL;
+		this.popup = { active: false };
+		this.options = options;
 	}
 
 	update(state, oldState) {
 		if (!this.view) {
-			this.popup = { ...this.popup, isActive: false };
 			return;
 		}
-
-		this.isActive = this.hasMark(schema.marks.link)(this.view.state, this.view.dispatch);
 
 		if (oldState && oldState.doc.eq(state.doc) && oldState.selection.eq(state.selection)) {
 			return;
 		}
 
-		const { from, to } = state.selection;
-
-		// These are in screen coordinates
-		// We can't use EditorView.cordsAtPos here because it can't handle linebreaks correctly
-		// See: https://github.com/ProseMirror/prosemirror-view/pull/47
-		const start = coordsAtPos(this.view, from);
-		const end = coordsAtPos(this.view, to, true);
-
-		let isMultiline = start.top !== end.top;
-		let left = isMultiline ? start.left : start.left + (end.left - start.left) / 2;
-		let href = this.getHref(state);
-
-		let visible = false;
-		if (this.view.state.selection.empty && href !== null) {
-			visible = true;
+		let node = this.getLinkNode(state.selection.from);
+		if (node) {
+			let rect = node.getBoundingClientRect();
+			let href = this.getHref(state);
+			if (this.view.state.selection.empty && href !== null) {
+				this.popup = {
+					active: true,
+					rect,
+					href,
+					setURL: this.setURL.bind(this),
+					removeURL: this.removeURL.bind(this),
+					open: this.open.bind(this)
+				};
+				return;
+			}
 		}
-
-		this.popup = {
-			isActive: visible,
-			left,
-			top: start.top,
-			bottom: end.bottom,
-			href,
-			isMultiline,
-			pos: from,
-			setURL: this.setURL.bind(this),
-			removeURL: this.removeURL.bind(this),
-			toggle: this.toggle.bind(this),
-			open: this.open.bind(this)
-		};
+		this.popup = { active: false };
 	}
+
+	getLinkNode(pos) {
+		let node = this.view.domAtPos(pos);
+		node = node.node;
+		do {
+			if (node.nodeType === Node.ELEMENT_NODE && node.nodeName === 'A') {
+				return node;
+			}
+			else if (node === this.view.dom) {
+				return;
+			}
+		}
+		while ((node = node.parentNode));
+	}
+
 
 	toggle() {
 		let { state, dispatch } = this.view;
-		if (this.hasMark(schema.marks.link)(this.view.state, this.view.dispatch)) {
-			this.removeMark(schema.marks.link)(this.view.state, this.view.dispatch);
+		if (this.hasMark(schema.marks.link)(state, dispatch)) {
+			this.removeMark(schema.marks.link)(state, dispatch);
 		}
 		else if (!state.selection.empty) {
-			this.popup = { ...this.popup, isActive: true };
+			let selection = window.getSelection();
+			let range = selection.getRangeAt(0);
+			let rect = range.getBoundingClientRect();
+			this.popup = {
+				active: true,
+				rect,
+				href: '',
+				setURL: this.setURL.bind(this),
+				removeURL: this.removeURL.bind(this),
+				open: this.open.bind(this)
+			};
 			dispatch(state.tr);
 		}
 	}
@@ -141,12 +83,10 @@ class Link {
 						dispatch(tr);
 						return false;
 					}
-					// TODO: `return true` is not necessary here and everywhere else
-					return true;
 				});
 			}
 			else {
-				this.onOpenURL(this.popup.href);
+				this.options.onOpenURL(this.popup.href);
 			}
 		}
 	}
@@ -268,8 +208,19 @@ class Link {
 	}
 
 	destroy() {
-		this.popup = { ...this.popup, isActive: false };
+		this.popup = { active: false };
 	}
+}
+
+function getHrefAtPos($pos) {
+	let start = $pos.parent.childAfter($pos.parentOffset);
+	if (start.node) {
+		let mark = start.node.marks.find(mark => mark.type.name === 'link');
+		if (mark) {
+			return mark.attrs.href;
+		}
+	}
+	return null;
 }
 
 export let linkKey = new PluginKey('link');

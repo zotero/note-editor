@@ -9,7 +9,7 @@ function HighlightPopup({ parentRef, pluginState }) {
 	const inputRef = useRef();
 
 	useLayoutEffect(() => {
-		if (!pluginState.isActive) {
+		if (!pluginState.active) {
 			return;
 		}
 
@@ -70,7 +70,7 @@ function HighlightPopup({ parentRef, pluginState }) {
 	}
 
 	return useMemo(() => {
-		if (!pluginState.isActive) return null;
+		if (!pluginState.active) return null;
 
 		return (
 			<div ref={containerRef}>
@@ -80,7 +80,7 @@ function HighlightPopup({ parentRef, pluginState }) {
 				>
 					<div className="button toolbarButton" onClick={handleOpen}><div className="mce-ico mce-i-newdocument"/> Show on Page</div>
 					<div className="button toolbarButton" onClick={handleUnlink}><div className="mce-ico mce-i-unlink"/> Unlink</div>
-					{pluginState.enableAddCitation && <div className="button toolbarButton" onClick={handleAdd}><div className="mce-ico mce-i-blockquote"/> Add Citation</div>}
+					{pluginState.canAddCitation && <div className="button toolbarButton" onClick={handleAdd}><div className="mce-ico mce-i-blockquote"/> Add Citation</div>}
 				</div>
 			</div>
 		);

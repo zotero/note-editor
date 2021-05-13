@@ -26,7 +26,7 @@ function Toolbar({ viewMode, enableReturnButton, menuState, linkState, unsaved, 
 			</div>
 			<div className="middle">
 				<TextDropdown menuState={menuState}/>
-				<Button icon={<IconLink/>} title="Link" onClick={() => linkState.popup.toggle()}/>
+				<Button icon={<IconLink/>} title="Link" onClick={() => linkState.toggle()}/>
 				<StateButton state={menuState.clearFormatting} icon={<IconRemoveFormatting/>} title="Clear Formatting"/>
 				<AlignDropdown menuState={menuState} />
 				<Button icon={<IconCitation/>} title="Insert Citation" onClick={() => menuState.citation.run()}/>

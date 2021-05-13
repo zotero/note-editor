@@ -1,72 +1,27 @@
 import { Plugin, PluginKey } from 'prosemirror-state';
-import { ReplaceAroundStep, ReplaceStep } from 'prosemirror-transform';
+import { ReplaceStep } from 'prosemirror-transform';
+import { schema } from '../schema';
 import { formatCitation, SetAttrsStep } from '../utils';
-import { highlightKey } from './highlight';
-import { Slice } from 'prosemirror-model';
-
-function getNode(state) {
-	const { $from, $to, $cursor } = state.selection;
-
-	let nodes = [];
-	state.doc.nodesBetween($from.pos, $to.pos, (parentNode, parentPos) => {
-		parentNode.forEach((node, offset, index) => {
-			let absolutePos = parentPos + offset + 1;
-			if (node.type.name === 'image') {
-				// console.log($from.pos, $to.pos, absolutePos)
-				if ($from.pos === absolutePos && $to.pos === absolutePos + node.nodeSize) {
-					nodes.push({ pos: absolutePos, node, parent: parentNode, index });
-				}
-			}
-		});
-	});
-	if (nodes.length === 1) {
-		return nodes[0];
-	}
-	return null;
-}
+import { getSingleSelectedNode } from '../commands';
 
 class Image {
 	constructor(state, options) {
 		this.options = options;
-		this.popup = {
-			isActive: false
-		};
-		// this.onOpenURL = options.onOpenURL;
+		this.popup = { active: false };
 	}
 
 	update(state, oldState) {
 		if (!this.view) {
-			this.popup = { ...this.popup, isActive: false };
 			return;
 		}
 
-		let node = getNode(state);
+		let nodeData = getSingleSelectedNode(state, schema.nodes.image);
+		if (nodeData) {
+			let { node, pos, index, parent } = nodeData;
 
-		let pos;
-		let index;
-		let parent;
-		if (node) {
-			pos = node.pos;
-			index = node.index;
-			parent = node.parent;
-			node = node.node;
 			if (!node.attrs.annotation) {
 				return;
 			}
-		}
-
-		if (node) {
-			let { from, to } = state.selection;
-
-			// TODO: Should be within the bounds of the highlight
-
-			// These are in screen coordinates
-			// We can't use EditorView.cordsAtPos here because it can't handle linebreaks correctly
-			// See: https://github.com/ProseMirror/prosemirror-view/pull/47
-			let start = this.view.coordsAtPos(from);
-			let end = this.view.coordsAtPos(to);
-			let isMultiline = start.top !== end.top;
-			let left = isMultiline ? start.left : start.left + (end.left - start.left) / 2;
 
 			let dom = this.view.nodeDOM(pos);
 			let rect = dom.getBoundingClientRect();
@@ -95,41 +50,36 @@ class Image {
 			}
 
 			this.popup = {
-				isActive: true,
-				left,
-				top: start.top,
-				bottom: end.bottom,
-				isMultiline,
-				pos: from,
+				active: true,
 				rect,
-				enableAddCitation: !citation && !!node.attrs.annotation.citationItem,
+				canAddCitation: !citation && !!node.attrs.annotation.citationItem,
 				open: this.open.bind(this),
 				unlink: this.unlink.bind(this),
 				addCitation: this.addCitation.bind(this)
 			};
 			return;
 		}
-
-		this.popup = {
-			isActive: false
-		};
+		this.popup = { active: false };
 	}
 
 	open() {
-		let { $from } = this.view.state.selection;
-		let { node } = getNode(this.view.state);
-		if (node.attrs.annotation) {
-			this.options.onOpen(node.attrs.annotation);
+		let nodeData = getSingleSelectedNode(this.view.state, schema.nodes.image);
+		if (nodeData) {
+			let { node } = nodeData;
+			if (node.attrs.annotation) {
+				this.options.onOpen(node.attrs.annotation);
+			}
 		}
 	}
 
 	unlink() {
 		let { state, dispatch } = this.view;
 		let { tr } = state;
-		let node = getNode(state);
-		if (node) {
-			tr.setNodeMarkup(node.pos, null, {
-				...node.node.attrs,
+		let nodeData = getSingleSelectedNode(state, schema.nodes.image);
+		if (nodeData) {
+			let { node, pos } = nodeData;
+			tr.setNodeMarkup(pos, null, {
+				...node.attrs,
 				annotation: null
 			});
 			dispatch(tr);
@@ -140,26 +90,29 @@ class Image {
 		let { state, dispatch } = this.view;
 		let { tr } = state;
 		let { $to } = state.selection;
-		let { node } = getNode(state);
-		let pos = $to.pos;
+		let nodeData = getSingleSelectedNode(state, schema.nodes.image);
+		if (nodeData) {
+			let { node } = nodeData;
+			let pos = $to.pos;
 
-		let citationItem = JSON.parse(JSON.stringify(node.attrs.annotation.citationItem));
-		this.options.metadata.fillCitationItemsWithData([citationItem]);
-		let citation = {
-			citationItems: [citationItem],
-			properties: {}
-		};
+			let citationItem = JSON.parse(JSON.stringify(node.attrs.annotation.citationItem));
+			this.options.metadata.fillCitationItemsWithData([citationItem]);
+			let citation = {
+				citationItems: [citationItem],
+				properties: {}
+			};
 
-		let formattedCitation = formatCitation(citation);
-		let citationNode = state.schema.nodes.citation.create({
-				...node.attrs,
-				citation
-			},
-			[
-				state.schema.text('(' + formattedCitation + ')')
-			]
-		);
-		dispatch(tr.insert(pos, [state.schema.text(' '), citationNode]));
+			let formattedCitation = formatCitation(citation);
+			let citationNode = state.schema.nodes.citation.create({
+					...node.attrs,
+					citation
+				},
+				[
+					state.schema.text('(' + formattedCitation + ')')
+				]
+			);
+			dispatch(tr.insert(pos, [state.schema.text(' '), citationNode]));
+		}
 	}
 
 	citationHasItem(citation, citationItem) {
@@ -167,7 +120,7 @@ class Image {
 	}
 
 	destroy() {
-		this.popup = { ...this.popup, isActive: false };
+		this.popup = { active: false };
 	}
 }
 

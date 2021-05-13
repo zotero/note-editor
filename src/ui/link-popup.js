@@ -3,30 +3,29 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, Fragment } from 'react';
 import cx from 'classnames';
 
-function LinkPopup({ parentRef, linkState }) {
+function LinkPopup({ parentRef, pluginState }) {
 	const [editing, setEditing] = useState(false);
 	const containerRef = useRef();
 	const popupRef = useRef();
 	const inputRef = useRef();
 
 	useEffect(() => {
-		setEditing(!linkState.href);
-	}, [linkState]);
+		setEditing(!pluginState.href);
+	}, [pluginState]);
 
 
 	useLayoutEffect(() => {
-		if (!linkState.isActive) {
+		if (!pluginState.active) {
 			return;
 		}
 
 		let parentScrollTop = parentRef.current.scrollTop;
 		let parentTop = parentRef.current.getBoundingClientRect().top;
 		let maxWidth = containerRef.current.offsetWidth;
-		let top = parentScrollTop + (linkState.top - popupRef.current.offsetHeight - parentTop - 10);
-		let left = linkState.left;
-		let isAbove = true;
+		let top = parentScrollTop + (pluginState.rect.top - popupRef.current.offsetHeight - parentTop - 10);
+
 		if (top < 0) {
-			top = parentScrollTop + (linkState.bottom - parentTop) + 10;
+			top = parentScrollTop + (pluginState.rect.bottom - parentTop) + 10;
 			popupRef.current.classList.remove('page-popup-top');
 			popupRef.current.classList.add('page-popup-bottom');
 		}
@@ -36,6 +35,8 @@ function LinkPopup({ parentRef, linkState }) {
 		}
 
 		let width = popupRef.current.offsetWidth;
+		let left = pluginState.rect.left + (pluginState.rect.right - pluginState.rect.left) / 2 - width / 2;
+
 		if (left + width > maxWidth) {
 			left = maxWidth - width;
 		}
@@ -48,7 +49,7 @@ function LinkPopup({ parentRef, linkState }) {
 		popupRef.current.style.left = Math.round(left) + 'px';
 
 		if (inputRef.current) {
-			inputRef.current.value = linkState.href || '';
+			inputRef.current.value = pluginState.href || '';
 		}
 
 		if (editing) {
@@ -58,19 +59,19 @@ function LinkPopup({ parentRef, linkState }) {
 				}
 			}, 0);
 		}
-	}, [editing, linkState]);
+	}, [editing, pluginState]);
 
 	function handleSet() {
-		linkState.setURL(inputRef.current.value);
+		pluginState.setURL(inputRef.current.value);
 	}
 
 	function handleUnset() {
-		linkState.removeURL();
+		pluginState.removeURL();
 	}
 
 	function handleOpen(event) {
 		event.preventDefault();
-		linkState.open();
+		pluginState.open();
 	}
 
 	function handleEdit() {
@@ -79,7 +80,7 @@ function LinkPopup({ parentRef, linkState }) {
 
 	function handleKeydown(event) {
 		if (event.key === 'Enter') {
-			linkState.setURL(inputRef.current.value);
+			pluginState.setURL(inputRef.current.value);
 		}
 		else if (event.key === 'Escape') {
 			setEditing(false);
@@ -87,7 +88,7 @@ function LinkPopup({ parentRef, linkState }) {
 	}
 
 	return useMemo(() => {
-		if (!linkState.isActive) return null;
+		if (!pluginState.active) return null;
 
 		return (
 			<div ref={containerRef}>
@@ -106,7 +107,7 @@ function LinkPopup({ parentRef, linkState }) {
 						)
 						: (
 							<Fragment>
-								<div className="link"><a href={linkState.href} onClick={handleOpen}>{linkState.href}</a></div>
+								<div className="link"><a href={pluginState.href} onClick={handleOpen}>{pluginState.href}</a></div>
 								<div className="button toolbarButton" onClick={handleEdit}>Edit</div>
 								<div className="button toolbarButton" onClick={handleUnset}>Unlink</div>
 							</Fragment>
@@ -114,7 +115,7 @@ function LinkPopup({ parentRef, linkState }) {
 				</div>
 			</div>
 		);
-	}, [editing, linkState]);
+	}, [editing, pluginState]);
 }
 
 export default LinkPopup;

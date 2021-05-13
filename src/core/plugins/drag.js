@@ -1,4 +1,4 @@
-import { NodeSelection, Plugin } from 'prosemirror-state';
+import { NodeSelection, Plugin, TextSelection } from 'prosemirror-state';
 import { dropPoint } from 'prosemirror-transform';
 import { throttle } from '../utils';
 import { Slice, Fragment } from 'prosemirror-model';

@@ -11,7 +11,7 @@ function CitationPopup({ parentRef, pluginState }) {
 	const inputRef = useRef();
 
 	useLayoutEffect(() => {
-		if (!pluginState.isActive) {
+		if (!pluginState.active) {
 			return;
 		}
 
@@ -62,7 +62,7 @@ function CitationPopup({ parentRef, pluginState }) {
 	}
 
 	return useMemo(() => {
-		if (!pluginState.isActive) return null;
+		if (!pluginState.active) return null;
 
 		return (
 			<div ref={containerRef}>
@@ -70,7 +70,7 @@ function CitationPopup({ parentRef, pluginState }) {
 					ref={popupRef}
 					className={cx('citation-popup page-popup')}
 				>
-					{pluginState.enableOpen && <div className="button toolbarButton" onClick={handleOpen}><div className="mce-ico mce-i-newdocument"/> Go to Page</div>}
+					{pluginState.canOpen && <div className="button toolbarButton" onClick={handleOpen}><div className="mce-ico mce-i-newdocument"/> Go to Page</div>}
 					<div className="button toolbarButton" onClick={handleShowItem}><div className="mce-ico mce-i-undo"/> Show Item</div>
 					<div className="button toolbarButton" onClick={handleEdit}><div className="mce-ico mce-i-blockquote"/> Edit Citation</div>
 				</div>

@@ -224,46 +224,50 @@ class Highlight {
 
 function unlinkHighlights(tr) {
 	let updated = false;
-	tr.doc.descendants((node, pos) => {
-		if (node.type.name === 'highlight') {
-			if (node.content instanceof Fragment && node.content.content.length) {
-				let first = node.content.content[0];
-				let last = node.content.content[node.content.content.length - 1];
-				if (node.textContent.length < 2
-					|| !['"', '“'].includes(first.text[0])
-					|| !['"', '”'].includes(last.text[last.text.length - 1])) {
-					pos = tr.mapping.map(pos);
-					tr = tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0));
+	let updatedInLastIteration = false;
+	do {
+		updatedInLastIteration = false;
+		tr.doc.descendants((node, pos) => {
+			if (updatedInLastIteration) {
+				return false;
+			}
+			if (node.type.name === 'highlight') {
+				if (node.content instanceof Fragment && node.content.content.length) {
+					let first = node.content.content[0];
+					let last = node.content.content[node.content.content.length - 1];
+					if (node.textContent.length < 2
+						|| !['"', '“'].includes(first.text[0])
+						|| !['"', '”'].includes(last.text[last.text.length - 1])) {
+
+						tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0));
+						updated = true;
+						updatedInLastIteration = true;
+					}
+				}
+				// Remove empty highlight nodes that appear when deleting whole text
+				else {
+					tr.delete(pos, pos + node.nodeSize);
 					updated = true;
+					updatedInLastIteration = true;
 				}
 			}
-			// Remove empty highlight nodes that appear when deleting whole text
-			else {
-				pos = tr.mapping.map(pos);
-				tr = tr.delete(pos, pos + node.nodeSize);
-				updated = true;
-			}
-		}
-	});
+		});
 
-	return updated && tr || null;
+	}
+	while (updatedInLastIteration);
+	return updated;
 }
 
 function handleEnter(state, dispatch) {
-	const { schema } = state;
-	const { $from, $to } = state.selection;
-	// No selection & the cursor inside word-node
+	let { tr } = state;
+	let { $from, $to } = state.selection;
 	if ($from.pos === $to.pos && $from.parent.type === schema.nodes.highlight) {
-		const blockParent = $from.node(1);
-		const newBlock = blockParent.type.create(blockParent.attrs);
-		// node like the block parent with an empty inline node in it
+		let blockParent = $from.node(1);
+		// https://discuss.prosemirror.net/t/the-weird-backspacing-functionality-with-inline-nodes/2128/8
 		let block = blockParent.copy();
-		// Slice that opens both nodes at both sides, so that only the inner close-and-then-open
-		// tokens are part of it
 		let slice = new Slice(new Fragment([block]), 0, 1);
-		let tr = state.tr.replace($from.pos, $from.pos, slice);
+		tr.replace($from.pos, $from.pos, slice);
 		dispatch(tr);
-		return true;
 	}
 }
 
@@ -297,11 +301,11 @@ export function highlight(options) {
 			if (!transactions.some(tr => tr.docChanged)) {
 				return null;
 			}
-			let { tr: trr } = newState;
+			let { tr } = newState;
 			let updated = false;
 			if (newState.selection.empty) {
-				transactions.forEach((tr) => {
-					tr.steps.forEach((step) => {
+				transactions.forEach((tr2) => {
+					tr2.steps.forEach((step) => {
 						if (step instanceof ReplaceStep && step.slice) {
 							step.getMap().forEach((oldStart, oldEnd, newStart, newEnd) => {
 								// TODO: Investigate this potentially buggy part
@@ -311,14 +315,14 @@ export function highlight(options) {
 								let $pos = oldState.doc.resolve(oldStart);
 								if ($pos.parent.type.name === 'highlight') {
 									if ($pos.parentOffset === 0) {
-										trr = trr.delete(newStart, newEnd);
-										trr = trr.replace(newStart - 1, newStart - 1, step.slice);
+										tr.delete(newStart, newEnd);
+										tr.replace(newStart - 1, newStart - 1, step.slice);
 										updated = true;
 									}
 									else if ($pos.parentOffset === $pos.parent.content.size) {
-										trr = trr.delete(newStart, newEnd);
-										trr = trr.replace(newStart + 1, newStart + 1, step.slice);
-										trr = trr.setSelection(new TextSelection(trr.doc.resolve(newStart + step.slice.size + 1)));
+										tr.delete(newStart, newEnd);
+										tr.replace(newStart + 1, newStart + 1, step.slice);
+										tr.setSelection(new TextSelection(tr.doc.resolve(newStart + step.slice.size + 1)));
 										updated = true;
 									}
 								}
@@ -328,11 +332,11 @@ export function highlight(options) {
 				});
 			}
 
-			let res = unlinkHighlights(trr);
+			if (unlinkHighlights(tr)) {
+				updated = true;
+			}
 
-			if (res) return res;
-
-			return updated && trr || null;
+			return updated ? tr : null;
 		},
 
 		filterTransaction(tr, state) {

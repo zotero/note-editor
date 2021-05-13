@@ -370,3 +370,27 @@ export function attachImportedImage(nodeID, attachmentKey) {
 		});
 	};
 }
+
+export function getSingleSelectedNode(state, type, inside) {
+	const { $from, $to } = state.selection;
+	let nodes = [];
+	state.doc.nodesBetween($from.pos, $to.pos, (parentNode, parentPos) => {
+		parentNode.forEach((node, offset, index) => {
+			let absolutePos = parentPos + offset + 1;
+			if (node.type === type
+				&& (
+					// For citation, image
+					!inside && $from.pos === absolutePos && $to.pos === absolutePos + node.nodeSize
+					// For highlight
+					|| inside && $from.pos > absolutePos + 1 && $to.pos < absolutePos + node.nodeSize - 1
+				)
+			) {
+				nodes.push({ pos: absolutePos, node, parent: parentNode, index });
+			}
+		});
+	});
+	if (nodes.length === 1) {
+		return nodes[0];
+	}
+	return null;
+}

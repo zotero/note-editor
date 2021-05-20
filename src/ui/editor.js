@@ -1,6 +1,7 @@
 'use strict';
 
 import React, { useRef, useState, useLayoutEffect, useEffect, Fragment } from 'react';
+import { useIntl } from 'react-intl';
 
 import Toolbar from './toolbar';
 import Findbar from './findbar';
@@ -11,6 +12,7 @@ import CitationPopup from './citation-popup';
 import ImagePopup from './image-popup';
 
 function Editor(props) {
+	const intl = useIntl();
 	const editorRef = useRef(null);
 	const [editorState, setEditorState] = useState(props.editorCore.pluginState);
 
@@ -40,10 +42,12 @@ function Editor(props) {
 				onOpenWindow={props.onOpenWindow}
 			/>}
 			<Findbar searchState={editorState.search} active={editorState.search.active}/>
-			{props.showUpdateNotice
-				&& <Noticebar>This note was edited with a newer version of Zotero.<br/>
-				Please update Zotero to make changes.</Noticebar>
-			}
+			{props.showUpdateNotice && <Noticebar>
+				{intl.formatMessage({ id: 'noteEditor.updateNotice' })
+				// Transform \n to <br>
+				.split(/\n/)
+				.reduce((result, word) => result.length ? [...result, <br/>, word] : [word], [])}
+			</Noticebar>}
 			<div className="editor-core" ref={editorRef}>
 				<div className="relative-container">
 					{refReady && !props.disableUI && <Fragment>

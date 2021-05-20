@@ -1,6 +1,7 @@
 'use strict';
 
-import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, Fragment } from 'react';
+import React, { useLayoutEffect, useRef, useMemo } from 'react';
+import { FormattedMessage } from 'react-intl';
 import cx from 'classnames';
 
 function HighlightPopup({ parentRef, pluginState }) {
@@ -59,28 +60,24 @@ function HighlightPopup({ parentRef, pluginState }) {
 		pluginState.addCitation();
 	}
 
-
-	function handleKeydown(event) {
-		if (event.key === 'Enter') {
-			pluginState.setURL(inputRef.current.value);
-		}
-		else if (event.key === 'Escape') {
-			setEditing(false);
-		}
-	}
-
 	return useMemo(() => {
 		if (!pluginState.active) return null;
 
 		return (
 			<div ref={containerRef}>
-				<div
-					ref={popupRef}
-					className={cx('highlight-popup page-popup page-popup-top')}
-				>
-					<div className="button toolbarButton" onClick={handleOpen}><div className="mce-ico mce-i-newdocument"/> Show on Page</div>
-					<div className="button toolbarButton" onClick={handleUnlink}><div className="mce-ico mce-i-unlink"/> Unlink</div>
-					{pluginState.canAddCitation && <div className="button toolbarButton" onClick={handleAdd}><div className="mce-ico mce-i-blockquote"/> Add Citation</div>}
+				<div ref={popupRef} className={cx('highlight-popup page-popup page-popup-top')}>
+					<div className="button toolbarButton" onClick={handleOpen}>
+						<div className="mce-ico mce-i-newdocument"/>
+						<FormattedMessage id="noteEditor.showOnPage"/>
+					</div>
+					<div className="button toolbarButton" onClick={handleUnlink}>
+						<div className="mce-ico mce-i-unlink"/>
+						<FormattedMessage id="noteEditor.unlink"/>
+					</div>
+					{pluginState.canAddCitation && <div className="button toolbarButton" onClick={handleAdd}>
+						<div className="mce-ico mce-i-blockquote"/>
+						<FormattedMessage id="noteEditor.addCitation"/>
+					</div>}
 				</div>
 			</div>
 		);

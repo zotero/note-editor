@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { IntlProvider } from 'react-intl';
 
 import { randomString } from './core/utils';
 import { schema } from './core/schema';
@@ -52,6 +53,7 @@ class EditorInstance {
 		this._dir = window.dir = options.dir;
 		this._hasBackup = options.hasBackup;
 		this._enableReturnButton = options.enableReturnButton;
+		this._localizedStrings = options.localizedStrings;
 		this._editorCore = null;
 
 		this._setFont(options.font);
@@ -60,6 +62,11 @@ class EditorInstance {
 
 	getDataSync(onlyChanged) {
 		return this._editorCore.getData(onlyChanged);
+	}
+
+	_getLocalizedString(key) {
+		let string = this._localizedStrings[key];
+		return string || key;
 	}
 
 	_setFont(font) {
@@ -130,24 +137,29 @@ class EditorInstance {
 		}
 
 		ReactDOM.render(
-			<Editor
-				readOnly={this._readOnly}
-				disableUI={this._disableUI}
-				// TODO: Rename this to something like 'inContextPane`
-				enableReturnButton={this._enableReturnButton}
-				viewMode={this._viewMode}
-				showUpdateNotice={this._editorCore.unsupportedSchema}
-				editorCore={this._editorCore}
-				onClickReturn={() => {
-					this._postMessage({ action: 'return' });
-				}}
-				onShowNote={() => {
-					this._postMessage({ action: 'showNote' });
-				}}
-				onOpenWindow={() => {
-					this._postMessage({ action: 'openWindow' });
-				}}
-			/>,
+			<IntlProvider
+				locale={window.navigator.language}
+				messages={this._localizedStrings}
+			>
+				<Editor
+					readOnly={this._readOnly}
+					disableUI={this._disableUI}
+					// TODO: Rename this to something like 'inContextPane`
+					enableReturnButton={this._enableReturnButton}
+					viewMode={this._viewMode}
+					showUpdateNotice={this._editorCore.unsupportedSchema}
+					editorCore={this._editorCore}
+					onClickReturn={() => {
+						this._postMessage({ action: 'return' });
+					}}
+					onShowNote={() => {
+						this._postMessage({ action: 'showNote' });
+					}}
+					onOpenWindow={() => {
+						this._postMessage({ action: 'openWindow' });
+					}}
+				/>
+			</IntlProvider>,
 			document.getElementById('editor-container')
 		);
 		window.addEventListener('message', this._messageHandler);
@@ -277,53 +289,38 @@ class EditorInstance {
 			[
 				{
 					name: 'cut',
-					label: 'Cut',
+					label: this._getLocalizedString('noteEditor.cut'),
 					enabled: !this._readOnly && this._editorCore.hasSelection(),
 					persistent: true
 				},
 				{
 					name: 'copy',
-					label: 'Copy',
+					label: this._getLocalizedString('noteEditor.copy'),
 					enabled: this._editorCore.hasSelection(),
 					persistent: true
 				},
 				{
 					name: 'paste',
-					label: 'Paste',
+					label: this._getLocalizedString('noteEditor.paste'),
 					enabled: !this._readOnly,
 					persistent: true
 				}
 			],
 			[
-				// {
-				// 	name: 'editHighlight',
-				// 	label: 'Edit',
-				// 	enabled: node.type.name === 'highlight'
-				// },
-				// {
-				// 	name: 'showInLibrary',
-				// 	label: 'Show in Library',
-				// 	enabled: node.type.name === 'highlight'
-				// },
-				// {
-				// 	name: 'openAnnotation',
-				// 	label: 'Show in PDF',
-				// 	enabled: node.type.name === 'highlight'
-				// },
 				{
 					name: 'insertCitation',
-					label: 'Insert Citation',
+					label: this._getLocalizedString('noteEditor.insertCitation'),
 					enabled: !this._readOnly && !this._editorCore.hasSelection()
 				},
 				{
 					name: 'rtl',
-					label: 'Right to Left',
+					label: this._getLocalizedString('noteEditor.rightToLeft'),
 					enabled: !this._readOnly && (this._dir === 'ltr' && !this._editorCore.pluginState.menu.rtl.isActive
 						|| this._dir === 'rtl' && this._editorCore.pluginState.menu.ltr.isActive)
 				},
 				{
 					name: 'ltr',
-					label: 'Left to Right',
+					label: this._getLocalizedString('noteEditor.leftToRight'),
 					enabled: !this._readOnly && (this._dir === 'ltr' && this._editorCore.pluginState.menu.rtl.isActive
 						|| this._dir === 'rtl' && !this._editorCore.pluginState.menu.ltr.isActive)
 				}
@@ -331,7 +328,7 @@ class EditorInstance {
 			[
 				{
 					name: 'openBackup',
-					label: 'View Note Backup',
+					label: this._getLocalizedString('noteEditor.viewNoteBackup'),
 					enabled: this._hasBackup
 				}
 			]

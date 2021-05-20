@@ -30,7 +30,8 @@
 		"prosemirror-utils": "^0.9.6",
 		"prosemirror-view": "^1.18.4",
 		"react": "^16.14.0",
-		"react-dom": "^16.14.0"
+		"react-dom": "^16.14.0",
+		"react-intl": "^5.17.7"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.14.0",

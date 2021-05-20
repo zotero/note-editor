@@ -1,9 +1,11 @@
 'use strict';
 
-import cx from 'classnames';
 import React, { useState, useEffect, useRef } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import cx from 'classnames';
 
 function Findbar({ searchState, active }) {
+	const intl = useIntl();
 	const [findValue, setFindValue] = useState('');
 	const [replaceValue, setReplaceValue] = useState('');
 	const searchInputRef = useRef();
@@ -74,34 +76,54 @@ function Findbar({ searchState, active }) {
 		<div className="findbar" onMouseDown={handleMouseDown}>
 			<div className="column-left">
 				<div className="line">
-					<input ref={searchInputRef} type="text" placeholder="Search…" value={searchState.searchTerm || ''}
-					       onChange={handleFindInputChange} onKeyDown={handleFindInputKeyDown}/>
+					<input
+						ref={searchInputRef} type="text"
+					  placeholder={intl.formatMessage({id: 'noteEditor.search'})}
+					  value={searchState.searchTerm || ''}
+					  onChange={handleFindInputChange} onKeyDown={handleFindInputKeyDown}
+					/>
 				</div>
 				<div className="line">
-					<input type="text" placeholder="Replace…" value={replaceValue}
-					       onChange={handleReplaceInputChange} onKeyDown={handleFindInputKeyDown}/>
+					<input
+						type="text"
+						placeholder={intl.formatMessage({id: 'noteEditor.replace'})}
+						value={replaceValue}
+						onChange={handleReplaceInputChange}
+						onKeyDown={handleFindInputKeyDown}
+					/>
 				</div>
 			</div>
 			<div className="column-right">
 				<div className="line">
 					<div className="toggles">
-						<div className={cx('button', { active: searchState.caseSensitive })} onClick={handleCaseToggle}
-						     title="Match case">Aa
-						</div>
-						<div className={cx('button', { active: searchState.wholeWords })} onClick={handleWordToggle}
-						     title="Whole words">W
-						</div>
+						<div
+							className={cx('button', { active: searchState.caseSensitive })}
+							onClick={handleCaseToggle}
+							title={intl.formatMessage({id: 'noteEditor.matchCase'})}
+						>Aa</div>
+						<div
+							className={cx('button', { active: searchState.wholeWords })}
+							onClick={handleWordToggle}
+							title={intl.formatMessage({id: 'noteEditor.wholeWords'})}
+						>W</div>
 					</div>
 					<div className="buttons">
-						<div className="button" onClick={handleFindPrev}>Prev</div>
-						<div className="button" onClick={handleFindNext}>Next</div>
+						<div className="button" onClick={handleFindPrev}>
+								<FormattedMessage id="noteEditor.previous"/>
+						</div>
+						<div className="button" onClick={handleFindNext}>
+							<FormattedMessage id="noteEditor.next"/>
+						</div>
 					</div>
-
 				</div>
 				<div className="line">
 					<div className="buttons">
-						<div className="button" onClick={handleReplace}>Replace</div>
-						<div className="button" onClick={handleReplaceAll}>Replace All</div>
+						<div className="button" onClick={handleReplace}>
+							<FormattedMessage id="noteEditor.replaceNext"/>
+						</div>
+						<div className="button" onClick={handleReplaceAll}>
+							<FormattedMessage id="noteEditor.replaceAll"/>
+						</div>
 					</div>
 				</div>
 			</div>

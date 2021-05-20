@@ -180,6 +180,7 @@ const configZotero = {
 	externals: {
 		'react': 'React',
 		'react-dom': 'ReactDOM',
+		'react-intl': 'ReactIntl',
 		'prop-types': 'PropTypes'
 	}
 };

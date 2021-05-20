@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { IntlProvider } from 'react-intl';
 
 import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
@@ -213,23 +214,28 @@ function main(html) {
 	document.body.dir = 'ltr';
 
 	ReactDOM.render(
-		<Editor
-			readOnly={false}
-			disableUI={false}
-			showUpdateNotice={true}
-			enableReturnButton={true}
-			viewMode={'pdf'}
-			editorCore={editorCore}
-			onClickReturn={() => {
-				console.log('Clicked return');
-			}}
-			onShowNote={() => {
-				console.log('Show Note');
-			}}
-			onOpenWindow={() => {
-				console.log('Open Window');
-			}}
-		/>,
+		<IntlProvider
+			locale={window.navigator.language}
+			messages={[]}
+		>
+			<Editor
+				readOnly={false}
+				disableUI={false}
+				showUpdateNotice={true}
+				enableReturnButton={true}
+				viewMode={'pdf'}
+				editorCore={editorCore}
+				onClickReturn={() => {
+					console.log('Clicked return');
+				}}
+				onShowNote={() => {
+					console.log('Show Note');
+				}}
+				onOpenWindow={() => {
+					console.log('Open Window');
+				}}
+			/>
+		</IntlProvider>,
 		document.getElementById('editor-container')
 	);
 

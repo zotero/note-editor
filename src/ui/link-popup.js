@@ -1,9 +1,11 @@
 'use strict';
 
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, Fragment } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
 import cx from 'classnames';
 
 function LinkPopup({ parentRef, pluginState }) {
+	const intl = useIntl();
 	const [editing, setEditing] = useState(false);
 	const containerRef = useRef();
 	const popupRef = useRef();
@@ -99,17 +101,28 @@ function LinkPopup({ parentRef, pluginState }) {
 					{editing
 						? (
 							<Fragment>
-								<div className="link"><input ref={inputRef} type="edit" placeholder="Enter URL"
-							                             onKeyDown={handleKeydown}/>
+								<div className="link">
+									<input
+										ref={inputRef}
+										type="edit"
+										placeholder={intl.formatMessage({id: 'noteEditor.enterLink'})}
+										onKeyDown={handleKeydown}
+									/>
 								</div>
-								<div className="button toolbarButton" onClick={handleSet}>Set</div>
+								<div className="button toolbarButton" onClick={handleSet}>
+									<FormattedMessage id="noteEditor.set"/>
+								</div>
 							</Fragment>
 						)
 						: (
 							<Fragment>
 								<div className="link"><a href={pluginState.href} onClick={handleOpen}>{pluginState.href}</a></div>
-								<div className="button toolbarButton" onClick={handleEdit}>Edit</div>
-								<div className="button toolbarButton" onClick={handleUnset}>Unlink</div>
+								<div className="button toolbarButton" onClick={handleEdit}>
+									<FormattedMessage id="noteEditor.edit"/>
+								</div>
+								<div className="button toolbarButton" onClick={handleUnset}>
+									<FormattedMessage id="noteEditor.unlink"/>
+								</div>
 							</Fragment>
 						)}
 				</div>

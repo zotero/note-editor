@@ -56,6 +56,9 @@ class EditorInstance {
 		this._localizedStrings = options.localizedStrings;
 		this._editorCore = null;
 
+		// TODO: Don't use global var
+		window.localizedStrings = options.localizedStrings;
+
 		this._setFont(options.font);
 		this._init(options.value);
 	}

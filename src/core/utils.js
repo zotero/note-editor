@@ -179,10 +179,11 @@ export function formatCitationItem(citationItem) {
 		else if (authors.length === 2) {
 			let a = authors[0].family || authors[0].literal;
 			let b = authors[1].family || authors[1].literal;
-			str = a + ' and ' + b;
+			// TODO: Don't use global var
+			str = a + ' ' + (window.localizedStrings['general.and'] || 'and') + ' ' + b;
 		}
 		else if (authors.length >= 3) {
-			str = (authors[0].family || authors[0].literal) + ' et al.';
+			str = (authors[0].family || authors[0].literal) + ' ' + (window.localizedStrings['general.etAl'] || 'et al.');
 		}
 	}
 

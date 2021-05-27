@@ -44,6 +44,7 @@ function Editor(props) {
 			<Findbar searchState={editorState.search} active={editorState.search.active}/>
 			{props.showUpdateNotice && <Noticebar>
 				{intl.formatMessage({ id: 'noteEditor.updateNotice' })
+				.replace(/%1\$S/g, intl.formatMessage({ id: 'zotero.appName' }))
 				// Transform \n to <br>
 				.split(/\n/)
 				.reduce((result, word) => result.length ? [...result, <br/>, word] : [word], [])}

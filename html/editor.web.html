@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="--width: 1000px">
+<html lang="en" style="--width: 900px">
 <head>
 	<meta charset="UTF-8">
 	<title>Zotero Note Editor</title>
@@ -9,11 +9,12 @@
 	<style>
 		#editor-container {
 			width: var(--width);
+			inset-inline-start: 0;
 		}
 
 		#resizer {
 			position: absolute;
-			left: var(--width);
+			inset-inline-start: var(--width);
 			top: 0;
 			bottom: 0;
 			width: 5px;
@@ -24,10 +25,10 @@
 
 		#dev {
 			position: absolute;
-			left: var(--width);
+			inset-inline-start: var(--width);
 			top: 0;
 			bottom: 0;
-			right: 0;
+			inset-inline-end: 0;
 			padding: 20px;
 			font-family: monospace, monospace;
 			overflow: scroll;

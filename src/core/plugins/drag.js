@@ -30,7 +30,6 @@ class Drag {
 			let rect = this.node.getBoundingClientRect();
 
 			let top = rect.top - parentRect.top;
-			let left = rect.left;
 
 			if (!this.dragHandleNode) {
 				let relativeContainer = document.querySelector('.relative-container');
@@ -59,13 +58,24 @@ class Drag {
 				relativeContainer.append(this.dragHandleNode);
 			}
 
+			let padding = rect.left - parentRect.left;
+			if (document.getElementsByTagName("html")[0].dir === 'rtl') {
+				padding = parentRect.right - rect.right;
+			}
+
 			if (this.node.nodeName === 'LI') {
-				left += 22;
+				padding += 22;
+			}
+
+			if (document.getElementsByTagName("html")[0].dir === 'rtl') {
+				this.dragHandleNode.style.right = padding - 22 + 'px';
+			}
+			else {
+				this.dragHandleNode.style.left = padding - 22 + 'px';
 			}
 
 			this.dragHandleNode.style.display = 'block';
 			this.dragHandleNode.style.top = top - 2 + 'px';
-			this.dragHandleNode.style.left = left - 22 + 'px';
 		}, 50);
 	}
 

@@ -46,6 +46,10 @@
 	}
 }
 
+[dir=rtl] .toolbar-button-return {
+	transform: scaleX(-1);
+}
+
 .dropdown {
 	position: relative;
 

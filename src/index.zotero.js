@@ -133,7 +133,7 @@ class EditorInstance {
 			}
 		});
 
-		document.body.dir = this._dir;
+		document.getElementsByTagName("html")[0].dir = this._dir;
 
 		if (this._editorCore.unsupportedSchema) {
 			this._readOnly = true;

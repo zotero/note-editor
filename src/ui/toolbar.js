@@ -28,6 +28,7 @@ function Toolbar({ viewMode, enableReturnButton, menuState, linkState, unsaved, 
 			<div className="start">
 				{enableReturnButton &&
 					<Button
+						className="toolbar-button-return"
 						icon={<IconChevronLeft/>}
 						title={intl.formatMessage({ id: 'noteEditor.returnToNotesList' })}
 						onClick={onClickReturn}

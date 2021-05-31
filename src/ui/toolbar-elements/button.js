@@ -3,10 +3,10 @@
 import React from 'react';
 import cx from 'classnames';
 
-export function Button({ icon, title, active, onClick, onMouseDown }) {
+export function Button({ icon, title, active, className, onClick, onMouseDown }) {
 	return (
 		<div
-			className={cx('toolbar-button', { active: !!active })}
+			className={cx('toolbar-button', { active: !!active }, className)}
 			title={title}
 			onClick={(e) => {
 				e.preventDefault();

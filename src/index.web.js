@@ -211,7 +211,8 @@ function main(html) {
 		}
 	});
 
-	document.body.dir = 'ltr';
+	let dir = 'ltr';
+	document.getElementsByTagName("html")[0].dir = dir;
 
 	ReactDOM.render(
 		<IntlProvider

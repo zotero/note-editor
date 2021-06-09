@@ -5,7 +5,7 @@ import { buildToHTML, buildFromHTML, buildClipboardSerializer } from './utils';
 
 const schema = new Schema({ nodes, marks });
 // Update in Zotero 'editorInstance.js' as well!
-schema.version = 2;
+schema.version = 3;
 
 const toHTML = buildToHTML(schema);
 const fromHTML = buildFromHTML(schema);

@@ -344,9 +344,13 @@ export default {
 		},
 		parseDOM: [{
 			tag: 'span.highlight',
-			getAttrs: dom => ({
-				annotation: decodeObject(dom.getAttribute('data-annotation'))
-			})
+			getAttrs: dom => {
+				// TODO: Remove this code at some point
+				// Removes `text` property encountered in pre-v3 schema
+				let annotation = decodeObject(dom.getAttribute('data-annotation'));
+				delete annotation.text;
+				return { annotation };
+			}
 		}],
 		toDOM: node => ['span', {
 			class: 'highlight',

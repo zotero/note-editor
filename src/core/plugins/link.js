@@ -1,5 +1,7 @@
 import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { schema } from '../schema';
+import { removeMarkRangeAtCursor, updateMarkRangeAtCursor } from '../commands';
+import { getMarkRangeAtCursor } from '../helpers';
 
 class Link {
 	constructor(state, options) {
@@ -49,11 +51,11 @@ class Link {
 		while ((node = node.parentNode));
 	}
 
-
 	toggle() {
 		let { state, dispatch } = this.view;
-		if (this.hasMark(schema.marks.link)(state, dispatch)) {
-			this.removeMark(schema.marks.link)(state, dispatch);
+		let range = getMarkRangeAtCursor(state, schema.marks.link);
+		if (range) {
+			removeMarkRangeAtCursor(schema.marks.link)(state, dispatch);
 		}
 		else if (!state.selection.empty) {
 			let selection = window.getSelection();
@@ -92,11 +94,11 @@ class Link {
 	}
 
 	setURL(url) {
-		this.updateMark(schema.marks.link, { href: url })(this.view.state, this.view.dispatch);
+		updateMarkRangeAtCursor(schema.marks.link, { href: url })(this.view.state, this.view.dispatch);
 	}
 
 	removeURL() {
-		this.removeMark(schema.marks.link)(this.view.state, this.view.dispatch);
+		removeMarkRangeAtCursor(schema.marks.link)(this.view.state, this.view.dispatch);
 	}
 
 	getHref(state) {
@@ -109,102 +111,6 @@ class Link {
 			}
 		}
 		return null;
-	}
-
-	getMarkRange($pos = null, type = null) {
-		if (!$pos || !type) {
-			return false;
-		}
-
-		const start = $pos.parent.childAfter($pos.parentOffset);
-
-		if (!start.node) {
-			return false;
-		}
-
-		const link = start.node.marks.find(mark => mark.type === type);
-		if (!link) {
-			return false;
-		}
-
-		let startIndex = $pos.index();
-		let startPos = $pos.start() + start.offset;
-		let endIndex = startIndex + 1;
-		let endPos = startPos + start.node.nodeSize;
-
-		while (startIndex > 0 && link.isInSet($pos.parent.child(startIndex - 1).marks)) {
-			startIndex -= 1;
-			startPos -= $pos.parent.child(startIndex).nodeSize;
-		}
-
-		while (endIndex < $pos.parent.childCount && link.isInSet($pos.parent.child(endIndex).marks)) {
-			endPos += $pos.parent.child(endIndex).nodeSize;
-			endIndex += 1;
-		}
-
-		return { from: startPos, to: endPos };
-	}
-
-	updateMark(type, attrs) {
-		return (state, dispatch) => {
-			const { tr, selection, doc } = state;
-			let { from, to } = selection;
-			const { $from, empty } = selection;
-
-			if (empty) {
-				const range = this.getMarkRange($from, type);
-
-				from = range.from;
-				to = range.to;
-			}
-
-			const hasMark = doc.rangeHasMark(from, to, type);
-
-			if (hasMark) {
-				tr.removeMark(from, to, type);
-			}
-
-			tr.addMark(from, to, type.create(attrs));
-
-			return dispatch(tr);
-		};
-	}
-
-	removeMark(type) {
-		return (state, dispatch) => {
-			const { tr, selection } = state;
-			let { from, to } = selection;
-			const { $from, empty } = selection;
-
-			if (empty) {
-				const range = this.getMarkRange($from, type);
-
-				from = range.from;
-				to = range.to;
-			}
-
-			tr.removeMark(from, to, type);
-
-			return dispatch(tr);
-		};
-	}
-
-
-	hasMark(type) {
-		return (state, dispatch) => {
-			const { tr, selection, doc } = state;
-			let { from, to } = selection;
-			const { $from, empty } = selection;
-
-			if (empty) {
-				const range = this.getMarkRange($from, type);
-
-				from = range.from;
-				to = range.to;
-			}
-
-			return doc.rangeHasMark(from, to, type);
-		};
 	}
 
 	destroy() {

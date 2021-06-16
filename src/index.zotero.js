@@ -283,6 +283,19 @@ class EditorInstance {
 			}
 			case 'ltr': {
 				this._editorCore.pluginState.menu.ltr.run();
+				return;
+			}
+			case 'alignLeft': {
+				this._editorCore.pluginState.menu.alignLeft.run();
+				return;
+			}
+			case 'alignCenter': {
+				this._editorCore.pluginState.menu.alignCenter.run();
+				return;
+			}
+			case 'alignRight': {
+				this._editorCore.pluginState.menu.alignRight.run();
+				return;
 			}
 		}
 	}
@@ -314,7 +327,9 @@ class EditorInstance {
 					name: 'insertCitation',
 					label: this._getLocalizedString('noteEditor.insertCitation'),
 					enabled: !this._readOnly && !this._editorCore.hasSelection()
-				},
+				}
+			],
+			[
 				{
 					name: 'rtl',
 					label: this._getLocalizedString('noteEditor.rightToLeft'),
@@ -326,7 +341,34 @@ class EditorInstance {
 					label: this._getLocalizedString('noteEditor.leftToRight'),
 					enabled: !this._readOnly && (this._dir === 'ltr' && this._editorCore.pluginState.menu.rtl.isActive
 						|| this._dir === 'rtl' && !this._editorCore.pluginState.menu.ltr.isActive)
-				}
+				},
+				{
+					name: 'align',
+					label: this._getLocalizedString('noteEditor.align'),
+					enabled: !this._readOnly,
+					groups: [
+						[
+							{
+								name: 'alignLeft',
+								label: this._getLocalizedString('noteEditor.alignLeft'),
+								checked: this._editorCore.pluginState.menu.alignLeft.isActive,
+								enabled: !this._readOnly
+							},
+							{
+								name: 'alignCenter',
+								label: this._getLocalizedString('noteEditor.alignCenter'),
+								checked: this._editorCore.pluginState.menu.alignCenter.isActive,
+								enabled: !this._readOnly
+							},
+							{
+								name: 'alignRight',
+								label: this._getLocalizedString('noteEditor.alignRight'),
+								checked: this._editorCore.pluginState.menu.alignRight.isActive,
+								enabled: !this._readOnly
+							}
+						]
+					]
+				},
 			],
 			[
 				{

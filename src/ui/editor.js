@@ -33,6 +33,7 @@ function Editor(props) {
 			{!props.disableUI && <Toolbar
 				viewMode={props.viewMode}
 				enableReturnButton={props.enableReturnButton}
+				colorState={editorState.color}
 				menuState={editorState.menu}
 				linkState={editorState.link}
 				unsaved={editorState.core.unsaved}

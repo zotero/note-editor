@@ -21,6 +21,7 @@ import { attachImportedImage, insertHTML, reformatCitations, setCitation } from 
 import Provider from './provider';
 
 import { menu, menuKey } from './plugins/menu';
+import { color, colorKey } from './plugins/color';
 import { link, linkKey } from './plugins/link';
 import { search, searchKey } from './plugins/search';
 import { image, imageKey } from './plugins/image';
@@ -137,6 +138,7 @@ class EditorCore {
 					keymap(baseKeymap),
 					dropCursor(),
 					gapCursor(),
+					color(),
 					menu(),
 					search(),
 					link({
@@ -301,7 +303,8 @@ class EditorCore {
 
 	updatePluginState(state) {
 		this.pluginState = {
-			core: {unsaved: this.unsaved},
+			core: { unsaved: this.unsaved },
+			color: colorKey.getState(state),
 			menu: menuKey.getState(state),
 			link: linkKey.getState(state),
 			search: searchKey.getState(state),

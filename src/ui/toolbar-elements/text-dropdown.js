@@ -5,11 +5,10 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import cx from 'classnames';
 
 import {
-	IconBold,
-	IconCase,
-	IconItalic,
-	IconUnderline
+	IconBold, IconCase,IconCode, IconItalic, IconStrike,
+	IconSubscript, IconSuperscript, IconUnderline
 } from '../icons';
+
 import Dropdown from './dropdown';
 import { StateButton } from './button';
 
@@ -18,7 +17,7 @@ const blockTypes = [
 	['heading2', <h2><FormattedMessage id="noteEditor.heading2"/></h2>],
 	['heading3', <h3><FormattedMessage id="noteEditor.heading3"/></h3>],
 	['paragraph', <span><FormattedMessage id="noteEditor.paragraph"/></span>],
-	['code', <code><FormattedMessage id="noteEditor.monospaced"/></code>],
+	['codeBlock', <code><FormattedMessage id="noteEditor.monospaced"/></code>],
 	['bulletList', <code><FormattedMessage id="noteEditor.bulletList"/></code>],
 	['orderedList', <span><FormattedMessage id="noteEditor.orderedList"/></span>],
 	['blockquote', <span><FormattedMessage id="noteEditor.blockquote"/></span>]
@@ -38,21 +37,45 @@ export default function TextDropdown({ menuState }) {
 			title={intl.formatMessage({ id: 'noteEditor.formatText' })}
 		>
 			<div className="inline-options">
-				<StateButton
-					icon={<IconBold/>}
-					title={intl.formatMessage({ id: 'noteEditor.bold' })}
-					state={menuState.strong}
-				/>
-				<StateButton
-					icon={<IconItalic/>}
-					title={intl.formatMessage({ id: 'noteEditor.italic' })}
-					state={menuState.em}
-				/>
-				<StateButton
-					icon={<IconUnderline/>}
-					title={intl.formatMessage({ id: 'noteEditor.underline' })}
-					state={menuState.underline}
-				/>
+				<div className="line">
+					<StateButton
+						icon={<IconBold/>}
+						title={intl.formatMessage({ id: 'noteEditor.bold' })}
+						state={menuState.strong}
+					/>
+					<StateButton
+						icon={<IconItalic/>}
+						title={intl.formatMessage({ id: 'noteEditor.italic' })}
+						state={menuState.em}
+					/>
+					<StateButton
+						icon={<IconUnderline/>}
+						title={intl.formatMessage({ id: 'noteEditor.underline' })}
+						state={menuState.underline}
+					/>
+					<StateButton
+						icon={<IconStrike/>}
+						title={intl.formatMessage({ id: 'noteEditor.strikethrough' })}
+						state={menuState.strike}
+					/>
+				</div>
+				<div className="line">
+					<StateButton
+						icon={<IconSubscript/>}
+						title={intl.formatMessage({ id: 'noteEditor.subscript' })}
+						state={menuState.subscript}
+					/>
+					<StateButton
+						icon={<IconSuperscript/>}
+						title={intl.formatMessage({ id: 'noteEditor.superscript' })}
+						state={menuState.superscript}
+					/>
+					<StateButton
+						icon={<IconCode/>}
+						title={intl.formatMessage({ id: 'noteEditor.monospaced' })}
+						state={menuState.code}
+					/>
+				</div>
 			</div>
 			<div className="block-options">
 				{blockTypes.map(([type, element], index) => (

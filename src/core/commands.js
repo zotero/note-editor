@@ -1,17 +1,159 @@
 import { TextSelection } from 'prosemirror-state';
 import { findParentNode } from 'prosemirror-utils';
-import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
-import {
-	encodeObject,
-	formatCitation,
-	formatCitationItem,
-	formatCitationItemPreview,
-	randomString,
-	SetAttrsStep
-} from './utils';
+import { wrapInList, liftListItem, sinkListItem } from 'prosemirror-schema-list';
+import { formatCitation, SetAttrsStep } from './utils';
 import { fromHTML, schema } from './schema';
 import { Fragment, Slice } from 'prosemirror-model';
 import { setBlockType } from 'prosemirror-commands';
+import { getMarkAttributes, getMarkRangeAtCursor, getMarkRange, isMarkActive } from './helpers';
+
+// Alternative commands to work with marks containing attributes,
+// as ProseMirror doesn't take into account mark attributes
+// Code from https://github.com/ueberdosis/tiptap/tree/main/packages/core/src/commands
+
+export function unsetMark(type) {
+	return function(state, dispatch) {
+		const { tr } = state;
+		const { selection } = tr;
+		const { $from, empty, ranges } = selection;
+
+		if (dispatch) {
+			if (empty) {
+				let { from, to } = selection
+				const range = getMarkRange($from, type)
+
+				if (range) {
+					from = range.from
+					to = range.to
+				}
+
+				tr.removeMark(from, to, type)
+			}
+			else {
+				ranges.forEach(range => {
+					tr.removeMark(range.$from.pos, range.$to.pos, type)
+				})
+			}
+
+			tr.removeStoredMark(type)
+			dispatch(tr);
+		}
+		return true;
+	}
+}
+
+export function setMark(type, attributes = {}) {
+	return function(state, dispatch) {
+		const { tr } = state;
+		const { selection } = tr;
+		const { empty, ranges } = selection;
+
+		if (dispatch) {
+			if (empty) {
+				const oldAttributes = getMarkAttributes(state, type)
+
+				tr.addStoredMark(type.create({
+					...oldAttributes,
+					...attributes,
+				}))
+			}
+			else {
+				ranges.forEach(range => {
+					const from = range.$from.pos
+					const to = range.$to.pos
+
+					state.doc.nodesBetween(from, to, (node, pos) => {
+						const trimmedFrom = Math.max(pos, from)
+						const trimmedTo = Math.min(pos + node.nodeSize, to)
+						const someHasMark = node.marks.find(mark => mark.type === type)
+
+						// if there is already a mark of this type
+						// we know that we have to merge its attributes
+						// otherwise we add a fresh new mark
+						if (someHasMark) {
+							node.marks.forEach(mark => {
+								if (type === mark.type) {
+									tr.addMark(trimmedFrom, trimmedTo, type.create({
+										...mark.attrs,
+										...attributes,
+									}))
+								}
+							})
+						}
+						else {
+							tr.addMark(trimmedFrom, trimmedTo, type.create(attributes))
+						}
+					})
+				})
+			}
+			dispatch(tr);
+		}
+		return true;
+	}
+}
+
+export function toggleMark(type, attributes = {}) {
+	return function (state) {
+		const isActive = isMarkActive(state, type, attributes)
+
+		if (isActive) {
+			return unsetMark(type)
+		}
+
+		return setMark(type, attributes)
+	}
+}
+
+export function updateMarkRangeAtCursor(type, attrs) {
+		return (state, dispatch) => {
+			const { tr, selection, doc } = state;
+			let { from, to } = selection;
+			const { $from, empty } = selection;
+
+			if (empty) {
+				const range = getMarkRangeAtCursor(state, type)
+				if (range) {
+					from = range.from;
+					to = range.to;
+				}
+			}
+
+			const hasMark = doc.rangeHasMark(from, to, type);
+
+			if (hasMark) {
+				tr.removeMark(from, to, type);
+			}
+
+			tr.addStoredMark(type.create(attrs));
+
+			if (to > from) {
+				tr.addMark(from, to, type.create(attrs));
+			}
+			dispatch(tr);
+		};
+	}
+
+	export function removeMarkRangeAtCursor(type) {
+		return (state, dispatch) => {
+			const { tr, selection } = state;
+			let { from, to } = selection;
+			const { $from, empty } = selection;
+
+			if (empty) {
+				const range = getMarkRangeAtCursor(state, type);
+				if (range) {
+					from = range.from;
+					to = range.to;
+				}
+			}
+
+			tr.ensureMarks([]);
+			if (to > from) {
+				tr.removeMark(from, to, type);
+			}
+			dispatch(tr);
+		};
+	}
 
 function getClosestListItemNode($pos) {
 	let depth = $pos.depth;
@@ -155,51 +297,6 @@ export function toggleDir(dir) {
 		if (!changes) return false;
 		if (dispatch) dispatch(tr);
 
-		return true;
-	};
-}
-
-export function toggleMark1(markType, attrs, force) {
-	return function (state, dispatch) {
-		var ref = state.selection;
-		var empty = ref.empty;
-		var $cursor = ref.$cursor;
-		var ranges = ref.ranges;
-		if ((empty && !$cursor)) {
-			return false;
-		}
-		if (dispatch) {
-			if ($cursor) {
-				if (!force && markType.isInSet(state.storedMarks || $cursor.marks())) {
-					dispatch(state.tr.removeStoredMark(markType));
-				}
-				else {
-					dispatch(state.tr.addStoredMark(markType.create(attrs)));
-				}
-			}
-			else {
-				var has = false, tr = state.tr;
-				for (var i = 0; !has && i < ranges.length; i++) {
-					var ref$1 = ranges[i];
-					var $from = ref$1.$from;
-					var $to = ref$1.$to;
-					has = state.doc.rangeHasMark($from.pos, $to.pos, markType);
-				}
-
-				for (var i$1 = 0; i$1 < ranges.length; i$1++) {
-					var ref$2 = ranges[i$1];
-					var $from$1 = ref$2.$from;
-					var $to$1 = ref$2.$to;
-					if (!force && has) {
-						tr.removeMark($from$1.pos, $to$1.pos, markType);
-					}
-					else {
-						tr.addMark($from$1.pos, $to$1.pos, markType.create(attrs));
-					}
-				}
-				dispatch(tr.scrollIntoView());
-			}
-		}
 		return true;
 	};
 }

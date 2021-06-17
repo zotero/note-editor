@@ -37,7 +37,7 @@ function hasMarkup(node, type, attrs) {
 function clear() {
   return function (state, dispatch) {
     let { tr } = state;
-    let marks = ['strong', 'em', 'underline', 'strike', 'textColor', 'backgroundColor', 'code'];
+    let marks = ['strong', 'em', 'underline', 'strike', 'textColor', 'backgroundColor', 'code', 'subsup'];
     let nodes = ['heading'];
 
     marks.forEach(mark => {
@@ -74,7 +74,7 @@ class Menu {
 		return {
 			isActive: markActive3(type.create(attrs))(this.state),
 			run: () => {
-				toggleMark(type, attrs)(this.view.state, this.view.dispatch);
+				commands.toggleMark(type, attrs)(this.view.state)(this.view.state, this.view.dispatch);
 			}
 		};
 	}
@@ -188,18 +188,12 @@ class Menu {
 		this.underline = this.buildToggle(schema.marks.underline);
 		this.subscript = this.buildToggle(schema.marks.subsup, { type: 'sub' });
 		this.superscript = this.buildToggle(schema.marks.subsup, { type: 'sup' });
+		this.code = this.buildToggle(schema.marks.code);
 
 		this.textColor = {
 			color: getActiveColor(state),
 			run(color) {
-				commands.toggleMark1(schema.marks.textColor, { color }, true)(state, dispatch);
-			}
-		};
-
-		this.backgroundColor = {
-			color: getActiveColor(state),
-			run(color) {
-				commands.toggleMark1(schema.marks.backgroundColor, { color }, true)(state, dispatch);
+				commands.toggleMark(schema.marks.textColor, { color }, true)(state, dispatch);
 			}
 		};
 
@@ -213,7 +207,7 @@ class Menu {
 		let insideList = nodeIsActive(state, schema.nodes.orderedList) || nodeIsActive(state, schema.nodes.bulletList);
 		let insideBlockquote = nodeIsActive(state, schema.nodes.blockquote);
 		this.paragraph = this.buildBlock(schema.nodes.paragraph, {}, insideList || insideBlockquote);
-		this.code = this.buildBlock(schema.nodes.codeBlock);
+		this.codeBlock = this.buildBlock(schema.nodes.codeBlock);
 		this.heading1 = this.buildBlock(schema.nodes.heading, { level: 1 });
 		this.heading2 = this.buildBlock(schema.nodes.heading, { level: 2 });
 		this.heading3 = this.buildBlock(schema.nodes.heading, { level: 3 });

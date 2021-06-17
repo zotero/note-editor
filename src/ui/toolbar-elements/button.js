@@ -14,6 +14,9 @@ export function Button({ icon, title, active, className, onClick, onMouseDown })
 			}}
 			onMouseDown={(e) => {
 				e.preventDefault();
+				if (e.button !== 0) {
+					return;
+				}
 				onMouseDown && onMouseDown();
 			}}
 		>

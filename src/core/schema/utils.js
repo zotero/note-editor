@@ -27,7 +27,7 @@ export function buildToHTML(schema) {
 		];
 
 		let blockNodes = [
-			'ol', 'ul', 'li', 'br', 'hr', 'blockquote', 'table', 'th', 'tr', 'td', 'thead', 'tbody', 'tfoot'
+			'ol', 'ul', 'li', 'hr', 'blockquote', 'table', 'th', 'tr', 'td', 'thead', 'tbody', 'tfoot'
 		];
 
 		let nodes = tmp.querySelectorAll([...textNodes, ...blockNodes].join(','));

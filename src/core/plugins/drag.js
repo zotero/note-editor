@@ -58,7 +58,7 @@ class Drag {
 				relativeContainer.append(this.dragHandleNode);
 			}
 
-			let padding = rect.left - parentRect.left;
+			let padding = rect.left - parentRect.left - 4;
 			if (document.getElementsByTagName("html")[0].dir === 'rtl') {
 				padding = parentRect.right - rect.right;
 			}

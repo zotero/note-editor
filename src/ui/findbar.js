@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import cx from 'classnames';
+import { IconChevronDown, IconChevronUp } from './icons';
 
 function Findbar({ searchState, active }) {
 	const intl = useIntl();
@@ -74,56 +74,40 @@ function Findbar({ searchState, active }) {
 
 	return active && (
 		<div className="findbar" onMouseDown={handleMouseDown}>
-			<div className="column-left">
-				<div className="line">
+			<div className="line">
+				<div className="input">
 					<input
 						ref={searchInputRef} type="text"
-					  placeholder={intl.formatMessage({id: 'noteEditor.search'})}
-					  value={searchState.searchTerm || ''}
-					  onChange={handleFindInputChange} onKeyDown={handleFindInputKeyDown}
+						placeholder={intl.formatMessage({ id: 'noteEditor.find' })}
+						value={searchState.searchTerm || ''}
+						onChange={handleFindInputChange} onKeyDown={handleFindInputKeyDown}
 					/>
 				</div>
-				<div className="line">
+				<div className="buttons">
+					<div className="button" onClick={handleFindPrev} title={intl.formatMessage({ id: 'noteEditor.previous' })}>
+						<IconChevronUp/>
+					</div>
+					<div className="button" onClick={handleFindNext} title={intl.formatMessage({ id: 'noteEditor.next' })}>
+						<IconChevronDown/>
+					</div>
+				</div>
+			</div>
+			<div className="line">
+				<div className="input">
 					<input
 						type="text"
-						placeholder={intl.formatMessage({id: 'noteEditor.replace'})}
+						placeholder={intl.formatMessage({ id: 'noteEditor.replaceWith' })}
 						value={replaceValue}
 						onChange={handleReplaceInputChange}
 						onKeyDown={handleFindInputKeyDown}
 					/>
 				</div>
-			</div>
-			<div className="column-right">
-				<div className="line">
-					<div className="toggles">
-						<div
-							className={cx('button', { active: searchState.caseSensitive })}
-							onClick={handleCaseToggle}
-							title={intl.formatMessage({id: 'noteEditor.matchCase'})}
-						>Aa</div>
-						<div
-							className={cx('button', { active: searchState.wholeWords })}
-							onClick={handleWordToggle}
-							title={intl.formatMessage({id: 'noteEditor.wholeWords'})}
-						>W</div>
+				<div className="buttons">
+					<div className="button text-button" onClick={handleReplace}>
+						<FormattedMessage id="noteEditor.replaceNext"/>
 					</div>
-					<div className="buttons">
-						<div className="button" onClick={handleFindPrev}>
-								<FormattedMessage id="noteEditor.previous"/>
-						</div>
-						<div className="button" onClick={handleFindNext}>
-							<FormattedMessage id="noteEditor.next"/>
-						</div>
-					</div>
-				</div>
-				<div className="line">
-					<div className="buttons">
-						<div className="button" onClick={handleReplace}>
-							<FormattedMessage id="noteEditor.replaceNext"/>
-						</div>
-						<div className="button" onClick={handleReplaceAll}>
-							<FormattedMessage id="noteEditor.replaceAll"/>
-						</div>
+					<div className="button text-button" onClick={handleReplaceAll}>
+						<FormattedMessage id="noteEditor.replaceAll"/>
 					</div>
 				</div>
 			</div>

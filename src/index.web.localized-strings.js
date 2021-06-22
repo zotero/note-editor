@@ -139,4 +139,5 @@ export let localizedStrings = {
 	'noteEditor.superscript': 'Superscript',
 	'noteEditor.edit': 'Edit',
 	'noteEditor.applyAnnotationColors': 'Apply Annotation Colors',
+	'noteEditor.removeAnnotationColors': 'Remove Annotation Colors',
 };

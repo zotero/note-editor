@@ -82,14 +82,16 @@ class Color {
 		this.state = {
 			availableColors,
 			activeColors,
-			canApplyAnnotationColors: this.applyAnnotationColors(true),
+			canApplyAnnotationColors: this.setAnnotationColors(false, true),
+			canRemoveAnnotationColors: this.setAnnotationColors(true, true),
 			setColor: this.setColor.bind(this),
 			removeColor: this.removeColor.bind(this),
-			applyAnnotationColors: this.applyAnnotationColors.bind(this)
+			applyAnnotationColors: () => this.setAnnotationColors(false),
+			removeAnnotationColors: () => this.setAnnotationColors(true)
 		};
 	}
 
-	applyAnnotationColors(onlyCheck) {
+	setAnnotationColors(remove, onlyCheck) {
 		let { state, dispatch } = this.view;
 		let { tr } = state;
 		let found = false
@@ -103,12 +105,23 @@ class Color {
 					let $from = state.doc.resolve(from);
 					let range = getMarkRange($from, schema.marks.backgroundColor, { color });
 
-					if (!range || range.from !== from || range.to !== to) {
-						if (!onlyCheck) {
+					if (remove) {
+						if (range && range.from === from && range.to === to) {
+							found = true;
+							if (onlyCheck) {
+								return false;
+							}
+							tr.removeMark(from, to, schema.marks.backgroundColor);
+						}
+					}
+					else {
+						if (!range || range.from !== from || range.to !== to) {
+							found = true;
+							if (onlyCheck) {
+								return false;
+							}
 							tr.addMark(from, to, schema.marks.backgroundColor.create({ color }));
 						}
-						found = true;
-						return false;
 					}
 				}
 			}

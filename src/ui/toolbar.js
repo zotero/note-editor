@@ -75,6 +75,9 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 					{colorState.state.canApplyAnnotationColors && <div className="option" onClick={() => colorState.state.applyAnnotationColors()}>
 						<FormattedMessage id="noteEditor.applyAnnotationColors"/>
 					</div>}
+					{colorState.state.canRemoveAnnotationColors && <div className="option" onClick={() => colorState.state.removeAnnotationColors()}>
+						<FormattedMessage id="noteEditor.removeAnnotationColors"/>
+					</div>}
 				</Dropdown>
 			</div>
 		</div>

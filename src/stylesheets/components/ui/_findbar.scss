@@ -7,60 +7,79 @@
 
 	.line {
 		display: flex;
-		height: 32px;
-		border: 1px solid #d9d9d9;
-		border-radius: 4px;
-		padding: 0 4px 0 7px;
 
-		&:first-child {
-			margin-bottom: 4px;
+		&:nth-child(2) {
+			margin-top: 4px;
 		}
 
-		.input {
+		.input-box {
 			flex-grow: 1;
 			display: flex;
+			height: 32px;
+			border: 1px solid #d9d9d9;
+			border-radius: 4px;
+			padding: 0 4px 0 7px;
 
-			input {
-				width: 100%;
-				border: none;
-				outline: none;
-				color: inherit;
+			.input {
+				flex-grow: 1;
+				display: flex;
+
+				input {
+					width: 100%;
+					border: none;
+					outline: none;
+					color: inherit;
+				}
+			}
+
+			.buttons {
+				display: flex;
+				align-items: center;
+
+				.button {
+					color: #404040;
+					width: 22px;
+					height: 22px;
+					display: flex;
+					align-items: center;
+					justify-content: space-around;
+					border-radius: 4px;
+
+					&:hover {
+						background-color: #F0F0F0;
+					}
+
+					&:active,
+					&.active {
+						background-color: #404040;
+						color: #ffffff;
+					}
+				}
+
+				.text-button {
+					cursor: default;
+					white-space: nowrap;
+					width: unset;
+					margin-left: 4px;
+					border: 1px solid lightgray;
+					padding: 0 7px;
+				}
+
 			}
 		}
 
-		.buttons {
+		.check-button {
+			height: 32px;
 			display: flex;
 			align-items: center;
+			cursor: default;
+			white-space: nowrap;
+			margin-left: 4px;
+			padding: 0 7px;
 
-			.button {
-				color: #404040;
-				width: 22px;
-				height: 22px;
-				display: flex;
-				align-items: center;
-				justify-content: space-around;
-				border-radius: 4px;
-
-				&:hover {
-					background-color: #F0F0F0;
-				}
-
-				&:active,
-				&.active {
-					background-color: #404040;
-					color: #ffffff;
-				}
+			label {
+				padding-left: 5px;
 			}
-
-			.text-button {
-				cursor: default;
-				white-space: nowrap;
-				width: unset;
-				margin-left: 4px;
-				border: 1px solid lightgray;
-				padding: 0 7px;
-			}
-
 		}
 	}
 }

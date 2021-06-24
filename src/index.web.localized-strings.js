@@ -117,7 +117,7 @@ export let localizedStrings = {
 	'noteEditor.showOnPage': 'Show on Page',
 	'noteEditor.addCitation': 'Add Citation',
 	'noteEditor.alignRight': 'Align Right',
-	'noteEditor.replaceWith': 'Replace with',
+	'noteEditor.replace': 'Replace',
 	'noteEditor.annotationsWithDate': 'Annotations (%S)',
 	'noteEditor.alignLeft': 'Align Left',
 	'noteEditor.clearFormatting': 'Clear Formatting',

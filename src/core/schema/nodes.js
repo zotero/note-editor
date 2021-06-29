@@ -334,7 +334,7 @@ export default {
 		inline: true,
 		group: 'inline',
 		// atom: true,
-		content: 'text*',
+		content: '(text | hardBreak)*',
 		defining: true,
 		// draggable: true,
 		// TODO: Limit what marks highlight node can have

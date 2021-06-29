@@ -121,10 +121,9 @@ function unlinkHighlights(tr) {
 				if (node.content instanceof Fragment && node.content.content.length) {
 					let first = node.content.content[0];
 					let last = node.content.content[node.content.content.length - 1];
-					if (node.textContent.length < 2
+					if (!first.type.isText || !last.type.isText || node.textContent.length < 2
 						|| !['"', '“'].includes(first.text[0])
 						|| !['"', '”'].includes(last.text[last.text.length - 1])) {
-
 						tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0));
 						updated = true;
 						updatedInLastIteration = true;

@@ -14,7 +14,9 @@ function Findbar({ searchState, active }) {
 	useEffect(() => {
 		if (active) {
 			setTimeout(() => {
-				searchInputRef.current.focus();
+				if (searchInputRef.current) {
+					searchInputRef.current.focus();
+				}
 			}, 100);
 		}
 	}, [active]);
@@ -100,7 +102,7 @@ function Findbar({ searchState, active }) {
 				</div>
 				<div className="check-button">
 					<input type="checkbox" id="replace-checkbox" checked={showReplace} onChange={handleReplaceCheckboxChange}/>
-					<label for="replace-checkbox"><FormattedMessage id="noteEditor.replace"/></label>
+					<label htmlFor="replace-checkbox"><FormattedMessage id="noteEditor.replace"/></label>
 				</div>
 			</div>
 			{showReplace && <div className="line">

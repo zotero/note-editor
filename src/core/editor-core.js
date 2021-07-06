@@ -188,7 +188,8 @@ class EditorCore {
 				image: nodeViews.image({
 					provider: this.provider,
 					onDimensions: (node, width, height) => {
-						// TODO: Update dimensions immediately (still in single transaction)
+						// TODO: Update dimensions immediately (still in single transaction),
+						//  because currently another modification after image insertion is necessary
 						this.dimensionsStore.data[node.attrs.nodeID] = [width, height];
 					},
 					onOpenURL: options.onOpenURL.bind(this)

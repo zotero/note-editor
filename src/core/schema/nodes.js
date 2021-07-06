@@ -333,12 +333,8 @@ export default {
 	highlight: {
 		inline: true,
 		group: 'inline',
-		// atom: true,
 		content: '(text | hardBreak)*',
 		defining: true,
-		// draggable: true,
-		// TODO: Limit what marks highlight node can have
-		// marks: 'em strong subsup', // The same as in pdf-reader
 		attrs: {
 			annotation: { default: null }
 		},

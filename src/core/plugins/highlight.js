@@ -181,6 +181,10 @@ export function highlight(options) {
 				}
 			};
 		},
+		// Move characters outside of highlight node when they are
+		// inserted at highlight node boundaries
+		// Transaction modifications made below aren't properly reflected
+		// in undo history, some characters still remain when undoing
 		// TODO: Rewrite
 		appendTransaction(transactions, oldState, newState) {
 			if (!transactions.some(tr => tr.docChanged)) {
@@ -222,35 +226,6 @@ export function highlight(options) {
 			}
 
 			return updated ? tr : null;
-		},
-
-		filterTransaction(tr, state) {
-			let { from, to } = state.selection;
-			let filter = false;
-			if (from === to && tr.steps.length === 1) {
-				let step = tr.steps[0];
-				state.doc.nodesBetween(step.from, step.to, (parentNode, parentPos) => {
-					if (parentNode.type.name === 'highlight' && parentPos === step.from && parentPos + parentNode.nodeSize === step.to) {
-						if (from === step.from) {
-							filter = true;
-							setTimeout(() => {
-								let pluginState = highlightKey.getState(state);
-								let { dispatch } = pluginState.view;
-								dispatch(pluginState.view.state.tr.delete(from + 1, from + 2));
-							}, 0);
-						}
-						else if (from === step.to) {
-							filter = true;
-							setTimeout(() => {
-								let pluginState = highlightKey.getState(state);
-								let { dispatch } = pluginState.view;
-								dispatch(pluginState.view.state.tr.delete(from - 2, from - 1));
-							}, 0);
-						}
-					}
-				});
-			}
-			return !filter;
 		},
 
 		props: {

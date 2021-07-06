@@ -273,6 +273,7 @@ class EditorInstance {
 				let nodeID = randomString();
 				let citationNode = schema.nodes.citation.create({ nodeID, citation });
 				let { state, dispatch } = this._editorCore.view;
+				// TODO: Automatically add white spaces before/after citation when necessary
 				dispatch(state.tr.insert(pos, citationNode));
 				this._postMessage({ action: 'openCitationPopup', nodeID, citation });
 				return;

@@ -74,6 +74,7 @@ class Menu {
 		return {
 			isActive: markActive3(type.create(attrs))(this.state),
 			run: () => {
+				this.view.focus();
 				commands.toggleMark(type, attrs)(this.view.state)(this.view.state, this.view.dispatch);
 			}
 		};
@@ -95,6 +96,7 @@ class Menu {
 		return {
 			isActive: isActive && !setInactive,
 			run: () => {
+				this.view.focus();
 				if (isActive) {
 					command = setBlockType(schema.nodes.paragraph, attrs);
 				}
@@ -126,7 +128,6 @@ class Menu {
 		let $from = selection.$from;
 		let $to = selection.$to;
 		if (this.isBlockquoteActive(state)) {
-
 			let $a = state.doc.resolve($from.start(1));
 			let $b = state.doc.resolve($to.end(1));
 			let range = $a.blockRange($b);
@@ -180,6 +181,12 @@ class Menu {
 			dispatch = this.view.dispatch;
 		}
 
+		let focus = () => {
+			if (this.view) {
+				this.view.focus();
+			}
+		}
+
 		let state = newState;
 		this.state = newState;
 		this.strong = this.buildToggle(schema.marks.strong);
@@ -193,6 +200,7 @@ class Menu {
 		this.textColor = {
 			color: getActiveColor(state),
 			run(color) {
+				focus();
 				commands.toggleMark(schema.marks.textColor, { color }, true)(state, dispatch);
 			}
 		};
@@ -200,6 +208,7 @@ class Menu {
 		this.clearFormatting = {
 			isActive: false,
 			run() {
+				focus();
 				clear()(state, dispatch);
 			}
 		};
@@ -215,6 +224,7 @@ class Menu {
 		this.bulletList = {
 			isActive: this.isListActive(state, schema.nodes.bulletList),
 			run: () => {
+				focus();
 				commands.toggleList(schema.nodes.bulletList, schema.nodes.listItem)(state, dispatch, this.view);
 			}
 		};
@@ -222,6 +232,7 @@ class Menu {
 		this.orderedList = {
 			isActive: this.isListActive(state, schema.nodes.orderedList),
 			run: () => {
+				focus();
 				commands.toggleList(schema.nodes.orderedList, schema.nodes.listItem)(state, dispatch, this.view);
 			}
 		};
@@ -229,6 +240,7 @@ class Menu {
 		this.blockquote = {
 			isActive: this.isBlockquoteActive(state),
 			run: () => {
+				focus();
 				return this.toggleBlockquote(state, dispatch);
 			}
 		}
@@ -236,6 +248,7 @@ class Menu {
 		this.alignLeft = {
 			isActive: commands.hasAttr(state, 'align', 'left'),
 			run() {
+				focus();
 				commands.toggleAlignment('left')(state, dispatch);
 			}
 		};
@@ -243,6 +256,7 @@ class Menu {
 		this.alignCenter = {
 			isActive: commands.hasAttr(state, 'align', 'center'),
 			run() {
+				focus();
 				commands.toggleAlignment('center')(state, dispatch);
 			}
 		};
@@ -250,6 +264,7 @@ class Menu {
 		this.alignRight = {
 			isActive: commands.hasAttr(state, 'align', 'right'),
 			run() {
+				focus();
 				commands.toggleAlignment('right')(state, dispatch);
 			}
 		};
@@ -257,6 +272,7 @@ class Menu {
 		this.indent = {
 			isActive: false,
 			run() {
+				focus();
 				commands.changeIndent(1)(state, dispatch);
 			}
 		};
@@ -264,6 +280,7 @@ class Menu {
 		this.outdent = {
 			isActive: false,
 			run() {
+				focus();
 				commands.changeIndent(-1)(state, dispatch);
 			}
 		};
@@ -271,6 +288,7 @@ class Menu {
 		this.ltr = {
 			isActive: commands.hasAttr(state, 'dir', 'ltr'),
 			run() {
+				focus();
 				commands.toggleDir('ltr')(state, dispatch);
 			}
 		};
@@ -278,6 +296,7 @@ class Menu {
 		this.rtl = {
 			isActive: commands.hasAttr(state, 'dir', 'rtl'),
 			run() {
+				focus();
 				commands.toggleDir('rtl')(state, dispatch);
 			}
 		};
@@ -285,6 +304,7 @@ class Menu {
 		this.citation = {
 			isActive: false,
 			run() {
+				focus();
 				let citation = {
 					citationItems: [],
 					properties: {}

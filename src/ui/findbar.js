@@ -92,12 +92,12 @@ function Findbar({ searchState, active }) {
 						/>
 					</div>
 					<div className="buttons">
-						<div className="button" onClick={handleFindPrev} title={intl.formatMessage({ id: 'noteEditor.previous' })}>
+						<button className="button" onClick={handleFindPrev} title={intl.formatMessage({ id: 'noteEditor.previous' })}>
 							<IconChevronUp/>
-						</div>
-						<div className="button" onClick={handleFindNext} title={intl.formatMessage({ id: 'noteEditor.next' })}>
+						</button>
+						<button className="button" onClick={handleFindNext} title={intl.formatMessage({ id: 'noteEditor.next' })}>
 							<IconChevronDown/>
-						</div>
+						</button>
 					</div>
 				</div>
 				<div className="check-button">
@@ -117,12 +117,12 @@ function Findbar({ searchState, active }) {
 						/>
 					</div>
 					<div className="buttons">
-						<div className="button text-button" onClick={handleReplace}>
+						<button className="button text-button" onClick={handleReplace}>
 							<FormattedMessage id="noteEditor.replaceNext"/>
-						</div>
-						<div className="button text-button" onClick={handleReplaceAll}>
+						</button>
+						<button className="button text-button" onClick={handleReplaceAll}>
 							<FormattedMessage id="noteEditor.replaceAll"/>
-						</div>
+						</button>
 					</div>
 				</div>
 			</div>}

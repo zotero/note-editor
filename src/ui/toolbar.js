@@ -20,12 +20,8 @@ import ColorsDropdown from './toolbar-elements/colors-dropdown';
 function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow }) {
 	const intl = useIntl();
 
-	function handleMouseDown(event) {
-		event.preventDefault();
-	}
-
 	return (
-		<div className="toolbar" onMouseDown={handleMouseDown}>
+		<div className="toolbar">
 			<div className="start">
 				{enableReturnButton &&
 					<Button
@@ -66,18 +62,18 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 					icon={<IconMore/>}
 					title={intl.formatMessage({ id: 'noteEditor.more' })}
 				>
-					{!unsaved && viewMode !== 'library' && <div className="option" onClick={onShowNote}>
+					{!unsaved && viewMode !== 'library' && <button className="option" onClick={onShowNote}>
 						<FormattedMessage id="noteEditor.showInLibrary"/>
-					</div>}
-					{viewMode !== 'window' && <div className="option" onClick={onOpenWindow}>
+					</button>}
+					{viewMode !== 'window' && <button className="option" onClick={onOpenWindow}>
 						<FormattedMessage id="noteEditor.editInWindow"/>
-					</div>}
-					{colorState.state.canApplyAnnotationColors && <div className="option" onClick={() => colorState.state.applyAnnotationColors()}>
+					</button>}
+					{colorState.state.canApplyAnnotationColors && <button className="option" onClick={() => colorState.state.applyAnnotationColors()}>
 						<FormattedMessage id="noteEditor.applyAnnotationColors"/>
-					</div>}
-					{colorState.state.canRemoveAnnotationColors && <div className="option" onClick={() => colorState.state.removeAnnotationColors()}>
+					</button>}
+					{colorState.state.canRemoveAnnotationColors && <button className="option" onClick={() => colorState.state.removeAnnotationColors()}>
 						<FormattedMessage id="noteEditor.removeAnnotationColors"/>
-					</div>}
+					</button>}
 				</Dropdown>
 			</div>
 		</div>

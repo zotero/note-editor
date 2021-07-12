@@ -1,5 +1,6 @@
 
 .toolbar {
+	user-select: none;
 	color: #404040;
 	font-size: 12px;
 	border-bottom: 1px solid #d9d9d9;
@@ -94,6 +95,7 @@
 			}
 
 			.option {
+				width: 100%;
 				padding: 5px 0 5px 20px;
 
 				&:hover {
@@ -175,6 +177,7 @@
 		.option {
 			white-space: nowrap;
 			padding: 5px 15px;
+			width: 100%;
 
 			&:hover {
 				background-color: #F0F0F0;

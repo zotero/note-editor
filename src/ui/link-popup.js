@@ -109,20 +109,20 @@ function LinkPopup({ parentRef, pluginState }) {
 										onKeyDown={handleKeydown}
 									/>
 								</div>
-								<div className="button toolbarButton" onClick={handleSet}>
+								<button className="button toolbarButton" onClick={handleSet}>
 									<FormattedMessage id="noteEditor.set"/>
-								</div>
+								</button>
 							</Fragment>
 						)
 						: (
 							<Fragment>
 								<div className="link"><a href={pluginState.href} onClick={handleOpen}>{pluginState.href}</a></div>
-								<div className="button toolbarButton" onClick={handleEdit}>
+								<button className="button toolbarButton" onClick={handleEdit}>
 									<FormattedMessage id="noteEditor.edit"/>
-								</div>
-								<div className="button toolbarButton" onClick={handleUnset}>
+								</button>
+								<button className="button toolbarButton" onClick={handleUnset}>
 									<FormattedMessage id="noteEditor.unlink"/>
-								</div>
+								</button>
 							</Fragment>
 						)}
 				</div>

@@ -71,6 +71,7 @@ class Link {
 			};
 			dispatch(state.tr);
 		}
+		this.view.focus();
 	}
 
 	open() {
@@ -99,6 +100,7 @@ class Link {
 
 	removeURL() {
 		removeMarkRangeAtCursor(schema.marks.link)(this.view.state, this.view.dispatch);
+		this.view.focus();
 	}
 
 	getHref(state) {

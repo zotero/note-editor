@@ -134,11 +134,13 @@ class Color {
 	}
 
 	setColor(color) {
+		this.view.focus();
 		let { state, dispatch } = this.view;
 		updateMarkRangeAtCursor(schema.marks.backgroundColor, { color })(state, dispatch);
 	}
 
 	removeColor() {
+		this.view.focus();
 		let { state, dispatch } = this.view;
 		removeMarkRangeAtCursor(schema.marks.backgroundColor)(state, dispatch);
 	}

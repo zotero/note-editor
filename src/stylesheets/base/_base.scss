@@ -8,12 +8,15 @@
 	box-sizing: border-box;
 }
 
-*:focus {
-	outline: none;
-}
-
 body {
 	background-color: white;
 	font-family: var(--font-family);
 	font-size: var(--font-size);
+}
+
+button {
+	all: unset;
+	outline: revert;
+	display: block;
+	box-sizing: border-box;
 }

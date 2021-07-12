@@ -55,6 +55,7 @@ export function buildKeymap(schema, mapKeys) {
 	bind('Backspace', undoInputRule);
 	if (!mac) bind('Mod-y', redo);
 
+	bind('Alt-F10', focusToolbar);
 	bind('Alt-ArrowUp', joinUp);
 	bind('Alt-ArrowDown', joinDown);
 	bind('Mod-BracketLeft', lift);
@@ -108,3 +109,15 @@ function customUndo(state, dispatch) {
     return undo(state, dispatch);
   }
 }
+
+function focusToolbar() {
+	document.querySelector('.toolbar button').focus();
+}
+
+window.addEventListener('keydown', function(event) {
+	if (event.key === 'Escape') {
+		document.querySelector('.primary-editor').focus();
+		// Necessary to avoid selecting block node when pressing escape multiple times
+		event.preventDefault();
+	}
+}, true);

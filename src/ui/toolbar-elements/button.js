@@ -3,25 +3,28 @@
 import React from 'react';
 import cx from 'classnames';
 
-export function Button({ icon, title, active, className, onClick, onMouseDown }) {
+export function Button({ icon, title, active, className, triggerOnMouseDown, onClick }) {
 	return (
-		<div
+		<button
 			className={cx('toolbar-button', { active: !!active }, className)}
 			title={title}
-			onClick={(e) => {
-				e.preventDefault();
-				onClick && onClick();
-			}}
-			onMouseDown={(e) => {
-				e.preventDefault();
-				if (e.button !== 0) {
+			onClick={(event) => {
+				event.preventDefault();
+				if (triggerOnMouseDown && event.detail) {
 					return;
 				}
-				onMouseDown && onMouseDown();
+				onClick();
+			}}
+			onMouseDown={(event) => {
+				event.preventDefault();
+				if (!triggerOnMouseDown || event.button !== 0) {
+					return;
+				}
+				onClick();
 			}}
 		>
 			{icon}
-		</div>
+		</button>
 	);
 }
 

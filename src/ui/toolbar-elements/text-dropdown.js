@@ -79,11 +79,12 @@ export default function TextDropdown({ menuState }) {
 			</div>
 			<div className="block-options">
 				{blockTypes.map(([type, element], index) => (
-					<div
+					<button
 						key={index}
 						className={cx('option', { active: menuState[type].isActive })}
 						onClick={() => handleItemPick(type)}
-					>{element}</div>
+						onMouseDown={(event) => event.preventDefault()}
+					>{element}</button>
 				))}
 			</div>
 		</Dropdown>

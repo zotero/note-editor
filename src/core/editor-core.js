@@ -133,7 +133,7 @@ class EditorCore {
 							}
 						}
 					}),
-					buildInputRules(schema),
+					buildInputRules(),
 					keymap(buildKeymap(schema)),
 					keymap(baseKeymap),
 					dropCursor(),

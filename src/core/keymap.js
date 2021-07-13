@@ -41,6 +41,11 @@ export function buildKeymap(options) {
 	bind('Mod-k', options.toggleLink);
 	bind('Mod-K', options.toggleLink);
 
+	bind('Mod-f', options.find);
+	bind('Mod-F', options.find);
+	// TODO: Use the currently selected text for search
+	// TODO: Implement Mod-r to replace
+
 	bind('Shift-Ctrl-8', wrapInList(schema.nodes.bulletList));
 	bind('Shift-Ctrl-9', wrapInList(schema.nodes.orderedList));
 	bind('Ctrl->', wrapIn(schema.nodes.blockquote));
@@ -91,5 +96,6 @@ function focusToolbar() {
 window.addEventListener('keydown', function(event) {
 	if (event.key === 'Escape') {
 		document.querySelector('.primary-editor').focus();
+		// TODO: Close findbar
 	}
 });

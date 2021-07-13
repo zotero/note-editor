@@ -139,6 +139,10 @@ class EditorCore {
 						toggleLink: () => {
 							this.pluginState.link.toggle();
 							return true;
+						},
+						find: () => {
+							this.pluginState.search.setActive(true);
+							return true;
 						}
 					})),
 					dropCursor(),

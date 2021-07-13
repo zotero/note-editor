@@ -5,50 +5,17 @@ import {
 import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
 import { undo, redo } from 'prosemirror-history';
 import { undoInputRule } from 'prosemirror-inputrules';
+import { schema } from './schema';
 import { changeIndent } from './commands';
 
 const mac = typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false;
 
-// :: (Schema, ?Object) → Object
-// Inspect the given schema looking for marks and nodes from the
-// basic schema, and if found, add key bindings related to them.
-// This will add:
-//
-// * **Mod-b** for toggling [strong](#schema-basic.StrongMark)
-// * **Mod-i** for toggling [emphasis](#schema-basic.EmMark)
-// * **Mod-`** for toggling [code font](#schema-basic.CodeMark)
-// * **Ctrl-Shift-0** for making the current textblock a paragraph
-// * **Ctrl-Shift-1** to **Ctrl-Shift-Digit6** for making the current
-//   textblock a heading of the corresponding level
-// * **Ctrl-Shift-Backslash** to make the current textblock a code block
-// * **Ctrl-Shift-8** to wrap the selection in an ordered list
-// * **Ctrl-Shift-9** to wrap the selection in a bullet list
-// * **Ctrl->** to wrap the selection in a block quote
-// * **Enter** to split a non-empty textblock in a list item while at
-//   the same time splitting the list item
-// * **Mod-Enter** to insert a hard break
-// * **Mod-_** to insert a horizontal rule
-// * **Backspace** to undo an input rule
-// * **Alt-ArrowUp** to `joinUp`
-// * **Alt-ArrowDown** to `joinDown`
-// * **Mod-BracketLeft** to `lift`
-// * **Escape** to `selectParentNode`
-//
-// You can suppress or map these bindings by passing a `mapKeys`
-// argument, which maps key names (say `"Mod-B"` to either `false`, to
-// remove the binding, or a new key name string.
-export function buildKeymap(schema, mapKeys) {
-	let keys = {}, type;
+export function buildKeymap(options) {
+	let keys = {};
 
 	function bind(key, cmd) {
-		if (mapKeys) {
-			let mapped = mapKeys[key];
-			if (mapped === false) return;
-			if (mapped) key = mapped;
-		}
 		keys[key] = cmd;
 	}
-
 
 	bind('Mod-z', customUndo);
 	bind('Shift-Mod-z', redo);
@@ -59,45 +26,52 @@ export function buildKeymap(schema, mapKeys) {
 	bind('Alt-ArrowUp', joinUp);
 	bind('Alt-ArrowDown', joinDown);
 	bind('Mod-BracketLeft', lift);
-	bind('Escape', selectParentNode);
 
-	if (type = schema.marks.strong) {
-		bind('Mod-b', toggleMark(type));
-		bind('Mod-B', toggleMark(type));
-	}
-	if (type = schema.marks.em) {
-		bind('Mod-i', toggleMark(type));
-		bind('Mod-I', toggleMark(type));
-	}
-	if (type = schema.marks.code) bind('Mod-`', toggleMark(type));
+	bind('Mod-b', toggleMark(schema.marks.strong));
+	bind('Mod-B', toggleMark(schema.marks.strong));
 
-	if (type = schema.nodes.bulletList) bind('Shift-Ctrl-8', wrapInList(type));
-	if (type = schema.nodes.orderedList) bind('Shift-Ctrl-9', wrapInList(type));
-	if (type = schema.nodes.blockquote) bind('Ctrl->', wrapIn(type));
-	if (type = schema.nodes.hardBreak) {
-		let br = type, cmd = chainCommands(exitCode, (state, dispatch) => {
-			dispatch(state.tr.replaceSelectionWith(br.create()).scrollIntoView());
-			return true;
-		});
-		bind('Mod-Enter', cmd);
-		bind('Shift-Enter', cmd);
-		if (mac) bind('Ctrl-Enter', cmd);
+	bind('Mod-i', toggleMark(schema.marks.em));
+	bind('Mod-I', toggleMark(schema.marks.em));
+
+	bind('Mod-u', toggleMark(schema.marks.underline));
+	bind('Mod-U', toggleMark(schema.marks.underline));
+
+	bind('Mod-`', toggleMark(schema.marks.code));
+
+	bind('Mod-k', options.toggleLink);
+	bind('Mod-K', options.toggleLink);
+
+	bind('Shift-Ctrl-8', wrapInList(schema.nodes.bulletList));
+	bind('Shift-Ctrl-9', wrapInList(schema.nodes.orderedList));
+	bind('Ctrl->', wrapIn(schema.nodes.blockquote));
+
+	// Hard break
+	let cmd = chainCommands(exitCode, (state, dispatch) => {
+		dispatch(state.tr.replaceSelectionWith(schema.nodes.hardBreak.create()).scrollIntoView());
+		return true;
+	});
+	bind('Mod-Enter', cmd);
+	bind('Shift-Enter', cmd);
+	if (mac) bind('Ctrl-Enter', cmd);
+
+	// List item
+	bind('Enter', splitListItem(schema.nodes.listItem));
+	bind('Shift-Tab', changeIndent(-1, true));
+	bind('Tab', changeIndent(1, true));
+
+	bind('Shift-Ctrl-0', setBlockType(schema.nodes.paragraph));
+	bind('Shift-Ctrl-\\', setBlockType(schema.nodes.codeBlock));
+
+	// Heading
+	for (let i = 1; i <= 6; i++) {
+		bind('Shift-Ctrl-' + i, setBlockType(schema.nodes.heading, { level: i }));
 	}
-	if (type = schema.nodes.listItem) {
-		bind('Enter', splitListItem(type));
-		bind('Shift-Tab', changeIndent(-1, true));
-		bind('Tab', changeIndent(1, true));
-	}
-	if (type = schema.nodes.paragraph) bind('Shift-Ctrl-0', setBlockType(type));
-	if (type = schema.nodes.codeBlock) bind('Shift-Ctrl-\\', setBlockType(type));
-	if (type = schema.nodes.heading) for (let i = 1; i <= 6; i++) bind('Shift-Ctrl-' + i, setBlockType(type, { level: i }));
-	if (type = schema.nodes.horizontalRule) {
-		let hr = type;
-		bind('Mod-_', (state, dispatch) => {
-			dispatch(state.tr.replaceSelectionWith(hr.create()).scrollIntoView());
-			return true;
-		});
-	}
+
+	// Horizontal rule
+	bind('Mod-_', (state, dispatch) => {
+		dispatch(state.tr.replaceSelectionWith(schema.nodes.horizontalRule.create()).scrollIntoView());
+		return true;
+	});
 
 	return keys;
 }
@@ -117,7 +91,5 @@ function focusToolbar() {
 window.addEventListener('keydown', function(event) {
 	if (event.key === 'Escape') {
 		document.querySelector('.primary-editor').focus();
-		// Necessary to avoid selecting block node when pressing escape multiple times
-		event.preventDefault();
 	}
-}, true);
+});

@@ -134,8 +134,13 @@ class EditorCore {
 						}
 					}),
 					buildInputRules(),
-					keymap(buildKeymap(schema)),
 					keymap(baseKeymap),
+					keymap(buildKeymap({
+						toggleLink: () => {
+							this.pluginState.link.toggle();
+							return true;
+						}
+					})),
 					dropCursor(),
 					gapCursor(),
 					color(),

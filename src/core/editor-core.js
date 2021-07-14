@@ -134,7 +134,6 @@ class EditorCore {
 						}
 					}),
 					buildInputRules(),
-					keymap(baseKeymap),
 					keymap(buildKeymap({
 						toggleLink: () => {
 							this.pluginState.link.toggle();
@@ -145,6 +144,7 @@ class EditorCore {
 							return true;
 						}
 					})),
+					keymap(baseKeymap),
 					dropCursor(),
 					gapCursor(),
 					color(),

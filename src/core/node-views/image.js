@@ -1,25 +1,28 @@
+
 class ImageView {
 	constructor(node, view, getPos, options) {
 		if (node.attrs.attachmentKey) {
 			this.listener = (data) => {
-				// If image is modified and dimensions are changed,
+				// Note: If image file is modified and dimensions are changed,
 				// it will be displayed with invalid aspect ratio
 				this.img.onload = (event) => {
 					if (node.attrs.width === null || node.attrs.height === null) {
 						// Use natural image dimensions if neither width nor height is provided
 						let width = event.target.naturalWidth;
 						let height = event.target.naturalHeight;
-						// Calculate proportional height if only width is known
+						// Calculate proportional height if width is known
 						if (node.attrs.width !== null) {
 							width = node.attrs.width;
 							height = event.target.naturalHeight * node.attrs.width / event.target.naturalWidth;
 						}
-						// Calculate proportional width if only height is known
+						// Calculate proportional width if height is known
 						if (node.attrs.height !== null) {
 							width = event.target.naturalWidth * node.attrs.height / event.target.naturalHeight;
 							height = node.attrs.height;
 						}
-						options.onDimensions(node, width, height);
+						if (width > 0 && height > 0) {
+							options.onDimensions(node, width, height);
+						}
 					}
 					this.img.parentNode.style.paddingBottom = '';
 					this.img.style.display = 'block';

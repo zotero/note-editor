@@ -176,25 +176,6 @@ export function image(options) {
 			}
 			prevAttachmentKeys = attachmentKeys;
 
-
-			let updatedDimensions = false;
-			if (changed) {
-				newState.doc.descendants((node, pos) => {
-					if (node.type.name === 'image'
-						&& options.dimensionsStore.data[node.attrs.nodeID]) {
-						let [width, height] = options.dimensionsStore.data[node.attrs.nodeID];
-						newTr = newTr.step(new SetAttrsStep(pos, {
-							...node.attrs,
-							width,
-							height
-						})).setMeta('addToHistory', false);
-						updatedDimensions = true;
-					}
-				});
-
-				options.dimensionsStore.data = {};
-			}
-
 			let images = [];
 			transactions.forEach((tr) => {
 				tr.steps.forEach((step) => {
@@ -226,7 +207,7 @@ export function image(options) {
 				options.onImportImages(images);
 			}
 
-			if (updatedDimensions || images.length) {
+			if (images.length) {
 				return newTr;
 			}
 		}

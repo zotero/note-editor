@@ -62,6 +62,9 @@ import { trailingParagraph } from './plugins/trailing-paragraph';
 //   although the note is not updated
 // - New metadata is applied when note is edited by user
 
+// About images:
+// - On load, dimensions are updated automatically which happens when note is opened
+
 class EditorCore {
 	constructor(options) {
 		this.options = options;
@@ -69,7 +72,6 @@ class EditorCore {
 		this.unsaved = options.unsaved;
 		this.docChanged = false;
 		this.needMetadataUpdate = false;
-		this.dimensionsStore = { data: {} };
 		this.unsupportedSchema = false;
 		this.nodeViews = [];
 		this.metadata = new Metadata();
@@ -163,7 +165,6 @@ class EditorCore {
 						metadata: this.metadata
 					}),
 					image({
-						dimensionsStore: this.dimensionsStore,
 						onSyncAttachmentKeys: options.onSyncAttachmentKeys,
 						onImportImages: options.onImportImages,
 						onOpen: options.onOpenAnnotation,
@@ -204,9 +205,8 @@ class EditorCore {
 				image: nodeViews.image({
 					provider: this.provider,
 					onDimensions: (node, width, height) => {
-						// TODO: Update dimensions immediately (still in single transaction),
-						//  because currently another modification after image insertion is necessary
-						this.dimensionsStore.data[node.attrs.nodeID] = [width, height];
+						// Immediately update image dimensions and trigger note updating, which should happen only once per image
+						updateImageDimensions(node.attrs.nodeID, width, height)(this.view.state, this.view.dispatch);
 					},
 					onOpenURL: options.onOpenURL.bind(this)
 				}),

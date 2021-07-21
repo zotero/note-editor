@@ -17,7 +17,12 @@ import nodeViews from './node-views';
 import { debounce } from './utils';
 import { buildKeymap } from './keymap';
 import { buildInputRules } from './input-rules';
-import { attachImportedImage, insertHTML, reformatCitations, setCitation } from './commands';
+import {
+	attachImportedImage,
+	insertHTML,
+	setCitation,
+	updateImageDimensions
+} from './commands';
 import Provider from './provider';
 
 import { menu, menuKey } from './plugins/menu';
@@ -53,10 +58,9 @@ import { trailingParagraph } from './plugins/trailing-paragraph';
 // - If citation/highlight/image is pasted into TinyMCE editor, the
 //   item data stays inside citation node, until the note is edited
 //   in note-editor
-// - On load, metadata `citationItems` and formatted
-//   citations in body are updated automatically
-// - On load, unused metadata citation items are deleted,
+// - On load, metadata `citationItems` are updated and unused items are deleted,
 //   although the note is not updated
+// - New metadata is applied when note is edited by user
 
 class EditorCore {
 	constructor(options) {
@@ -64,6 +68,7 @@ class EditorCore {
 		this.readOnly = options.readOnly;
 		this.unsaved = options.unsaved;
 		this.docChanged = false;
+		this.needMetadataUpdate = false;
 		this.dimensionsStore = { data: {} };
 		this.unsupportedSchema = false;
 		this.nodeViews = [];
@@ -165,6 +170,8 @@ class EditorCore {
 						metadata: this.metadata
 					}),
 					citation({
+						metadata: this.metadata,
+						isMetadataUpdateNeeded: () => this.needMetadataUpdate,
 						onShowItem: (node) => {
 							options.onShowCitationItem(node.attrs.citation);
 						},
@@ -218,6 +225,7 @@ class EditorCore {
 				if (tr.docChanged) {
 					that.docChanged = true;
 					that.unsaved = false;
+					that.needMetadataUpdate = false;
 
 					if (tr.getMeta('system')) {
 						that.update(true);
@@ -253,7 +261,7 @@ class EditorCore {
 
 		this.view.editorCore = this;
 
-		// Automatic actions that modify document or metadata
+		// Update/cleanup metadata without triggering note update
 		if (!this.readOnly) {
 			// Undo stack is empty therefore unused citation items can be
 			// deleted, although this by it self doesn't trigger doc saving
@@ -264,8 +272,8 @@ class EditorCore {
 				this.updateCitationItemsList();
 			}, 0);
 
-			// TODO: Consider to automatically update formatted citations if they don't match
-			// TODO: Consider to add `citationItem` to image and highlight annotations if it's missing
+			// TODO: Consider to add `citationItem` to image and highlight annotations if
+			//  it's missing (because there was no parent item at the time)
 		}
 
 		// DevTools can freeze editor and throw random errors!
@@ -294,7 +302,7 @@ class EditorCore {
 		let list = this.metadata.citationItems.map(ci => ({ uris: ci.uris }));
 
 		// Add missing metadata citationItems that were produced by copying
-		// citations/highlights/images not over note-editor.
+		// citations/highlights/images not over note-editor
 		let missing = this.metadata.getMissingCitationItems(this.view.state);
 		list = [...list, ...missing];
 
@@ -304,10 +312,8 @@ class EditorCore {
 	// Automatically updates doc, but might not update views if body doesn't change
 	updateCitationItems(citationItems) {
 		let updatedCitationItems = this.metadata.updateCitationItems(citationItems);
-		if (updatedCitationItems) {
-			let { state, dispatch } = this.view;
-			// Trigger 'system' initiated update that doesn't update note dateModified
-			reformatCitations(updatedCitationItems, this.metadata)(state, dispatch);
+		if (updatedCitationItems.length) {
+			this.needMetadataUpdate = true;
 		}
 	}
 

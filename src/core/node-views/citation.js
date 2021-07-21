@@ -1,5 +1,8 @@
 import { formatCitation } from '../utils';
 
+// Note: Node view is only updated when document or decoration is updated at specific position
+// https://discuss.prosemirror.net/t/force-nodes-of-specific-type-to-re-render/2480/2
+
 class CitationView {
 	constructor(node, view, getPos, options) {
 		this.dom = document.createElement('span');

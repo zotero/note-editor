@@ -1,6 +1,9 @@
 import { schema } from './index';
 import { basicDeepEqual } from '../utils';
 
+// Note: Metadata change doesn't trigger note updating. Instead, new
+// metadata is only applied when note is actually edited
+
 export default class Metadata {
 	constructor(options) {
 		this.options = options;

@@ -22,6 +22,10 @@ class Search {
 	setActive(active) {
 		let { state, dispatch } = this.view;
 		this.active = active;
+		if (!active) {
+			// up/down arrow keys doesn't work in Firefox if editor area is not focused
+			this.view.dom.focus();
+		}
 		this.needsUpdate = true;
 		dispatch(state.tr);
 	}

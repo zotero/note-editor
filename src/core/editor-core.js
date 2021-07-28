@@ -76,12 +76,12 @@ class EditorCore {
 		this.nodeViews = [];
 		this.metadata = new Metadata();
 
-		// TODO: Discontinue provider and implement lazy loading for images
+		// TODO: Implement lazy and sequential loading for images
 		this.provider = new Provider({
 			onSubscribe: (subscription) => {
-				options.onSubscribeProvider(subscription);
+				options.onSubscribe(subscription);
 			},
-			onUnsubscribe: options.onUnsubscribeProvider
+			onUnsubscribe: options.onUnsubscribe
 		});
 
 		let doc;
@@ -165,7 +165,6 @@ class EditorCore {
 						metadata: this.metadata
 					}),
 					image({
-						onSyncAttachmentKeys: options.onSyncAttachmentKeys,
 						onImportImages: options.onImportImages,
 						onOpen: options.onOpenAnnotation,
 						metadata: this.metadata

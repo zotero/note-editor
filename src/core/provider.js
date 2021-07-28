@@ -19,9 +19,9 @@ class Provider {
 		this.onUnsubscribe(subscription);
 	}
 
-	notify(id, type, data) {
+	notify(id, data) {
 		this.subscriptions.forEach((subscription) => {
-			if (subscription.id === id && subscription.type === type) {
+			if (subscription.id === id) {
 				subscription.listener(data);
 				subscription.cachedData = data;
 			}

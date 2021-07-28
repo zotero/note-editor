@@ -124,20 +124,9 @@ class Image {
 	}
 }
 
-function getAttachmentKeys(state) {
-	let attachmentKeys = [];
-	state.tr.doc.descendants((node, pos) => {
-		if (node.type.name === 'image' && node.attrs.attachmentKey) {
-			attachmentKeys.push(node.attrs.attachmentKey);
-		}
-	});
-	return attachmentKeys;
-}
-
 export let imageKey = new PluginKey('image');
 
 export function image(options) {
-	let prevAttachmentKeys = null;
 	return new Plugin({
 		key: imageKey,
 		state: {
@@ -166,15 +155,6 @@ export function image(options) {
 			let changed = transactions.some(tr => tr.docChanged);
 
 			if (!changed) return;
-
-			let attachmentKeys = getAttachmentKeys(newState);
-			if (changed && !prevAttachmentKeys) {
-				options.onSyncAttachmentKeys(attachmentKeys);
-			}
-			else if (JSON.stringify(attachmentKeys) !== JSON.stringify(prevAttachmentKeys)) {
-				options.onSyncAttachmentKeys(attachmentKeys);
-			}
-			prevAttachmentKeys = attachmentKeys;
 
 			let images = [];
 			transactions.forEach((tr) => {

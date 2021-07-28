@@ -91,8 +91,8 @@ function main(html) {
 		readOnly: false,
 		unsaved: true,
 		placeholder: 'This is a placeholder',
-		onSubscribeProvider(subscriber) {
-			console.log('onSubscribeProvider', subscriber);
+		onSubscribe(subscriber) {
+			console.log('onSubscribe', subscriber);
 			if (subscriber.type === 'citation') {
 				setTimeout(function () {
 					let key = JSON.stringify(subscriber.data.citation);
@@ -123,24 +123,14 @@ function main(html) {
 				}, 0);
 			}
 		},
-		onUnsubscribeProvider(subscription) {
-			console.log('onUnsubscribeProvider', subscription);
+		onUnsubscribe(subscription) {
+			console.log('onUnsubscribe', subscription);
 		},
 		async onImportImages(images) {
 			console.log('onImportImages', images);
 			for (let image of images) {
 				let attachmentKey = await importImage(image.src);
 				editorCore.attachImportedImage(image.nodeID, attachmentKey);
-			}
-		},
-		onSyncAttachmentKeys(attachmentKeys) {
-			console.log('onSyncAttachmentKeys', attachmentKeys);
-			for (let key in imageStore) {
-				if (!attachmentKeys.includes(key)) {
-					console.log(`deleting ${key} from imageStore`);
-					deletedImages[key] = imageStore[key];
-					delete imageStore[key];
-				}
 			}
 		},
 		onOpenURL(url) {

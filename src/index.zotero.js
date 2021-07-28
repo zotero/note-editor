@@ -88,20 +88,17 @@ class EditorInstance {
 			readOnly: this._readOnly,
 			unsaved: this._unsaved,
 			placeholder: this._placeholder,
-			onSubscribeProvider: (subscription) => {
+			onSubscribe: (subscription) => {
 				let { id, type, nodeID, data } = subscription;
 				subscription = { id, type, nodeID, data };
-				this._postMessage({ action: 'subscribeProvider', subscription });
+				this._postMessage({ action: 'subscribe', subscription });
 			},
-			onUnsubscribeProvider: (subscription) => {
+			onUnsubscribe: (subscription) => {
 				let { id, type } = subscription;
-				this._postMessage({ action: 'unsubscribeProvider', id, type });
+				this._postMessage({ action: 'unsubscribe', id, type });
 			},
 			onImportImages: (images) => {
 				this._postMessage({ action: 'importImages', images });
-			},
-			onSyncAttachmentKeys: (attachmentKeys) => {
-				this._postMessage({ action: 'syncAttachmentKeys', attachmentKeys });
 			},
 			onUpdate: (system) => {
 				let noteData = this._editorCore.getData();
@@ -181,9 +178,9 @@ class EditorInstance {
 
 		let message = event.data.message;
 		switch (message.action) {
-			case 'notifyProvider': {
-				let { id, type, data } = message;
-				this._editorCore.provider.notify(id, type, data);
+			case 'notifySubscription': {
+				let { id, data } = message;
+				this._editorCore.provider.notify(id, data);
 				return;
 			}
 			case 'setCitation': {

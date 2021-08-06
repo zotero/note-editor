@@ -78,3 +78,22 @@ valid_elements: "@[id|class|style|title|dir<ltr?rtl|lang|xml::lang],"
 			+ "samp,"
 			+ "var,",
 ```
+
+## Versions
+
+- v2 c5dfc982 zotero/zotero@415e644
+  - Add `data-citation-items` metadata property to store an array of `{ uris, itemData }`
+  - Pull itemData from citations, highlights, images into metadata container `data-citation-items` property, to reduce note size
+  - Keep only the following annotation properties:
+    - uri
+	- text
+	- color
+	- pageLabel
+	- position
+	- citationItem
+- v3 c801eb5d zotero/zotero@3beb858
+  - Remove `annotation.text` and the code that uses it
+- v4 8af929c3
+  - Use `annotation.attachmentURI` instead of `annotation.uri` for newly inserted annotations
+  - Fallback to `annotation.uri` if `annotation.attachmentURI` doesn't exist
+  - Add `annotation.annotationKey` to reference the original annotation

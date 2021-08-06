@@ -116,7 +116,7 @@ class EditorInstance {
 			onOpenAnnotation: (annotation) => {
 				this._postMessage({
 					action: 'openAnnotation',
-					attachmentURI: annotation.attachmentURI || annotation.uri,
+					attachmentURI: annotation.attachmentURI,
 					position: annotation.position
 				});
 			},
@@ -240,7 +240,7 @@ class EditorInstance {
 					let annotation = node.attrs.annotation;
 					this._postMessage({
 						action: 'openAnnotation',
-						attachmentURI: annotation.attachmentURI || annotation.uri,
+						attachmentURI: annotation.attachmentURI,
 						position: annotation.position
 					});
 				}

@@ -277,21 +277,30 @@ export default {
 			width: { default: null },
 			height: { default: null },
 			attachmentKey: { default: null },
-			// annotation.uri -> annotation.attachmentURI migrated on v4
 			annotation: { default: null }
 		},
 		parseDOM: [{
 			tag: 'img',
-			getAttrs: dom => ({
-				nodeID: randomString(),
-				src: dom.getAttribute('src'),
-				alt: dom.getAttribute('alt') || '',
-				title: dom.getAttribute('title'),
-				width: getInteger(dom.getAttribute('width')),
-				height: getInteger(dom.getAttribute('height')),
-				attachmentKey: dom.getAttribute('data-attachment-key'),
-				annotation: decodeObject(dom.getAttribute('data-annotation'))
-			})
+			getAttrs: dom => {
+				let annotation = decodeObject(dom.getAttribute('data-annotation'));
+				// Migrate annotation.uri to annotation.attachmentURI which was used until v4
+				// TODO: This can be removed as well, when most of the notes are migrated
+				if (annotation && annotation.uri) {
+					annotation.attachmentURI = annotation.uri;
+					delete annotation.uri;
+				}
+
+				return {
+					nodeID: randomString(),
+					src: dom.getAttribute('src'),
+					alt: dom.getAttribute('alt') || '',
+					title: dom.getAttribute('title'),
+					width: getInteger(dom.getAttribute('width')),
+					height: getInteger(dom.getAttribute('height')),
+					attachmentKey: dom.getAttribute('data-attachment-key'),
+					annotation
+				};
+			}
 		}],
 		toDOM: node => ['img', {
 			src: node.attrs.src, // Preserves URL (not data URL) even after the import to have a better compatibility with the old client and also have the original URL just in case
@@ -337,16 +346,24 @@ export default {
 		content: '(text | hardBreak)*',
 		defining: true,
 		attrs: {
-			// annotation.uri -> annotation.attachmentURI migrated on v4
 			annotation: { default: null }
 		},
 		parseDOM: [{
 			tag: 'span.highlight',
 			getAttrs: dom => {
-				// TODO: Remove this code at some point
-				// Removes `text` property encountered in pre-v3 schema
 				let annotation = decodeObject(dom.getAttribute('data-annotation'));
-				delete annotation.text;
+				if (annotation) {
+					// TODO: Remove this code at some point
+					// Removes `text` property encountered in pre-v3 schema
+					delete annotation.text;
+
+					// Migrate annotation.uri to annotation.attachmentURI which was used until v4
+					// TODO: Remove when most of the notes are migrated
+					if (annotation.uri) {
+						annotation.attachmentURI = annotation.uri;
+						delete annotation.uri;
+					}
+				}
 				return { annotation };
 			}
 		}],

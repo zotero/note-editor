@@ -95,5 +95,5 @@ valid_elements: "@[id|class|style|title|dir<ltr?rtl|lang|xml::lang],"
   - Remove `annotation.text` and the code that uses it
 - v4 8af929c3
   - Use `annotation.attachmentURI` instead of `annotation.uri` for newly inserted annotations
-  - Fallback to `annotation.uri` if `annotation.attachmentURI` doesn't exist
+  - Migrate `annotation.uri` to `annotation.attachmentURI` when loading note
   - Add `annotation.annotationKey` to reference the original annotation

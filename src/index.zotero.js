@@ -114,7 +114,11 @@ class EditorInstance {
 				this._postMessage({ action: 'openURL', url });
 			},
 			onOpenAnnotation: (annotation) => {
-				this._postMessage({ action: 'openAnnotation', uri: annotation.uri, position: annotation.position });
+				this._postMessage({
+					action: 'openAnnotation',
+					attachmentURI: annotation.attachmentURI || annotation.uri,
+					position: annotation.position
+				});
 			},
 			onOpenCitationPage: (citation) => {
 				this._postMessage({ action: 'openCitationPage', citation });
@@ -234,7 +238,11 @@ class EditorInstance {
 			case 'openAnnotation': {
 				if (node.type.name === 'highlight') {
 					let annotation = node.attrs.annotation;
-					this._postMessage({ action: 'openAnnotation', uri: annotation.uri, position: annotation.position });
+					this._postMessage({
+						action: 'openAnnotation',
+						attachmentURI: annotation.attachmentURI || annotation.uri,
+						position: annotation.position
+					});
 				}
 				return;
 			}

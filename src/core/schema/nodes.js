@@ -277,6 +277,7 @@ export default {
 			width: { default: null },
 			height: { default: null },
 			attachmentKey: { default: null },
+			// annotation.uri -> annotation.attachmentURI migrated on v4
 			annotation: { default: null }
 		},
 		parseDOM: [{
@@ -336,6 +337,7 @@ export default {
 		content: '(text | hardBreak)*',
 		defining: true,
 		attrs: {
+			// annotation.uri -> annotation.attachmentURI migrated on v4
 			annotation: { default: null }
 		},
 		parseDOM: [{

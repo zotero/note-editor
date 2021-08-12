@@ -7,7 +7,7 @@ import EditorCore from './core/editor-core';
 
 import { imageStore, citationStore } from './index.web.data';
 import { TextSelection } from 'prosemirror-state';
-import { localizedStrings } from './index.web.localized-strings';
+import strings from './en-us.strings';
 
 
 let beautify = require('js-beautify').html;
@@ -208,7 +208,7 @@ function main(html) {
 	ReactDOM.render(
 		<IntlProvider
 			locale={window.navigator.language}
-			messages={localizedStrings}
+			messages={strings}
 		>
 			<Editor
 				readOnly={false}

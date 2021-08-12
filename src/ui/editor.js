@@ -56,7 +56,11 @@ function Editor(props) {
 						{editorState.link && <LinkPopup parentRef={editorRef} pluginState={editorState.link.popup}/>}
 						{editorState.highlight && <HighlightPopup parentRef={editorRef} pluginState={editorState.highlight.popup}/>}
 						{editorState.image && <ImagePopup parentRef={editorRef} pluginState={editorState.image.popup}/>}
-						{editorState.citation && <CitationPopup parentRef={editorRef} pluginState={editorState.citation.popup}/>}
+						{editorState.citation && <CitationPopup
+							parentRef={editorRef}
+							pluginState={editorState.citation.popup}
+							viewMode={props.viewMode}
+						/>}
 					</Fragment>}
 				</div>
 			</div>

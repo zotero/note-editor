@@ -6,7 +6,7 @@ import cx from 'classnames';
 
 // TODO: Rewrite all popups and reuse the common logic
 
-function CitationPopup({ parentRef, pluginState }) {
+function CitationPopup({ parentRef, pluginState, viewMode }) {
 	const containerRef = useRef();
 	const popupRef = useRef();
 	const inputRef = useRef();
@@ -79,10 +79,10 @@ function CitationPopup({ parentRef, pluginState }) {
 						<div className="mce-ico mce-i-undo"/>
 						<FormattedMessage id="noteEditor.showItem"/>
 					</div>
-					<div className="button toolbarButton" onClick={handleEdit}>
+					{viewMode !== 'ios' && <div className="button toolbarButton" onClick={handleEdit}>
 						<div className="mce-ico mce-i-blockquote"/>
 						<FormattedMessage id="noteEditor.editCitation"/>
-					</div>
+					</div>}
 				</div>
 			</div>
 		);

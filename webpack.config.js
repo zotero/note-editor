@@ -185,4 +185,93 @@ const configZotero = {
 	}
 };
 
-module.exports = [configWeb, configZotero];
+const configIOS = {
+	name: 'ios',
+	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+	devtool: 'source-map',
+	entry: [
+		'./src/index.ios.js',
+		'./src/stylesheets/main.scss'
+	],
+	output: {
+		path: path.join(__dirname, './build'),
+		filename: 'ios/editor.js',
+		library: 'zotero-editor',
+		libraryTarget: 'umd',
+		publicPath: '/',
+		umdNamedDefine: true
+	},
+	module: {
+		rules: [
+			{
+				test: /\.(js|jsx)$/,
+				exclude: /node_modules/,
+				use: {
+					loader: 'babel-loader',
+					options: {
+						presets: [
+							'@babel/preset-react',
+							[
+								'@babel/preset-env',
+								{
+									modules: false
+								}
+							]
+						],
+						'plugins': [
+							'@babel/plugin-transform-runtime',
+							'@babel/plugin-proposal-class-properties'
+						]
+					}
+				}
+			},
+			{
+				test: /\.scss$/,
+				use: [
+					{
+						loader: 'file-loader',
+						options: {
+							name: 'ios/editor.css'
+						}
+					},
+					{
+						loader: 'extract-loader'
+					},
+					{
+						loader: 'css-loader',
+						options: {
+							sourceMap: true,
+							url: false
+						}
+					},
+					{
+						loader: 'postcss-loader',
+						options: {
+							sourceMap: true
+						}
+					},
+					{
+						loader: 'sass-loader',
+						options: {
+							sourceMap: true
+						}
+					}
+				]
+			}
+		]
+	},
+	resolve: {
+		extensions: ['*', '.js']
+	},
+	plugins: [
+		new CopyWebpackPlugin([
+				{ from: 'res/', to: 'ios/' },
+				{ from: 'html/editor.ios.html', to: 'ios/editor.html' }
+			], { copyUnmodified: true }
+		),
+		new WriteFilePlugin()
+	]
+};
+
+
+module.exports = [configWeb, configZotero, configIOS];

@@ -44,12 +44,12 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 					title={intl.formatMessage({ id: 'noteEditor.insertLink' })}
 					onClick={() => linkState.toggle()}
 				/>
-				{/*<AlignDropdown menuState={menuState}/>*/}
-				<Button
+				{viewMode === 'ios' && <AlignDropdown menuState={menuState}/>}
+				{viewMode !== 'ios' && <Button
 					icon={<IconCitation/>}
 					title={intl.formatMessage({ id: 'noteEditor.insertCitation' })}
 					onClick={() => menuState.citation.run()}
-				/>
+				/>}
 				<StateButton
 					state={{ isActive: searchState.active, run: () => searchState.setActive(!searchState.active) }}
 					icon={<IconSearch/>}
@@ -65,7 +65,7 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 					{!unsaved && viewMode !== 'library' && <button className="option" onClick={onShowNote}>
 						<FormattedMessage id="noteEditor.showInLibrary"/>
 					</button>}
-					{viewMode !== 'window' && <button className="option" onClick={onOpenWindow}>
+					{viewMode !== 'window' && viewMode !== 'ios' && <button className="option" onClick={onOpenWindow}>
 						<FormattedMessage id="noteEditor.editInWindow"/>
 					</button>}
 					{colorState.state.canApplyAnnotationColors && <button className="option" onClick={() => colorState.state.applyAnnotationColors()}>

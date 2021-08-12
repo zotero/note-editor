@@ -4,6 +4,7 @@
 	"description": "",
 	"scripts": {
 		"build": "NODE_ENV=production webpack --display-modules",
+		"build:ios": "NODE_ENV=production webpack --config-name ios",
 		"start": "webpack-dev-server",
 		"test": "echo \"No tests yet\""
 	},

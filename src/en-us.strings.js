@@ -1,4 +1,4 @@
-export let localizedStrings = {
+export default {
 	'zotero.appName': 'Zotero',
 	'general.etAl': 'et al.',
 	'general.back': 'Back',

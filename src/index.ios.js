@@ -128,7 +128,7 @@ class EditorInstance {
 
 		let message = event.data.message;
 		switch (message.action) {
-			case 'feedSubscription': {
+			case 'notifySubscription': {
 				let { id, data } = message;
 				this._editorCore.provider.notify(id, data);
 				return;

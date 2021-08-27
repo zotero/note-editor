@@ -63,7 +63,7 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 					title={intl.formatMessage({ id: 'noteEditor.more' })}
 				>
 					{!unsaved && viewMode !== 'library' && <button className="option" onClick={onShowNote}>
-						<FormattedMessage id="noteEditor.showInLibrary"/>
+						<FormattedMessage id="general.showInLibrary"/>
 					</button>}
 					{viewMode !== 'window' && viewMode !== 'ios' && <button className="option" onClick={onOpenWindow}>
 						<FormattedMessage id="noteEditor.editInWindow"/>

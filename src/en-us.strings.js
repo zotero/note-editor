@@ -86,7 +86,7 @@ export default {
 	'general.green': 'Green',
 	'general.blue': 'Blue',
 	'general.purple': 'Purple',
-	'noteEditor.showInLibrary': 'Show in Library',
+	'general.showInLibrary': 'Show in Library',
 	'noteEditor.viewNoteBackup': 'View Note Backup',
 	'noteEditor.blockquote': 'Block Quote',
 	'noteEditor.italic': 'Italic',

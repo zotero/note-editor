@@ -114,12 +114,23 @@ export function dropPaste(options) {
 					options.onInsertObject('zotero/annotation', data);
 					return true;
 				}
+				// This probably can be used on Chrome
+				// else if (event.clipboardData.files.length) {
+				// 	insertImages(view, pos.pos, event.clipboardData.files);
+				// 	return true;
+				// }
 				let text = event.clipboardData.getData('text/plain');
 				let html = event.clipboardData.getData('text/html');
 				if (!event.shiftKey && html) {
 					let { state, dispatch } = view;
 					slice = transformSlice(view.state.schema, slice);
 					dispatch(state.tr.replaceSelection(slice).setMeta('importImages', true));
+					return true;
+				}
+				// Disable image pasting because on Windows it's inserted into contenteditable,
+				// but event.clipboardData.files is empty and there is no .getData('text/html')
+				// as well. When image import will be fully functioning, we can re-enable again
+				if (!text && !html) {
 					return true;
 				}
 				return false;

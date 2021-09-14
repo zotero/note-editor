@@ -16,6 +16,8 @@ export function Button({ icon, title, active, className, triggerOnMouseDown, onC
 				onClick();
 			}}
 			onMouseDown={(event) => {
+				// preventDefault prevents :active activation on Firefox
+				// (see https://bugzilla.mozilla.org/show_bug.cgi?id=771241)
 				event.preventDefault();
 				if (!triggerOnMouseDown || event.button !== 0) {
 					return;

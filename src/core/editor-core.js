@@ -71,10 +71,12 @@ class EditorCore {
 		this.readOnly = options.readOnly;
 		this.unsaved = options.unsaved;
 		this.docChanged = false;
-		this.needMetadataUpdate = false;
 		this.unsupportedSchema = false;
 		this.nodeViews = [];
 		this.metadata = new Metadata();
+
+		// To access metadata over node.type.schema.cached.metadata
+		schema.cached.metadata = this.metadata;
 
 		// TODO: Implement lazy and sequential loading for images
 		this.provider = new Provider({
@@ -170,8 +172,6 @@ class EditorCore {
 						metadata: this.metadata
 					}),
 					citation({
-						metadata: this.metadata,
-						isMetadataUpdateNeeded: () => this.needMetadataUpdate,
 						onShowItem: (node) => {
 							options.onShowCitationItem(node.attrs.citation);
 						},
@@ -224,7 +224,6 @@ class EditorCore {
 				if (tr.docChanged) {
 					that.docChanged = true;
 					that.unsaved = false;
-					that.needMetadataUpdate = false;
 
 					if (tr.getMeta('system')) {
 						that.update(true);
@@ -310,10 +309,7 @@ class EditorCore {
 
 	// Automatically updates doc, but might not update views if body doesn't change
 	updateCitationItems(citationItems) {
-		let updatedCitationItems = this.metadata.updateCitationItems(citationItems);
-		if (updatedCitationItems.length) {
-			this.needMetadataUpdate = true;
-		}
+		this.metadata.updateCitationItems(citationItems);
 	}
 
 	updatePluginState(state) {

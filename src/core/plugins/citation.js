@@ -1,8 +1,6 @@
 import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { schema } from '../schema';
 import { getSingleSelectedNode } from '../commands';
-import { ReplaceStep } from 'prosemirror-transform';
-import { formatCitation } from '../utils';
 
 class Citation {
 	constructor(state, options) {
@@ -77,40 +75,6 @@ export function citation(options) {
 					pluginState.destroy();
 				}
 			};
-		},
-		appendTransaction(transactions, oldState, newState) {
-			// Apply reformatted citations when note is edited
-			if (!options.isMetadataUpdateNeeded()
-				|| !transactions.some(tr => tr.docChanged)) {
-				return null;
-			}
-			let { tr } = newState;
-
-			let replacements = [];
-			newState.doc.descendants((node, pos) => {
-				if (node.type === schema.nodes.citation) {
-					try {
-						let citation = JSON.parse(JSON.stringify(node.attrs.citation));
-						options.metadata.fillCitationItemsWithData(citation.citationItems);
-						let from = pos + 1;
-						let to = pos + node.nodeSize - 1;
-						let formattedCitation = formatCitation(citation);
-						replacements.push({ from, to, formattedCitation });
-					}
-					catch (e) {
-						console.log(e);
-					}
-				}
-				return true;
-			});
-
-			for (let replacement of replacements) {
-				let { from, to, formattedCitation } = replacement;
-				let text = '(' + formattedCitation + ')';
-				tr.insertText(text, tr.mapping.map(from), tr.mapping.map(to));
-			}
-
-			return tr;
 		},
 		props: {
 			// Work around Firefox 60 bug where wrapped `contenteditable=false`

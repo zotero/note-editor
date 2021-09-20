@@ -1,5 +1,6 @@
 import { tableNodes } from 'prosemirror-tables';
-import { encodeObject, decodeObject, randomString } from '../utils';
+import { encodeObject, decodeObject, randomString, formatCitationItem } from '../utils';
+import { serializeCitationInnerHTML } from './utils';
 
 // Schema does not limit the indent level for the compatibility with
 // the old notes, although the UI doesn't allow to set higher than
@@ -317,7 +318,6 @@ export default {
 	citation: {
 		inline: true,
 		group: 'inline',
-		content: 'text*',
 		draggable: true,
 		atom: true,
 		selectable: true,
@@ -333,10 +333,13 @@ export default {
 					|| { citationItems: [], properties: {} }
 			})
 		}],
-		toDOM: node => ['span', {
-			class: 'citation',
-			'data-citation': encodeObject(node.attrs.citation)
-		}, 0]
+		toDOM: node => {
+			let children = serializeCitationInnerHTML(node);
+			return ['span', {
+				class: 'citation',
+				'data-citation': encodeObject(node.attrs.citation)
+			}, ...children]
+		}
 	},
 
 

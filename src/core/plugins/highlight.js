@@ -3,7 +3,6 @@ import { Fragment, Slice } from 'prosemirror-model';
 import { ReplaceAroundStep, ReplaceStep } from 'prosemirror-transform';
 import { schema } from '../schema';
 import { getSingleSelectedNode } from '../commands';
-import { formatCitation } from '../utils';
 
 class Highlight {
 	constructor(state, options) {
@@ -81,20 +80,15 @@ class Highlight {
 		let pos = $from.pos - $from.parentOffset + node.nodeSize - 1;
 
 		let citationItem = JSON.parse(JSON.stringify(node.attrs.annotation.citationItem));
-		this.options.metadata.fillCitationItemsWithData([citationItem]);
 		let citation = {
 			citationItems: [citationItem],
 			properties: {}
 		};
 
-		let formattedCitation = formatCitation(citation);
 		let citationNode = state.schema.nodes.citation.create({
 				...node.attrs,
 				citation
-			},
-			[
-				state.schema.text('(' + formattedCitation + ')')
-			]
+			}
 		);
 		dispatch(tr.insert(pos, [state.schema.text(' '), citationNode]));
 	}

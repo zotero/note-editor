@@ -1,7 +1,7 @@
 import { Plugin, PluginKey } from 'prosemirror-state';
 import { ReplaceStep } from 'prosemirror-transform';
 import { schema } from '../schema';
-import { formatCitation, SetAttrsStep } from '../utils';
+import { SetAttrsStep } from '../utils';
 import { getSingleSelectedNode } from '../commands';
 
 class Image {
@@ -96,20 +96,15 @@ class Image {
 			let pos = $to.pos;
 
 			let citationItem = JSON.parse(JSON.stringify(node.attrs.annotation.citationItem));
-			this.options.metadata.fillCitationItemsWithData([citationItem]);
 			let citation = {
 				citationItems: [citationItem],
 				properties: {}
 			};
 
-			let formattedCitation = formatCitation(citation);
 			let citationNode = state.schema.nodes.citation.create({
 					...node.attrs,
 					citation
-				},
-				[
-					state.schema.text('(' + formattedCitation + ')')
-				]
+				}
 			);
 			dispatch(tr.insert(pos, [state.schema.text(' '), citationNode]));
 		}

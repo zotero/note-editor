@@ -1,6 +1,6 @@
 import { DOMParser, DOMSerializer, Schema } from 'prosemirror-model';
 import { schema } from './index';
-import { encodeObject } from '../utils';
+import { encodeObject, formatCitationItem } from '../utils';
 
 // Note: TinyMCE is automatically removing div nodes without text and triggering immediate update/sync
 
@@ -100,10 +100,11 @@ export function buildClipboardSerializer(provider, schema, metadata) {
 					metadata.fillCitationItemsWithData(citation.citationItems);
 				}
 			}
+			let children = serializeCitationInnerHTML(node);
 			return ['span', {
 				class: 'citation',
 				'data-citation': citation && encodeObject(citation)
-			}, 0];
+			}, ...children];
 		},
 		highlight(node) {
 			let annotation;
@@ -119,4 +120,25 @@ export function buildClipboardSerializer(provider, schema, metadata) {
 			}, 0];
 		}
 	}), base.marks);
+}
+
+export function serializeCitationInnerHTML(node) {
+	let children = ['('];
+	try {
+		let citation = JSON.parse(JSON.stringify(node.attrs.citation));
+		node.type.schema.cached.metadata.fillCitationItemsWithData(citation.citationItems);
+		citation.citationItems.forEach((citationItem, index, array) => {
+			if (citationItem.itemData) {
+				children.push(['span', { class: 'citation-item' }, formatCitationItem(citationItem)]);
+				if (index !== array.length - 1) {
+					children.push('; ');
+				}
+			}
+		});
+	}
+	catch (e) {
+		console.log(e);
+	}
+	children.push(')');
+	return children;
 }

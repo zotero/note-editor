@@ -69,6 +69,7 @@ class EditorCore {
 	constructor(options) {
 		this.options = options;
 		this.readOnly = options.readOnly;
+		this.isAttachmentNote = options.isAttachmentNote;
 		this.unsaved = options.unsaved;
 		this.docChanged = false;
 		this.unsupportedSchema = false;
@@ -128,6 +129,7 @@ class EditorCore {
 				plugins: [
 					readOnly({ enable: this.readOnly }),
 					dropPaste({
+						ignoreImages: this.isAttachmentNote,
 						onInsertObject: options.onInsertObject
 					}),
 					transform(),

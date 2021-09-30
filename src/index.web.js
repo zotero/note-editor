@@ -91,6 +91,7 @@ function main(html) {
 		readOnly: false,
 		unsaved: true,
 		placeholder: 'This is a placeholder',
+		isAttachmentNote: false,
 		onSubscribe(subscriber) {
 			console.log('onSubscribe', subscriber);
 			if (subscriber.type === 'citation') {

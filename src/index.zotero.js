@@ -53,6 +53,7 @@ class EditorInstance {
 		this._dir = window.dir = options.dir;
 		this._hasBackup = options.hasBackup;
 		this._enableReturnButton = options.enableReturnButton;
+		this._isAttachmentNote = options.isAttachmentNote;
 		this._localizedStrings = options.localizedStrings;
 		this._editorCore = null;
 
@@ -88,6 +89,7 @@ class EditorInstance {
 			readOnly: this._readOnly,
 			unsaved: this._unsaved,
 			placeholder: this._placeholder,
+			isAttachmentNote: this._isAttachmentNote,
 			onSubscribe: (subscription) => {
 				let { id, type, nodeID, data } = subscription;
 				subscription = { id, type, nodeID, data };

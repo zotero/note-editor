@@ -43,7 +43,7 @@ function isImageValid(node) {
 	);
 }
 
-function transformFragment(schema, fragment, data) {
+function transformFragment(schema, fragment, data, ignoreImages) {
 	if (!data) {
 		data = {
 			imageNum: 0
@@ -53,7 +53,7 @@ function transformFragment(schema, fragment, data) {
 	for (let i = 0; i < fragment.childCount; i++) {
 		const child = fragment.child(i);
 		if (child.type === schema.nodes.image) {
-			if (isImageValid(child) && data.imageNum < MAX_IMAGES) {
+			if (!ignoreImages && isImageValid(child) && data.imageNum < MAX_IMAGES) {
 				data.imageNum++;
 			}
 			else {
@@ -65,8 +65,8 @@ function transformFragment(schema, fragment, data) {
 	return Fragment.fromArray(nodes);
 }
 
-function transformSlice(schema, slice) {
-	const fragment = transformFragment(schema, slice.content);
+function transformSlice(schema, slice, ignoreImages) {
+	const fragment = transformFragment(schema, slice.content, null, ignoreImages);
 	if (fragment) {
 		return new Slice(fragment, slice.openStart, slice.openEnd);
 	}
@@ -123,7 +123,7 @@ export function dropPaste(options) {
 				let html = event.clipboardData.getData('text/html');
 				if (!event.shiftKey && html) {
 					let { state, dispatch } = view;
-					slice = transformSlice(view.state.schema, slice);
+					slice = transformSlice(view.state.schema, slice, options.ignoreImages);
 					dispatch(state.tr.replaceSelection(slice).setMeta('importImages', true));
 					return true;
 				}
@@ -140,7 +140,7 @@ export function dropPaste(options) {
 				let html = event.dataTransfer.getData('text/html') || window.droppedData && window.droppedData['text/html'];
 				let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
 				let data;
-				if (event.dataTransfer.files.length) {
+				if (event.dataTransfer.files.length && !options.ignoreImages) {
 					insertImages(view, pos.pos, event.dataTransfer.files);
 					return true;
 				}
@@ -154,7 +154,7 @@ export function dropPaste(options) {
 				}
 				if (!moved && html) {
 					let { state, dispatch } = view;
-					slice = transformSlice(view.state.schema, slice);
+					slice = transformSlice(view.state.schema, slice, options.ignoreImages);
 					dispatch(state.tr.replaceRange(pos.pos, pos.pos, slice).setMeta('importImages', true));
 					return true;
 				}

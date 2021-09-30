@@ -36,6 +36,7 @@ class EditorInstance {
 			readOnly: this._readOnly,
 			unsaved: false,
 			placeholder: '',
+			isAttachmentNote: false,
 			onSubscribe: (subscription) => {
 				let { id, type, data } = subscription;
 				subscription = { id, type, data };

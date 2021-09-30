@@ -6,7 +6,7 @@ import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirr
 import { undo, redo } from 'prosemirror-history';
 import { undoInputRule } from 'prosemirror-inputrules';
 import { schema } from './schema';
-import { changeIndent } from './commands';
+import { changeIndent, removeBlockIndent } from './commands';
 
 const mac = typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false;
 
@@ -20,6 +20,7 @@ export function buildKeymap(options) {
 	bind('Mod-z', customUndo);
 	bind('Shift-Mod-z', redo);
 	bind('Backspace', undoInputRule);
+	bind('Backspace', removeBlockIndent());
 	if (!mac) bind('Mod-y', redo);
 
 	bind('Alt-F10', focusToolbar);

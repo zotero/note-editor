@@ -166,13 +166,11 @@ function getClosestListItemNode($pos) {
 	}
 }
 
-export function changeIndent(dir = 1, tab) {
+export function changeIndent(dir = 1) {
 	return function (state, dispatch, view) {
-		const { selection } = state;
-		const { $from, $to } = selection;
-		const { bulletList, orderedList, listItem } = state.schema.nodes;
-		// const node = $to.node();
-
+		let { selection } = state;
+		let { $from } = selection;
+		let { listItem } = state.schema.nodes;
 		let node = getClosestListItemNode($from);
 		if (node) {
 			if (dir > 0) {
@@ -184,61 +182,36 @@ export function changeIndent(dir = 1, tab) {
 			return true;
 		}
 
-		if (tab && dir > 0) {
-			dispatch(state.tr.replaceSelectionWith(state.schema.text('  ', [])));
+		// Block Tab for now
+		if (dir > 0) {
 			return true;
 		}
-		else {
-			let range = $from.blockRange($to);
-			let allSupportIndent = true;
-			let nodes = [];
-			let pos = range.start + 1;
-			for (let i = range.startIndex; i < range.endIndex; i++) {
-				let node = range.parent.child(i);
-				nodes.push([pos, node]);
-				pos += node.nodeSize;
-				if (!node.type.attrs.indent) {
-					allSupportIndent = false;
-				}
-			}
 
-			let { tr } = state;
-
-			if (allSupportIndent) {
-				for (let [pos, node] of nodes) {
-					let indent = node.attrs.indent || 0;
-					if (dir === 1 ? indent < 7 : indent >= 1) {
-						indent += dir;
-						if (indent === 0) {
-							indent = null;
-						}
-						tr.setBlockType(pos, pos, node.type, { ...node.attrs, indent });
-					}
-				}
-
-				if (nodes.length) {
-					dispatch(tr);
-				}
-			}
-		}
-
-		if (node) {
-			if (node.type.attrs.indent) {
-
-			}
-			else if (node.type === bulletList || node.type === orderedList) {
-
-			}
-			// else if (node.type === codeBlock) {
-			//   dispatch(state.tr.replaceSelectionWith($from.pos, state.schema.text('  ', [])));
-			//   return true;
-			// }
-		}
-
+		// Allow Shift + Tab
 		return false;
 	};
 }
 
+export function removeBlockIndent() {
+	return function (state, dispatch, view) {
+		let { selection } = state;
+		let { $from, $to } = selection;
+		let range = $from.blockRange($to);
+		if (range.startIndex + 1 === range.endIndex) {
+			let node = range.parent.child(range.startIndex);
+			let pos = range.start + 1;
+			if (node.type.attrs.indent
+				&& node.attrs.indent !== null
+				&& pos === $from.pos) {
+				let { tr } = state;
+				tr.setBlockType(pos, pos, node.type, { ...node.attrs, indent: null });
+				dispatch(tr);
+				return true;
+			}
+		}
+		return false;
+	};
+}
 
 export function hasAttr(state, attr, value) {
 	let val = false;

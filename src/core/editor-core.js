@@ -21,6 +21,7 @@ import {
 	attachImportedImage,
 	insertHTML,
 	setCitation,
+	touchCitations,
 	updateImageDimensions
 } from './commands';
 import Provider from './provider';
@@ -120,7 +121,6 @@ class EditorCore {
 		this.view = new EditorView(null, {
 			editable: () => !this.readOnly,
 			attributes: {
-				// 'spellcheck': false,
 				class: 'primary-editor'
 			},
 			state: EditorState.create({
@@ -309,9 +309,14 @@ class EditorCore {
 		this.options.onUpdateCitationItemsList(list);
 	}
 
-	// Automatically updates doc, but might not update views if body doesn't change
-	updateCitationItems(citationItems) {
-		this.metadata.updateCitationItems(citationItems);
+	// Without forceSaving enabled the updated item data is not saved and
+	// citation views aren't updated. Although dragging/copying serialization
+	// gets the updated citations
+	updateCitationItems(citationItems, forceSaving) {
+		let updatedCitationItems = this.metadata.updateCitationItems(citationItems);
+		if (updatedCitationItems.length && forceSaving) {
+			touchCitations()(this.view.state, this.view.dispatch);
+		}
 	}
 
 	updatePluginState(state) {

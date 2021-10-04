@@ -195,8 +195,8 @@ class EditorInstance {
 				return;
 			}
 			case 'updateCitationItems': {
-				let { citationItems } = message;
-				this._editorCore.updateCitationItems(citationItems);
+				let { citationItems, forceSaving } = message;
+				this._editorCore.updateCitationItems(citationItems, forceSaving);
 				return;
 			}
 			case 'attachImportedImage': {

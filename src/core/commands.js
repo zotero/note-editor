@@ -387,6 +387,21 @@ export function setCitation(nodeID, citation) {
 	};
 }
 
+// Triggers note serialization and updates citation node views
+export function touchCitations() {
+	return function (state, dispatch) {
+		let { tr } = state;
+		state.doc.descendants((node, pos) => {
+			if (node.type === schema.nodes.citation) {
+				tr.setNodeMarkup(pos, null, { ...node.attrs, version: node.attrs.version++ });
+			}
+		});
+		tr.setMeta('addToHistory', false);
+		tr.setMeta('system', true);
+		dispatch(tr);
+	}
+}
+
 export function updateImageDimensions(nodeID, width, height) {
 	return function (state, dispatch) {
 		let { tr } = state;

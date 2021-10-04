@@ -323,6 +323,8 @@ export default {
 		selectable: true,
 		attrs: {
 			nodeID: { default: null },
+			// Version number allows to trigger node update without actually changing it
+			version: { default: 0 },
 			citation: { default: null }
 		},
 		parseDOM: [{

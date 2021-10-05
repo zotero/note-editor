@@ -100,6 +100,10 @@ async function insertImages(view, pos, files) {
 	}
 }
 
+function isLink(str) {
+	return !str.includes(' ') && /^(https?:\/\/|ssh:\/\/|zotero:\/\/|ftp:\/\/|file:\/|www\.|(?:mailto:)?[A-Z0-9._%+\-]+@(?!.*@))(.+)$/i.test(str);
+}
+
 // TODO: Fix drop/paste into inline code
 // TODO: Limit pasted images width to the default value
 // NOTICE: Sometimes copying HTML from Chrome to the editor (no matter if
@@ -109,6 +113,7 @@ export function dropPaste(options) {
 	return new Plugin({
 		props: {
 			handlePaste(view, event, slice) {
+				let { state, dispatch } = view;
 				let data;
 				if (data = event.clipboardData.getData('zotero/annotation')) {
 					options.onInsertObject('zotero/annotation', data);
@@ -122,9 +127,14 @@ export function dropPaste(options) {
 				let text = event.clipboardData.getData('text/plain');
 				let html = event.clipboardData.getData('text/html');
 				if (!event.shiftKey && html) {
-					let { state, dispatch } = view;
-					slice = transformSlice(view.state.schema, slice, options.ignoreImages);
+					slice = transformSlice(schema, slice, options.ignoreImages);
 					dispatch(state.tr.replaceSelection(slice).setMeta('importImages', true));
+					return true;
+				}
+				if (text && isLink(text)) {
+					let link = schema.marks.link.create({ href: text });
+					let node = schema.text(text).mark([link]);
+					dispatch(state.tr.replaceSelectionWith(node, false));
 					return true;
 				}
 				// Disable image pasting because on Windows it's inserted into contenteditable,
@@ -136,6 +146,7 @@ export function dropPaste(options) {
 				return false;
 			},
 			handleDrop(view, event, slice, moved) {
+				let { state, dispatch } = view;
 				let text = event.dataTransfer.getData('text/plain') || window.droppedData && window.droppedData['text/plain'];
 				let html = event.dataTransfer.getData('text/html') || window.droppedData && window.droppedData['text/html'];
 				let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
@@ -153,9 +164,14 @@ export function dropPaste(options) {
 					return true;
 				}
 				if (!moved && html) {
-					let { state, dispatch } = view;
-					slice = transformSlice(view.state.schema, slice, options.ignoreImages);
+					slice = transformSlice(schema, slice, options.ignoreImages);
 					dispatch(state.tr.replaceRange(pos.pos, pos.pos, slice).setMeta('importImages', true));
+					return true;
+				}
+				if (text && isLink(text)) {
+					let link = schema.marks.link.create({ href: text });
+					let node = schema.text(text).mark([link]);
+					dispatch(state.tr.replaceRangeWith(pos.pos, pos.pos, node));
 					return true;
 				}
 				return false;

@@ -104,6 +104,10 @@ function isLink(str) {
 	return !str.includes(' ') && /^(https?:\/\/|ssh:\/\/|zotero:\/\/|ftp:\/\/|file:\/|www\.|(?:mailto:)?[A-Z0-9._%+\-]+@(?!.*@))(.+)$/i.test(str);
 }
 
+function isImageURL(str) {
+	return /^http[^\?]*.(jpeg|jpg|jpe|jfi|jif|jfif|png|gif|bmp|webp)(\?(.*))?$/gmi.test(str);
+}
+
 // TODO: Fix drop/paste into inline code
 // TODO: Limit pasted images width to the default value
 // NOTICE: Sometimes copying HTML from Chrome to the editor (no matter if
@@ -131,11 +135,18 @@ export function dropPaste(options) {
 					dispatch(state.tr.replaceSelection(slice).setMeta('importImages', true));
 					return true;
 				}
-				if (text && isLink(text)) {
-					let link = schema.marks.link.create({ href: text });
-					let node = schema.text(text).mark([link]);
-					dispatch(state.tr.replaceSelectionWith(node, false));
-					return true;
+				if (text) {
+					if (isImageURL(text)) {
+						let node = schema.nodes.image.create({ src: text });
+						dispatch(state.tr.replaceSelectionWith(node, false).setMeta('importImages', true));
+						return true;
+					}
+					else if (isLink(text)) {
+						let link = schema.marks.link.create({ href: text });
+						let node = schema.text(text).mark([link]);
+						dispatch(state.tr.replaceSelectionWith(node, false));
+						return true;
+					}
 				}
 				// Disable image pasting because on Windows it's inserted into contenteditable,
 				// but event.clipboardData.files is empty and there is no .getData('text/html')
@@ -168,11 +179,18 @@ export function dropPaste(options) {
 					dispatch(state.tr.replaceRange(pos.pos, pos.pos, slice).setMeta('importImages', true));
 					return true;
 				}
-				if (text && isLink(text)) {
-					let link = schema.marks.link.create({ href: text });
-					let node = schema.text(text).mark([link]);
-					dispatch(state.tr.replaceRangeWith(pos.pos, pos.pos, node));
-					return true;
+				if (text) {
+					if (isImageURL(text)) {
+						let node = schema.nodes.image.create({ src: text });
+						dispatch(state.tr.replaceRangeWith(pos.pos, pos.pos, node).setMeta('importImages', true));
+						return true;
+					}
+					else if (isLink(text)) {
+						let link = schema.marks.link.create({ href: text });
+						let node = schema.text(text).mark([link]);
+						dispatch(state.tr.replaceRangeWith(pos.pos, pos.pos, node));
+						return true;
+					}
 				}
 				return false;
 			}

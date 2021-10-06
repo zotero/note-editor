@@ -273,6 +273,7 @@ export default {
 		attrs: {
 			nodeID: { default: null },
 			src: { default: null },
+			originalSrc: { default: null }, // Clipboard serializer stores original src in .originalSrc, while data URL is stored in .src
 			alt: { default: '' }, // It's recommended to always have alt attribute
 			title: { default: null },
 			width: { default: null },
@@ -294,6 +295,7 @@ export default {
 				return {
 					nodeID: randomString(),
 					src: dom.getAttribute('src'),
+					originalSrc: dom.getAttribute('data-original-src'),
 					alt: dom.getAttribute('alt') || '',
 					title: dom.getAttribute('title'),
 					width: getInteger(dom.getAttribute('width')),
@@ -304,7 +306,7 @@ export default {
 			}
 		}],
 		toDOM: node => ['img', {
-			src: node.attrs.src, // Preserves URL (not data URL) even after the import to have a better compatibility with the old client and also have the original URL just in case
+			src: node.attrs.originalSrc || node.attrs.src, // Preserves URL (not data URL) even after the import to have a better compatibility with the old client and also have the original URL just in case
 			alt: node.attrs.alt,
 			title: node.attrs.title,
 			width: node.attrs.width,

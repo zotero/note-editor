@@ -71,11 +71,6 @@ export function buildClipboardSerializer(provider, schema, metadata) {
 	let base = DOMSerializer.fromSchema(schema);
 	return new DOMSerializer(Object.assign({}, base.nodes, {
 		image(node) {
-			let src = node.attrs.src;
-			let data = provider.getCachedData(node.attrs.nodeID, 'image');
-			if (data) {
-				src = data.src;
-			}
 			let annotation;
 			if (node.attrs.annotation) {
 				annotation = JSON.parse(JSON.stringify(node.attrs.annotation));
@@ -83,14 +78,24 @@ export function buildClipboardSerializer(provider, schema, metadata) {
 					metadata.fillCitationItemsWithData([annotation.citationItem]);
 				}
 			}
-			return ['img', {
-				src,
+
+			let attrs = {
+				src: node.attrs.src,
 				alt: node.attrs.alt,
 				title: node.attrs.title,
 				width: node.attrs.width,
 				height: node.attrs.height,
 				'data-annotation': annotation && encodeObject(annotation)
-			}];
+			};
+
+			let data = provider.getCachedData(node.attrs.nodeID, 'image');
+			if (data) {
+				if (attrs.src) {
+					attrs['data-original-src'] = attrs.src;
+				}
+				attrs.src = data.src;
+			}
+			return ['img', attrs];
 		},
 		citation(node) {
 			let citation;

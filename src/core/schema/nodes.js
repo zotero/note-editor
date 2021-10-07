@@ -273,8 +273,15 @@ export default {
 		attrs: {
 			nodeID: { default: null },
 			src: { default: null },
-			originalSrc: { default: null }, // Clipboard serializer stores original src in .originalSrc, while data URL is stored in .src
-			alt: { default: '' }, // It's recommended to always have alt attribute
+			// Clipboard serializer stores original image URL in .originalSrc,
+			// while data URL is stored in .src
+			originalSrc: { default: null },
+			// Temporary keeps pasted/dropped image data URL in memory to make
+			// sure it never gets serialized into note, even if import fails.
+			// Deleted when attachImportedImage is called
+			tempSrc: { default: null },
+			// It's recommended to always have alt attribute
+			alt: { default: '' },
 			title: { default: null },
 			width: { default: null },
 			height: { default: null },
@@ -306,7 +313,9 @@ export default {
 			}
 		}],
 		toDOM: node => ['img', {
-			src: node.attrs.originalSrc || node.attrs.src, // Preserves URL (not data URL) even after the import to have a better compatibility with the old client and also have the original URL just in case
+			// Preserves the original URL (not data URL) to have a better
+			// compatibility with the old client
+			src: node.attrs.src,
 			alt: node.attrs.alt,
 			title: node.attrs.title,
 			width: node.attrs.width,

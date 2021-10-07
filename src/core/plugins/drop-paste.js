@@ -24,11 +24,7 @@ const IMPORT_IMAGE_TYPES = [
 	'image/png'
 ];
 
-const IMAGE_DATA_URL_MAX_LENGTH = 20 * 1024 * 1024;
-
-// Limit images that can be imported per single paste/drop action,
-// to avoid creating too many attachments
-const MAX_IMAGES = 10;
+const IMAGE_DATA_URL_MAX_LENGTH = 16 * 1024 * 1024;
 
 function isImageValid(node) {
 	let { src, attachmentKey } = node.attrs;
@@ -51,10 +47,18 @@ function transformFragment(schema, fragment, data, ignoreImages) {
 	}
 	const nodes = [];
 	for (let i = 0; i < fragment.childCount; i++) {
-		const child = fragment.child(i);
+		let child = fragment.child(i);
 		if (child.type === schema.nodes.image) {
-			if (!ignoreImages && isImageValid(child) && data.imageNum < MAX_IMAGES) {
+			if (!ignoreImages && isImageValid(child)) {
 				data.imageNum++;
+				if (child.attrs.src.startsWith('data:')) {
+					child = schema.nodes.image.create({
+						...child.attrs,
+						src: child.attrs.originalSrc,
+						originalSrc: null,
+						tempSrc: child.attrs.src
+					});
+				}
 			}
 			else {
 				continue;
@@ -83,7 +87,7 @@ async function insertImages(view, pos, files) {
 				reader.onload = function () {
 					let dataURL = this.result;
 					nodes.push(schema.nodes.image.create({
-						src: dataURL
+						tempSrc: dataURL
 					}));
 					resolve();
 				};
@@ -96,7 +100,7 @@ async function insertImages(view, pos, files) {
 	}
 	await Promise.all(promises);
 	if (nodes.length) {
-		dispatch(state.tr.insert(pos, nodes).setMeta('importImages', true));
+		dispatch(state.tr.insert(pos, nodes));
 	}
 }
 
@@ -132,13 +136,13 @@ export function dropPaste(options) {
 				let html = event.clipboardData.getData('text/html');
 				if (!event.shiftKey && html) {
 					slice = transformSlice(schema, slice, options.ignoreImages);
-					dispatch(state.tr.replaceSelection(slice).setMeta('importImages', true));
+					dispatch(state.tr.replaceSelection(slice));
 					return true;
 				}
 				if (text) {
 					if (isImageURL(text)) {
 						let node = schema.nodes.image.create({ src: text });
-						dispatch(state.tr.replaceSelectionWith(node, false).setMeta('importImages', true));
+						dispatch(state.tr.replaceSelectionWith(node, false));
 						return true;
 					}
 					else if (isLink(text)) {
@@ -176,13 +180,13 @@ export function dropPaste(options) {
 				}
 				if (!moved && html) {
 					slice = transformSlice(schema, slice, options.ignoreImages);
-					dispatch(state.tr.replaceRange(pos.pos, pos.pos, slice).setMeta('importImages', true));
+					dispatch(state.tr.replaceRange(pos.pos, pos.pos, slice));
 					return true;
 				}
 				if (text) {
 					if (isImageURL(text)) {
 						let node = schema.nodes.image.create({ src: text });
-						dispatch(state.tr.replaceRangeWith(pos.pos, pos.pos, node).setMeta('importImages', true));
+						dispatch(state.tr.replaceRangeWith(pos.pos, pos.pos, node));
 						return true;
 					}
 					else if (isLink(text)) {

@@ -119,9 +119,28 @@ class Image {
 	}
 }
 
+// Allows to skip some clearly unsupported urls
+function isUnsupported(src) {
+	let supportedTypes = [
+		'image/jpeg',
+		'image/png'
+	];
+
+	let unsupportedExtensions = [
+		'apng', 'avif', 'gif', 'svg', 'webp', 'bmp', 'ico', 'cur', 'tif', 'tiff'
+	];
+
+	if (src.startsWith('data:')) {
+		return !supportedTypes.includes(src.slice(5).split(/[,;]/)[0])
+	}
+
+	return unsupportedExtensions.includes(src.split('.').pop());
+}
+
 export let imageKey = new PluginKey('image');
 
 export function image(options) {
+	let importedIDs = [];
 	return new Plugin({
 		key: imageKey,
 		state: {
@@ -145,45 +164,25 @@ export function image(options) {
 			};
 		},
 		appendTransaction(transactions, oldState, newState) {
-			let newTr = newState.tr;
-
-			let changed = transactions.some(tr => tr.docChanged);
-
-			if (!changed) return;
-
+			if (!transactions.some(tr => tr.docChanged)
+				|| transactions.some(tr => tr.getMeta('system'))) {
+				return;
+			}
 			let images = [];
-			transactions.forEach((tr) => {
-				tr.steps.forEach((step) => {
-					if (tr.getMeta('importImages') && step instanceof ReplaceStep && step.slice) {
-						step.getMap().forEach((oldStart, oldEnd, newStart, newEnd) => {
-							newState.doc.nodesBetween(newStart, newEnd, (parentNode, parentPos) => {
-								parentNode.forEach((node, offset) => {
-									let absolutePos = parentPos + offset + 1;
-									if (node.type.name === 'image' && node.attrs.src && !node.attrs.attachmentKey) {
-										images.push({ nodeID: node.attrs.nodeID, src: node.attrs.src });
-										if (node.attrs.src.startsWith('data:')) {
-											// Unset src to make sure data URL is never saved,
-											// although, on import failure this results to empty img tag
-											// TODO: Remove empty img elements, although make sure they aren't being imported
-											newTr = newTr.step(new SetAttrsStep(absolutePos, {
-												...node.attrs,
-												src: null
-											})).setMeta('addToHistory', false);
-										}
-									}
-								});
-							});
-						});
+			newState.doc.descendants((node, pos) => {
+				if (node.type.name === 'image') {
+					let src = node.attrs.tempSrc || node.attrs.src;
+					if (src
+						&& !node.attrs.attachmentKey
+						&& !importedIDs.includes(node.attrs.nodeID)
+						&& !isUnsupported(src)) {
+						images.push({ nodeID: node.attrs.nodeID, src });
+						importedIDs.push(node.attrs.nodeID);
 					}
-				});
+				}
 			});
-
 			if (images.length) {
 				options.onImportImages(images);
-			}
-
-			if (images.length) {
-				return newTr;
 			}
 		}
 	});

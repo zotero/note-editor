@@ -421,8 +421,14 @@ export function attachImportedImage(nodeID, attachmentKey) {
 	return function (state, dispatch) {
 		state.doc.descendants((node, pos) => {
 			if (node.attrs.nodeID === nodeID) {
+				let src = node.attrs.src;
+				if (src && src.startsWith('data:')) {
+					src = null;
+				}
 				dispatch(state.tr.step(new SetAttrsStep(pos, {
 					...node.attrs,
+					src,
+					tempSrc: null,
 					attachmentKey
 				})).setMeta('addToHistory', false));
 				return false;

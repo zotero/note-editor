@@ -67,7 +67,7 @@ class ImageView {
 			this.dom = imageBlock;
 			this.img = img;
 		}
-		else if (node.attrs.src) {
+		else if (node.attrs.src && !node.attrs.tempSrc) {
 			this.img = null;
 			let div = document.createElement('div');
 			div.className = 'external-image';

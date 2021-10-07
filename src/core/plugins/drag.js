@@ -51,8 +51,15 @@ class Drag {
 				});
 
 				this.dragHandleNode.addEventListener('dragend', (event) => {
-					this.view.dispatch(this.view.state.tr.setSelection(TextSelection.create(this.view.state.tr.doc, 0)));
+					let { to } = this.view.state.selection;
+					this.view.dispatch(this.view.state.tr.setSelection(TextSelection.create(this.view.state.tr.doc, to - 1)));
 					this.dragHandleNode.style.display = 'none';
+					// Work around Firefox bug causing caret disappearance
+					// https://github.com/ProseMirror/prosemirror/issues/1113
+					setTimeout(() => {
+						this.view.dom.blur();
+						this.view.dom.focus()
+					},0);
 				});
 
 				relativeContainer.append(this.dragHandleNode);

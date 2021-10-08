@@ -40,7 +40,10 @@
 			background: #F0F0F0;
 		}
 
-		.mce-ico {
+		.icon {
+			display: flex;
+			align-items: center;
+			justify-content: space-around;
 			margin-inline-end: 7px;
 		}
 	}

@@ -3,6 +3,7 @@
 import React, { useLayoutEffect, useRef, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import cx from 'classnames';
+import { IconBlockquote, IconDocument, IconUnlink } from './icons';
 
 function HighlightPopup({ parentRef, pluginState }) {
 	const containerRef = useRef();
@@ -67,15 +68,15 @@ function HighlightPopup({ parentRef, pluginState }) {
 			<div ref={containerRef}>
 				<div ref={popupRef} className={cx('highlight-popup page-popup page-popup-top')}>
 					<div className="button toolbarButton" onClick={handleOpen}>
-						<div className="mce-ico mce-i-newdocument"/>
+						<div className="icon"><IconDocument/></div>
 						<FormattedMessage id="noteEditor.showOnPage"/>
 					</div>
 					<div className="button toolbarButton" onClick={handleUnlink}>
-						<div className="mce-ico mce-i-unlink"/>
+						<div className="icon"><IconUnlink/></div>
 						<FormattedMessage id="noteEditor.unlink"/>
 					</div>
 					{pluginState.canAddCitation && <div className="button toolbarButton" onClick={handleAdd}>
-						<div className="mce-ico mce-i-blockquote"/>
+						<div className="icon"><IconBlockquote/></div>
 						<FormattedMessage id="noteEditor.addCitation"/>
 					</div>}
 				</div>

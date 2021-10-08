@@ -3,6 +3,7 @@
 import React, { useLayoutEffect, useRef, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import cx from 'classnames';
+import { IconBlockquote, IconDocument, IconUndo } from './icons';
 
 // TODO: Rewrite all popups and reuse the common logic
 
@@ -72,15 +73,15 @@ function CitationPopup({ parentRef, pluginState, viewMode }) {
 					className={cx('citation-popup page-popup')}
 				>
 					{pluginState.canOpen && <div className="button toolbarButton" onClick={handleOpen}>
-						<div className="mce-ico mce-i-newdocument"/>
+						<div className="icon"><IconDocument/></div>
 						<FormattedMessage id="noteEditor.goToPage"/>
 					</div>}
 					<div className="button toolbarButton" onClick={handleShowItem}>
-						<div className="mce-ico mce-i-undo"/>
+						<div className="icon"><IconUndo/></div>
 						<FormattedMessage id="noteEditor.showItem"/>
 					</div>
 					{viewMode !== 'ios' && <div className="button toolbarButton" onClick={handleEdit}>
-						<div className="mce-ico mce-i-blockquote"/>
+						<div className="icon"><IconBlockquote/></div>
 						<FormattedMessage id="noteEditor.editCitation"/>
 					</div>}
 				</div>

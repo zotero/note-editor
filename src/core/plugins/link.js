@@ -2,6 +2,7 @@ import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { schema } from '../schema';
 import { removeMarkRangeAtCursor, updateMarkRangeAtCursor } from '../commands';
 import { getMarkRangeAtCursor } from '../helpers';
+import { refocusEditor } from '../utils';
 
 class Link {
 	constructor(state, options) {
@@ -95,7 +96,11 @@ class Link {
 	}
 
 	setURL(url) {
+		let to = this.view.state.selection.to;
 		updateMarkRangeAtCursor(schema.marks.link, { href: url })(this.view.state, this.view.dispatch);
+		refocusEditor(() => {
+			this.view.dispatch(this.view.state.tr.setSelection(TextSelection.create(this.view.state.tr.doc, to)));
+		});
 	}
 
 	removeURL() {

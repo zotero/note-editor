@@ -1,3 +1,19 @@
+
+// Work around firefox bug that stops up/down navigation in contenteditable to work
+export function refocusEditor(callback) {
+	let input = document.createElement('input');
+	input.style.position = 'absolute';
+	input.style.opacity = 0;
+	document.body.append(input);
+	input.focus();
+	input.offsetTop;
+	setTimeout(() => {
+		document.querySelector('.primary-editor').focus();
+		input.remove();
+		callback();
+	}, 0);
+}
+
 export const getActiveColor = function (state) {
 	const { $from, $to, $cursor } = state.selection;
 	const { textColor } = state.schema.marks;

@@ -38,7 +38,7 @@ class Link {
 	}
 
 	getLinkNode(pos) {
-		let node = this.view.domAtPos(pos);
+		let node = this.view.domAtPos(pos, 1);
 		node = node.node;
 		do {
 			if (node.nodeType === Node.ELEMENT_NODE && node.nodeName === 'A') {

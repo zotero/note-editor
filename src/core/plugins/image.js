@@ -20,6 +20,7 @@ class Image {
 			let { node, pos, index, parent } = nodeData;
 
 			if (!node.attrs.annotation) {
+				this.popup = { active: false };
 				return;
 			}
 

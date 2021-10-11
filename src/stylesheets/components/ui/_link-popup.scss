@@ -1,7 +1,7 @@
 
 .link-popup {
 	.link {
-		width: 150px;
+		width: 200px;
 		display: flex;
 		flex: 1;
 		overflow: hidden;
@@ -11,6 +11,7 @@
 			text-overflow: ellipsis;
 			overflow: hidden;
 			white-space: nowrap;
+			margin-left: 2px;
 		}
 
 		input {
@@ -21,7 +22,7 @@
 		}
 	}
 
-	.button {
-		border: 1px solid #c5c5c5;
+	.toolbarButton .icon {
+		margin: 0;
 	}
 }

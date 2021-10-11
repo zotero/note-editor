@@ -1,8 +1,9 @@
 'use strict';
 
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, Fragment } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useIntl } from 'react-intl';
 import cx from 'classnames';
+import { IconCheckmark, IconEdit, IconUnlink } from './icons';
 
 function LinkPopup({ parentRef, pluginState }) {
 	const intl = useIntl();
@@ -58,6 +59,7 @@ function LinkPopup({ parentRef, pluginState }) {
 			setTimeout(() => {
 				if (inputRef.current) {
 					inputRef.current.focus();
+					inputRef.current.select();
 				}
 			}, 0);
 		}
@@ -109,19 +111,31 @@ function LinkPopup({ parentRef, pluginState }) {
 										onKeyDown={handleKeydown}
 									/>
 								</div>
-								<button className="button toolbarButton" onClick={handleSet}>
-									<FormattedMessage id="noteEditor.set"/>
+								<button
+									className="button toolbarButton"
+									onClick={handleSet}
+									title={intl.formatMessage({id: 'noteEditor.set'})}
+								>
+									<div className="icon"><IconCheckmark/></div>
 								</button>
 							</Fragment>
 						)
 						: (
 							<Fragment>
 								<div className="link"><a href={pluginState.href} onClick={handleOpen}>{pluginState.href}</a></div>
-								<button className="button toolbarButton" onClick={handleEdit}>
-									<FormattedMessage id="noteEditor.edit"/>
+								<button
+									className="button toolbarButton"
+									onClick={handleEdit}
+									title={intl.formatMessage({id: 'noteEditor.edit'})}
+								>
+									<div className="icon"><IconEdit/></div>
 								</button>
-								<button className="button toolbarButton" onClick={handleUnset}>
-									<FormattedMessage id="noteEditor.unlink"/>
+								<button
+									className="button toolbarButton"
+									onClick={handleUnset}
+									title={intl.formatMessage({id: 'noteEditor.unlink'})}
+								>
+									<div className="icon"><IconUnlink/></div>
 								</button>
 							</Fragment>
 						)}

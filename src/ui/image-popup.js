@@ -3,7 +3,7 @@
 import React, { useLayoutEffect, useRef, useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import cx from 'classnames';
-import { IconDocument, IconUnlink } from './icons';
+import { IconBlockquote, IconDocument, IconUnlink } from './icons';
 
 // TODO: Consolidate all popups into single component
 
@@ -78,7 +78,7 @@ function ImagePopup({ parentRef, pluginState }) {
 						<FormattedMessage id="noteEditor.unlink"/>
 					</div>
 					{pluginState.canAddCitation && <div className="button toolbarButton" onClick={handleAdd}>
-						<div className="icon"><IconDocument/></div>
+						<div className="icon"><IconBlockquote/></div>
 						<FormattedMessage id="noteEditor.addCitation"/>
 					</div>}
 				</div>

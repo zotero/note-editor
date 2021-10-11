@@ -52,14 +52,16 @@ function LinkPopup({ parentRef, pluginState }) {
 		popupRef.current.style.left = Math.round(left) + 'px';
 
 		if (inputRef.current) {
-			inputRef.current.value = pluginState.href || '';
+			inputRef.current.value = pluginState.href || 'https://';
 		}
 
 		if (editing) {
 			setTimeout(() => {
 				if (inputRef.current) {
 					inputRef.current.focus();
-					inputRef.current.select();
+					if (pluginState.href) {
+						inputRef.current.select();
+					}
 				}
 			}, 0);
 		}
@@ -91,6 +93,10 @@ function LinkPopup({ parentRef, pluginState }) {
 		}
 	}
 
+	function handleInput(event) {
+		event.target.value = event.target.value.replace(/^[a-z]+:\/\/([a-z]+:\/\/)(.*)/, '$1$2');
+	}
+
 	return useMemo(() => {
 		if (!pluginState.active) return null;
 
@@ -109,6 +115,7 @@ function LinkPopup({ parentRef, pluginState }) {
 										type="edit"
 										placeholder={intl.formatMessage({id: 'noteEditor.enterLink'})}
 										onKeyDown={handleKeydown}
+										onInput={handleInput}
 									/>
 								</div>
 								<button

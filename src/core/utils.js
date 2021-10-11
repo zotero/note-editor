@@ -10,7 +10,7 @@ export function refocusEditor(callback) {
 	setTimeout(() => {
 		document.querySelector('.primary-editor').focus();
 		input.remove();
-		callback();
+		setTimeout(callback, 0);
 	}, 0);
 }
 

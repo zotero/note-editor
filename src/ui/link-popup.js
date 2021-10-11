@@ -22,13 +22,15 @@ function LinkPopup({ parentRef, pluginState }) {
 			return;
 		}
 
+		let rect = pluginState.node.getBoundingClientRect();
+
 		let parentScrollTop = parentRef.current.scrollTop;
 		let parentTop = parentRef.current.getBoundingClientRect().top;
 		let maxWidth = containerRef.current.offsetWidth;
-		let top = parentScrollTop + (pluginState.rect.top - popupRef.current.offsetHeight - parentTop - 10);
+		let top = parentScrollTop + (rect.top - popupRef.current.offsetHeight - parentTop - 10);
 
 		if (top < 0) {
-			top = parentScrollTop + (pluginState.rect.bottom - parentTop) + 10;
+			top = parentScrollTop + (rect.bottom - parentTop) + 10;
 			popupRef.current.classList.remove('page-popup-top');
 			popupRef.current.classList.add('page-popup-bottom');
 		}
@@ -38,9 +40,9 @@ function LinkPopup({ parentRef, pluginState }) {
 		}
 
 		let width = popupRef.current.offsetWidth;
-		let left = pluginState.rect.left + (pluginState.rect.right - pluginState.rect.left) / 2 - width / 2;
+		let left = rect.left + (rect.right - rect.left) / 2 - width / 2 + 1;
 
-		if (left + width > maxWidth) {
+		if (left + width >= maxWidth) {
 			left = maxWidth - width;
 		}
 
@@ -50,7 +52,9 @@ function LinkPopup({ parentRef, pluginState }) {
 
 		popupRef.current.style.top = Math.round(top) + 'px';
 		popupRef.current.style.left = Math.round(left) + 'px';
+	}, [pluginState]);
 
+	useLayoutEffect(() => {
 		if (inputRef.current) {
 			inputRef.current.value = pluginState.href || 'https://';
 		}
@@ -65,7 +69,7 @@ function LinkPopup({ parentRef, pluginState }) {
 				}
 			}, 0);
 		}
-	}, [editing, pluginState]);
+	}, [editing]);
 
 	function handleSet() {
 		pluginState.setURL(inputRef.current.value);
@@ -87,9 +91,11 @@ function LinkPopup({ parentRef, pluginState }) {
 	function handleKeydown(event) {
 		if (event.key === 'Enter') {
 			pluginState.setURL(inputRef.current.value);
+			event.preventDefault();
 		}
 		else if (event.key === 'Escape') {
 			setEditing(false);
+			event.preventDefault();
 		}
 	}
 

@@ -20,13 +20,13 @@ class Link {
 		}
 
 		let node = this.getLinkNode(state.selection.from);
+		let node2 = this.getLinkNode(state.selection.to - 1);
 		if (node) {
-			let rect = node.getBoundingClientRect();
 			let href = this.getHref(state);
-			if (this.view.state.selection.empty && href !== null) {
+			if ((this.view.state.selection.empty || node === node2) && href !== null) {
 				this.popup = {
 					active: true,
-					rect,
+					node,
 					href,
 					setURL: this.setURL.bind(this),
 					removeURL: this.removeURL.bind(this),
@@ -96,16 +96,24 @@ class Link {
 	}
 
 	setURL(url) {
+		let from = this.view.state.selection.from;
 		let to = this.view.state.selection.to;
+		if (!url) {
+			return this.removeURL();
+		}
 		updateMarkRangeAtCursor(schema.marks.link, { href: url })(this.view.state, this.view.dispatch);
 		refocusEditor(() => {
-			this.view.dispatch(this.view.state.tr.setSelection(TextSelection.create(this.view.state.tr.doc, to)));
+			this.view.dispatch(this.view.state.tr.setSelection(TextSelection.create(this.view.state.tr.doc, from, to)));
 		});
 	}
 
 	removeURL() {
+		let from = this.view.state.selection.from;
+		let to = this.view.state.selection.to;
 		removeMarkRangeAtCursor(schema.marks.link)(this.view.state, this.view.dispatch);
-		this.view.focus();
+		refocusEditor(() => {
+			this.view.dispatch(this.view.state.tr.setSelection(TextSelection.create(this.view.state.tr.doc, from, to)));
+		});
 	}
 
 	getHref(state) {

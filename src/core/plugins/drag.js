@@ -2,6 +2,7 @@ import { NodeSelection, Plugin, TextSelection } from 'prosemirror-state';
 import { dropPoint } from 'prosemirror-transform';
 import { throttle } from '../utils';
 import { Slice, Fragment } from 'prosemirror-model';
+import { __serializeForClipboard } from 'prosemirror-view';
 
 
 class Drag {
@@ -38,15 +39,22 @@ class Drag {
 				this.dragHandleNode.className = 'drag-handle';
 				this.dragHandleNode.draggable = true;
 				this.dragHandleNode.addEventListener('dragstart', (event) => {
-					event.dataTransfer.setData('text/plain', null);
-					event.dataTransfer.setDragImage(new Image(), 0, 0);
-
 					let pos = this.view.posAtDOM(this.node, 0) - 1;
 					let nnn = this.view.state.tr.doc.nodeAt(pos);
 					let $from = this.view.state.tr.doc.resolve(pos);
 
 					this.view.dispatch(this.view.state.tr.setSelection(new NodeSelection($from)));
+
 					let slice = new Slice(new Fragment([nnn]), 0, 0);
+					let ref = __serializeForClipboard(this.view, slice);
+					var dom = ref.dom;
+					var text = ref.text;
+					event.dataTransfer.setDragImage(new Image(), 0, 0);
+					event.dataTransfer.clearData();
+					event.dataTransfer.setData('text/html', dom.innerHTML);
+					event.dataTransfer.effectAllowed = 'copyMove';
+					event.dataTransfer.setData('text/plain', text);
+
 					this.view.dragging = { slice, move: true };
 				});
 
@@ -94,9 +102,15 @@ class Drag {
 
 
 	mousemove(event) {
+		// When dragging outside of iframe DropCursorView.prototype.dragleave throws
+		// "TypeError: Argument 1 of Node.contains does not implement interface Node."
 		let topNode = null;
 
 		let node = event.target;
+
+		if (node.nodeType !== Node.ELEMENT_NODE || !this.view.dom.contains(node)) {
+			return;
+		}
 
 		while (node && node.parentNode !== this.view.dom && node.nodeName !== 'LI') {
 			node = node.parentNode;

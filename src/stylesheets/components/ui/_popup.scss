@@ -1,32 +1,24 @@
 //
-// Page popup
+// Popup
 //
 
-.page-popup-container {
+.popup-container .popup {
 	position: absolute;
-	z-index: 10;
-}
-
-.page-popup {
-	position: absolute;
-	z-index: 100;
 	display: flex;
+	z-index: 100;
 	font-size: 12px;
 	background-color: #ffffff;
 	border: 1px solid #d9d9d9;
 	padding: 5px 5px;
-
 	border-radius: 4px;
-	box-shadow: 0 0 24px 0 rgba(0,0,0,0.12);
+	box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.12);
 	@include popover-pointer($width: 10px, $height: 5px);
 
-
-	.toolbarButton {
+	button {
 		user-select: none;
 		background: #FFFFFF;
 		padding: 4px;
 		border-radius: 4px;
-
 		cursor: default;
 		display: flex;
 		align-items: center;
@@ -47,6 +39,33 @@
 			margin-inline-end: 7px;
 		}
 	}
+}
 
 
+.link-popup {
+	.link {
+		width: 200px;
+		display: flex;
+		flex: 1;
+		overflow: hidden;
+		align-items: center;
+
+		a {
+			text-overflow: ellipsis;
+			overflow: hidden;
+			white-space: nowrap;
+			margin-left: 2px;
+		}
+
+		input {
+			width: 100%;
+			border: none;
+			outline: none;
+			color: inherit;
+		}
+	}
+
+	button .icon {
+		margin: 0;
+	}
 }

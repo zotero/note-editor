@@ -1,6 +1,7 @@
 
 // Work around firefox bug that stops up/down navigation in contenteditable to work
 export function refocusEditor(callback) {
+	let scrollTop = document.querySelector('.editor-core').scrollTop;
 	let input = document.createElement('input');
 	input.style.position = 'absolute';
 	input.style.opacity = 0;
@@ -10,6 +11,7 @@ export function refocusEditor(callback) {
 	setTimeout(() => {
 		document.querySelector('.primary-editor').focus();
 		input.remove();
+		document.querySelector('.editor-core').scrollTop = scrollTop;
 		setTimeout(callback, 0);
 	}, 0);
 }

@@ -5,11 +5,11 @@ import { useIntl } from 'react-intl';
 
 import Toolbar from './toolbar';
 import Findbar from './findbar';
-import LinkPopup from './link-popup';
+import LinkPopup from './popups/link-popup';
+import HighlightPopup from './popups/highlight-popup';
+import CitationPopup from './popups/citation-popup';
+import ImagePopup from './popups/image-popup';
 import Noticebar from './noticebar';
-import HighlightPopup from './highlight-popup';
-import CitationPopup from './citation-popup';
-import ImagePopup from './image-popup';
 
 function Editor(props) {
 	const intl = useIntl();

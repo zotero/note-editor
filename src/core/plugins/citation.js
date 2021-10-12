@@ -28,7 +28,7 @@ class Citation {
 
 			this.popup = {
 				active: true,
-				rect,
+				node: dom,
 				canOpen,
 				showItem: () => {
 					this.options.onShowItem(node);

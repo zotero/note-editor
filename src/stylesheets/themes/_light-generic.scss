@@ -36,7 +36,7 @@ $selection-color: #fff;
 $selection-bg: rgba($accent-color, 0.99);
 
 // Z-index master list
-$z-index-page-popup: 10;
+$z-index-popup: 10;
 $z-index-import-bar: 20;
 $z-index-error-wrapper: 1000;
 $z-index-findbar: 10000;
@@ -386,8 +386,8 @@ $import-bar-btn-focus-box-shadow-2x: null;
 $import-bar-btn-dismiss-offset: 0px;
 
 // Page popup
-$page-popup-border-radius: 4px;
-$page-popup-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.6);
+$popup-border-radius: 4px;
+$popup-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.6);
 
 // Selection popup
 $selection-popup-padding: 4px;

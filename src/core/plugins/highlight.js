@@ -44,7 +44,7 @@ class Highlight {
 
 			this.popup = {
 				active: true,
-				rect,
+				node: dom,
 				canAddCitation: !citation && !!node.attrs.annotation.citationItem,
 				open: this.open.bind(this),
 				unlink: this.unlink.bind(this),

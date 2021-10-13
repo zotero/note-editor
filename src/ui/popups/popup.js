@@ -13,7 +13,7 @@ function Popup({ parentRef, pluginState, className, children }) {
 			return;
 		}
 
-		let rect = pluginState.node.getBoundingClientRect();
+		let rect = pluginState.rect || pluginState.node.getBoundingClientRect();
 
 		let parentScrollTop = parentRef.current.scrollTop;
 		let parentTop = parentRef.current.getBoundingClientRect().top;

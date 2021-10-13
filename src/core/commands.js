@@ -402,6 +402,15 @@ export function touchCitations() {
 	}
 }
 
+export function triggerImagesImport() {
+	return function (state, dispatch) {
+		let { tr } = state;
+		tr.setMeta('autoImportImages', true);
+		tr.setMeta('system', true);
+		dispatch(tr);
+	}
+}
+
 export function updateImageDimensions(nodeID, width, height) {
 	return function (state, dispatch) {
 		let { tr } = state;

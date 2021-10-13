@@ -45,6 +45,7 @@ class EditorInstance {
 	constructor(options) {
 		window._currentEditorInstance = this;
 		this.instanceID = options.instanceID;
+		this._reloaded = options.reloaded;
 		this._viewMode = options.viewMode;
 		this._readOnly = options.readOnly;
 		this._unsaved = options.unsaved;
@@ -86,6 +87,7 @@ class EditorInstance {
 	_init(value) {
 		this._editorCore = new EditorCore({
 			value,
+			reloaded: this._reloaded,
 			readOnly: this._readOnly,
 			unsaved: this._unsaved,
 			placeholder: this._placeholder,
@@ -195,8 +197,8 @@ class EditorInstance {
 				return;
 			}
 			case 'updateCitationItems': {
-				let { citationItems, forceSaving } = message;
-				this._editorCore.updateCitationItems(citationItems, forceSaving);
+				let { citationItems } = message;
+				this._editorCore.updateCitationItems(citationItems);
 				return;
 			}
 			case 'attachImportedImage': {

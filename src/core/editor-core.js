@@ -22,6 +22,7 @@ import {
 	insertHTML,
 	setCitation,
 	touchCitations,
+	triggerImagesImport,
 	updateImageDimensions
 } from './commands';
 import Provider from './provider';
@@ -69,6 +70,7 @@ import { trailingParagraph } from './plugins/trailing-paragraph';
 class EditorCore {
 	constructor(options) {
 		this.options = options;
+		this.reloaded = options.reloaded;
 		this.readOnly = options.readOnly;
 		this.isAttachmentNote = options.isAttachmentNote;
 		this.unsaved = options.unsaved;
@@ -267,9 +269,16 @@ class EditorCore {
 			// deleted, although this by it self doesn't trigger doc saving
 			this.metadata.deleteUnusedCitationItems(this.view.state);
 
-			// Trigger `updateCitationItemsList` after `initialized` event.
+			// Call this after `initialized` event is sent
 			setTimeout(() => {
+				// Do automatic note modifications only when note was opened by user
+				// and not by reload (sync, notify), otherwise it can result to sync
+				// carousel, if i.e. different clients have different citation item
+				// data and the same note is opened on both clients
 				this.updateCitationItemsList();
+				if (!this.reloaded) {
+					triggerImagesImport()(this.view.state, this.view.dispatch);
+				}
 			}, 0);
 
 			// TODO: Consider to add `citationItem` to image and highlight annotations if
@@ -309,12 +318,12 @@ class EditorCore {
 		this.options.onUpdateCitationItemsList(list);
 	}
 
-	// Without forceSaving enabled the updated item data is not saved and
+	// For reloaded note the updated item data is not saved automatically and
 	// citation views aren't updated. Although dragging/copying serialization
-	// gets the updated citations
-	updateCitationItems(citationItems, forceSaving) {
+	// uses the updated citation data
+	updateCitationItems(citationItems) {
 		let updatedCitationItems = this.metadata.updateCitationItems(citationItems);
-		if (updatedCitationItems.length && forceSaving) {
+		if (updatedCitationItems.length && !this.reloaded) {
 			touchCitations()(this.view.state, this.view.dispatch);
 		}
 	}

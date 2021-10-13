@@ -165,8 +165,9 @@ export function image(options) {
 			};
 		},
 		appendTransaction(transactions, oldState, newState) {
-			if (!transactions.some(tr => tr.docChanged)
-				|| transactions.some(tr => tr.getMeta('system'))) {
+			if ((!transactions.some(tr => tr.docChanged)
+				|| transactions.some(tr => tr.getMeta('system')))
+				&& !transactions.some(tr => tr.getMeta('autoImportImages'))) {
 				return;
 			}
 			let images = [];
@@ -182,6 +183,14 @@ export function image(options) {
 					}
 				}
 			});
+
+			// TODO: Remove this limit
+			if (images.length > 25
+				&& transactions.some(tr => tr.getMeta('autoImportImages'))) {
+				importedIDs = [];
+				return;
+			}
+
 			if (images.length) {
 				options.onImportImages(images);
 			}

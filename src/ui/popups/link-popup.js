@@ -30,7 +30,7 @@ function LinkPopup({ parentRef, pluginState }) {
 				}
 			}, 0);
 		}
-	}, [editing]);
+	}, [editing, pluginState]);
 
 	function handleSet() {
 		pluginState.setURL(inputRef.current.value);

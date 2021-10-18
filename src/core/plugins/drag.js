@@ -10,6 +10,7 @@ class Drag {
 		this.view = view;
 		this.node = null;
 		this.dragHandleNode = null;
+		this.mouseIsDown = false;
 
 		this.handlers = ['mousemove'].map((name) => {
 			let handler = (e) => {
@@ -18,6 +19,10 @@ class Drag {
 			view.dom.addEventListener(name, handler);
 			return { name: name, handler: handler };
 		});
+
+		window.addEventListener('mouseup', () => {
+			this.mouseIsDown = false;
+		})
 
 		this.updateDragHandle = throttle(() => {
 			let parentRect = this.view.dom.getBoundingClientRect();
@@ -38,14 +43,21 @@ class Drag {
 				this.dragHandleNode = document.createElement('div');
 				this.dragHandleNode.className = 'drag-handle';
 				this.dragHandleNode.draggable = true;
+
+				this.dragHandleNode.addEventListener('mousedown', (event) => {
+					this.mouseIsDown = true;
+				});
+
 				this.dragHandleNode.addEventListener('dragstart', (event) => {
 					let pos = this.view.posAtDOM(this.node, 0) - 1;
-					let nnn = this.view.state.tr.doc.nodeAt(pos);
+					let node = this.view.state.tr.doc.nodeAt(pos);
 					let $from = this.view.state.tr.doc.resolve(pos);
 
 					this.view.dispatch(this.view.state.tr.setSelection(new NodeSelection($from)));
 
-					let slice = new Slice(new Fragment([nnn]), 0, 0);
+					// TODO: Consider using decorations to change background color when block drag handle is hovered
+
+					let slice = new Slice(new Fragment([node]), 0, 0);
 					let ref = __serializeForClipboard(this.view, slice);
 					var dom = ref.dom;
 					var text = ref.text;
@@ -59,6 +71,7 @@ class Drag {
 				});
 
 				this.dragHandleNode.addEventListener('dragend', (event) => {
+					this.mouseIsDown = false;
 					let { to } = this.view.state.selection;
 					this.view.dispatch(this.view.state.tr.setSelection(TextSelection.create(this.view.state.tr.doc, to - 1)));
 					this.dragHandleNode.style.display = 'none';
@@ -102,6 +115,10 @@ class Drag {
 
 
 	mousemove(event) {
+		if (this.mouseIsDown) {
+			return;
+		}
+
 		// When dragging outside of iframe DropCursorView.prototype.dragleave throws
 		// "TypeError: Argument 1 of Node.contains does not implement interface Node."
 		let topNode = null;

@@ -7,10 +7,10 @@ function extract(state) {
 	state.doc.descendants((node, pos) => {
 		try {
 			let citationItems;
-			if (node.type.attrs.citation) {
+			if (node.attrs.citation) {
 				citationItems = node.attrs.citation.citationItems
 			}
-			else if (node.type.attrs.annotation
+			else if (node.attrs.annotation
 				&& node.attrs.annotation.citationItem) {
 				citationItems = [node.attrs.annotation.citationItem];
 			}

@@ -95,29 +95,29 @@ function main(html) {
 		onSubscribe(subscriber) {
 			console.log('onSubscribe', subscriber);
 			if (subscriber.type === 'citation') {
-				setTimeout(function () {
-					let key = JSON.stringify(subscriber.data.citation);
-					if (citationStore[key]) {
-						editorCore.provider.notify(subscriber.id, 'citation', {
-							formattedCitation: citationStore[key]
-						});
-					}
-					//
-					// setTimeout(()=> {
-					//   this.editorCore.updateCitation(subscriber.id, subscriber.data.citation);
-					// }, 5000);
-				}, 0);
+				// setTimeout(function () {
+				// 	let key = JSON.stringify(subscriber.data.citation);
+				// 	if (citationStore[key]) {
+				// 		editorCore.provider.notify(subscriber.id, 'citation', {
+				// 			formattedCitation: citationStore[key]
+				// 		});
+				// 	}
+				// 	//
+				// 	// setTimeout(()=> {
+				// 	//   this.editorCore.updateCitation(subscriber.id, subscriber.data.citation);
+				// 	// }, 5000);
+				// }, 0);
 			}
 			else if (subscriber.type === 'image') {
 				setTimeout(function () {
 					if (imageStore[subscriber.data.attachmentKey]) {
-						editorCore.provider.notify(subscriber.id, 'image', {
+						editorCore.provider.notify(subscriber.id, {
 							src: imageStore[subscriber.data.attachmentKey]
 						});
 					}
 					else if (deletedImages[subscriber.data.attachmentKey]) {
 						imageStore[subscriber.data.attachmentKey] = deletedImages[subscriber.data.attachmentKey];
-						editorCore.provider.notify(subscriber.id, 'image', {
+						editorCore.provider.notify(subscriber.id, {
 							src: imageStore[subscriber.data.attachmentKey]
 						});
 					}
@@ -236,31 +236,39 @@ function main(html) {
 };
 
 let html1 = `
-<div data-schema-version="2" data-test="test" atest="123">
-<h1>Nodes:     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1</h1>
-<p><a href="werwer">Link starts <img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/>link ends</a></p>
-<p><code>Inline code starts <img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/><strong>strong</strong> <a href="test">link</a> inline code ends</code></p>
+<div data-citation-items="%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FU285LCSS%22%5D%2C%22itemData%22%3A%7B%22id%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FU285LCSS%22%2C%22type%22%3A%22article-journal%22%2C%22abstract%22%3A%22A%20purely%20peer-to-peer%20version%20of%20electronic%20cash%20would%20allow%20online%20payments%20to%20be%20sent%20directly%20from%20one%20party%20to%20another%20without%20going%20through%20a%20financial%20institution.%20Digital%20signatures%20provide%20part%20of%20the%20solution%2C%20but%20the%20main%20benefits%20are%20lost%20if%20a%20trusted%20third%20party%20is%20still%20required%20to%20prevent%20double-spending.%20We%20propose%20a%20solution%20to%20the%20double-spending%20problem%20using%20a%20peer-to-peer%20network.%20The%20network%20timestamps%20transactions%20by%20hashing%20them%20into%20an%20ongoing%20chain%20of%20hash-based%20proof-of-work%2C%20forming%20a%20record%20that%20cannot%20be%20changed%20without%20redoing%20the%20proof-of-work.%20The%20longest%20chain%20not%20only%20serves%20as%20proof%20of%20the%20sequence%20of%20events%20witnessed%2C%20but%20proof%20that%20it%20came%20from%20the%20largest%20pool%20of%20CPU%20power.%20As%20long%20as%20a%20majority%20of%20CPU%20power%20is%20controlled%20by%20nodes%20that%20are%20not%20cooperating%20to%20attack%20the%20network%2C%20they'll%20generate%20the%20longest%20chain%20and%20outpace%20attackers.%20The%20network%20itself%20requires%20minimal%20structure.%20Messages%20are%20broadcast%20on%20a%20best%20effort%20basis%2C%20and%20nodes%20can%20leave%20and%20rejoin%20the%20network%20at%20will%2C%20accepting%20the%20longest%20proof-of-work%20chain%20as%20proof%20of%20what%20happened%20while%20they%20were%20gone.%22%2C%22language%22%3A%22en%22%2C%22page%22%3A%229%22%2C%22source%22%3A%22Zotero%22%2C%22title%22%3A%22Bitcoin%3A%20A%20Peer-to-Peer%20Electronic%20Cash%20System%22%2C%22author%22%3A%5B%7B%22family%22%3A%22Nakamoto%22%2C%22given%22%3A%22Satoshi%22%7D%5D%7D%7D%5D" data-schema-version="5">
 <p>Paragraph - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code></p>
 <h1>Heading 1 - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code></h1>
 <h2>Heading 2</h2>
 <h3>Heading 3</h3>
 <h4>Heading 4</h4>
 <h5>Heading 5</h5>
-<h6 style="background-image: url('../img/logo.svg');">Heading 6</h6>
-<h6 style="background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==');">Heading 6</h6>
-<h6 style="background-image: url('http://asdf/img/logo.svg');">Heading 6</h6>
+<h6>Heading 6</h6>
 
-<p><span class="highlight" data-annotation="%7B%22parentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F3820982%2Fitems%2FRSBTC6WA%22%2C%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F3820982%2Fitems%2FPH3XGS7W%22%2C%22position%22%3A%7B%22pageIndex%22%3A4%2C%22rects%22%3A%5B%5B320.40026855%2C344.76534922848003%2C544.8284741526363%2C355.92280274877004%5D%2C%5B306.24053955%2C331.56332285848003%2C544.2454691574964%2C343.1658668218%5D%2C%5B306.24005126%2C318.60375864848004%2C454.4506083824394%2C329.76121216877004%5D%5D%7D%7D">"The Z’ factor is a useful tool for evaluating bioassay qualities[17]. In general, a Z’ value above 0.5 suggests that an assay is robust enough for HTS."</span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F3820982%2Fitems%2FRSBTC6WA%22%5D%2C%22locator%22%3A%225%22%7D%5D%2C%22properties%22%3A%7B%7D%7D">{citation}</span></p>
-<p><span class="highlight" data-annotation="%7B%22parentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F3820982%2Fitems%2FRSBTC6WA%22%2C%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F3820982%2Fitems%2FPH3XGS7W%22%2C%22position%22%3A%7B%22pageIndex%22%3A4%2C%22rects%22%3A%5B%5B320.40026855%2C344.76534922848003%2C544.8284741526363%2C355.92280274877004%5D%2C%5B306.24053955%2C331.56332285848003%2C544.2454691574964%2C343.1658668218%5D%2C%5B306.24005126%2C318.60375864848004%2C454.4506083824394%2C329.76121216877004%5D%5D%7D%7D">“The Z’ factor is a useful tool for evaluating bioassay qualities[17]. In general, a Z’ value above 0.5 suggests that an assay is robust enough for HTS.”</span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F3820982%2Fitems%2FRSBTC6WA%22%5D%2C%22locator%22%3A%225%22%7D%5D%2C%22properties%22%3A%7B%7D%7D">{citation}</span></p>
+<h2>Annotations</h2>
+<p><span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FC6IDLDLW%22%2C%22annotationKey%22%3A%222ESAYRD9%22%2C%22color%22%3A%22%235fb236%22%2C%22pageLabel%22%3A%221%22%2C%22position%22%3A%7B%22pageIndex%22%3A0%2C%22rects%22%3A%5B%5B108.1%2C373.615%2C504.091%2C384.8%5D%2C%5B108.1%2C362.015%2C324.159%2C373.2%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FU285LCSS%22%5D%2C%22locator%22%3A%221%22%7D%7D">“Commerce on the Internet has come to rely almost exclusively on financial institutions serving as trusted third parties to process electronic payments.”</span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FU285LCSS%22%5D%2C%22locator%22%3A%221%22%7D%5D%2C%22properties%22%3A%7B%7D%7D">(<span class="citation-item">Nakamoto, p. 1</span>)</span></p>
+
+<p><span class="highlight" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FC6IDLDLW%22%2C%22pageLabel%22%3A%223%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B122.5%2C485.515%2C503.755%2C496.7%5D%2C%5B108.1%2C473.915%2C140.925%2C485.1%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FU285LCSS%22%5D%2C%22locator%22%3A%223%22%7D%7D">“The proof-of-work also solves the problem of determining representation in majority decision making.”</span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FU285LCSS%22%5D%2C%22locator%22%3A%223%22%7D%5D%2C%22properties%22%3A%7B%7D%7D">(<span class="citation-item">Nakamoto, p. 3</span>)</span></p>
+
+<p><img alt="" data-attachment-key="DDAAFF11" data-annotation="%7B%22attachmentURI%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FC6IDLDLW%22%2C%22annotationKey%22%3A%22AD4NKL28%22%2C%22color%22%3A%22%23ffd400%22%2C%22pageLabel%22%3A%225%22%2C%22position%22%3A%7B%22pageIndex%22%3A4%2C%22rects%22%3A%5B%5B112.5%2C442.8%2C510.3%2C612%5D%5D%7D%2C%22citationItem%22%3A%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FU285LCSS%22%5D%2C%22locator%22%3A%225%22%7D%7D" width="663" height="282"><br><span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FU285LCSS%22%5D%2C%22locator%22%3A%225%22%2C%22itemData%22%3A%7B%22id%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F4100175%2Fitems%2FU285LCSS%22%2C%22type%22%3A%22article-journal%22%2C%22abstract%22%3A%22A%20purely%20peer-to-peer%20version%20of%20electronic%20cash%20would%20allow%20online%20payments%20to%20be%20sent%20directly%20from%20one%20party%20to%20another%20without%20going%20through%20a%20financial%20institution.%20Digital%20signatures%20provide%20part%20of%20the%20solution%2C%20but%20the%20main%20benefits%20are%20lost%20if%20a%20trusted%20third%20party%20is%20still%20required%20to%20prevent%20double-spending.%20We%20propose%20a%20solution%20to%20the%20double-spending%20problem%20using%20a%20peer-to-peer%20network.%20The%20network%20timestamps%20transactions%20by%20hashing%20them%20into%20an%20ongoing%20chain%20of%20hash-based%20proof-of-work%2C%20forming%20a%20record%20that%20cannot%20be%20changed%20without%20redoing%20the%20proof-of-work.%20The%20longest%20chain%20not%20only%20serves%20as%20proof%20of%20the%20sequence%20of%20events%20witnessed%2C%20but%20proof%20that%20it%20came%20from%20the%20largest%20pool%20of%20CPU%20power.%20As%20long%20as%20a%20majority%20of%20CPU%20power%20is%20controlled%20by%20nodes%20that%20are%20not%20cooperating%20to%20attack%20the%20network%2C%20they'll%20generate%20the%20longest%20chain%20and%20outpace%20attackers.%20The%20network%20itself%20requires%20minimal%20structure.%20Messages%20are%20broadcast%20on%20a%20best%20effort%20basis%2C%20and%20nodes%20can%20leave%20and%20rejoin%20the%20network%20at%20will%2C%20accepting%20the%20longest%20proof-of-work%20chain%20as%20proof%20of%20what%20happened%20while%20they%20were%20gone.%22%2C%22language%22%3A%22en%22%2C%22page%22%3A%229%22%2C%22source%22%3A%22Zotero%22%2C%22title%22%3A%22Bitcoin%3A%20A%20Peer-to-Peer%20Electronic%20Cash%20System%22%2C%22author%22%3A%5B%7B%22family%22%3A%22Nakamoto%22%2C%22given%22%3A%22Satoshi%22%7D%5D%7D%7D%5D%2C%22properties%22%3A%7B%7D%7D">(<span class="citation-item">Nakamoto, p. 5</span>)</span></p>
+
+<p>Invalid background-image 1:</p>
+<p style="background-image: url('../img/logo.svg');"></p>
+<p>Invalid background-image 2:</p>
+<p style="background-image: url('http://asdf/img/logo.svg');"></p>
+<p>Valid background-image 3:</p>
+<p style="background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==');"></p>
 
 
-<p><span class="highlight" data-annotation="%7B%22color%22%3A%20%22%23ffd400%22%2C%20%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2FNK36R7GU%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B45.695%2C466.519%2C284.774%2C474.8%5D%2C%5B33.732%2C456.342%2C284.708%2C464.312%5D%2C%5B33.732%2C445.911%2C284.735%2C453.881%5D%5D%7D%2C%22text%22%3A%22Treatment%20effects%20were%20reported%20as%20risk%20ratio%20(RR)%20with%2095%25%20%3Cb%3Econfidence%20interval%20(CI)%3C%2Fb%3E%20for%20adverse%20events%20or%20mean%20difference%20(MD)%20with%2095%25%20CI%20for%20length%20of%20intubation%20and%20duration%20of%20ICU%20and%20hospital%20stay.%20%22%7D">"Treatment effects were reported as risk ratio (RR) with 95% <b>confidence interval (CI)</b> for adverse events or mean difference (MD) with 95% CI for length of intubation and duration of ICU and hospital stay. "</span></p>
+<p>External image:</p>
+<p><img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/> </p>
 
+<p>Internal image placeholder (while waiting for the load):</p>
+<p><img width="500" height="500" data-attachment-key="DDAAFFXX"/></p>
+<p>Dead image</p>
+<p><img width="500" height="500"/></p>
 
-<p><span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2FSW46XL4F%22%5D%2C%22locator%22%3A%22192%22%7D%5D%2C%22properties%22%3A%7B%7D%7D">(Hsu et al., 2013)</span></p>
-
-<p><span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uris%22%3A%5B%22http%3A%2F%2Fzotero.org%2Fusers%2F3820982%2Fitems%2F5WHB5RZX%22%5D%2C%22itemData%22%3A%7B%22id%22%3A1780%2C%22type%22%3A%22article-journal%22%2C%22container-title%22%3A%22n%20engl%20j%20med%22%2C%22language%22%3A%22en%22%2C%22page%22%3A%223%22%2C%22source%22%3A%22Zotero%22%2C%22title%22%3A%22Not%20a%20Perfect%20Storm%20%E2%80%94%20Covid-19%20and%20the%20Importance%20of%20Language%22%2C%22author%22%3A%5B%7B%22family%22%3A%22Brandt%22%2C%22given%22%3A%22Allan%20M%22%7D%2C%7B%22family%22%3A%22Botelho%22%2C%22given%22%3A%22Alyssa%22%7D%5D%2C%22issued%22%3A%7B%22date-parts%22%3A%5B%5B%222020%22%5D%5D%7D%7D%2C%22locator%22%3A%221494%22%7D%5D%2C%22properties%22%3A%7B%7D%7D">(Brandt and Botelho, 2020, p. 1494)</span></p>
-
+<p>Multiple     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;spaces</p>
 
 <pre dir="rtl">Preformatted/code block - <strong>B</strong><em>I</em><u>U</u><span style="text-decoration: line-through">S</span><sub>2</sub><sup>2</sup><span style="color: #99CC00">T</span><span style="background-color: #99CC00">B</span><a href="g">L</a><code>C</code>
 1
@@ -331,13 +339,7 @@ let html1 = `
 <p>Horizontal rule:</p>
 <hr/>
 
-<p>External image:</p>
-<p><img src="https://static01.nyt.com/images/2020/07/30/science/30VIRUS-FUTURE3-jump/merlin_174267405_2f8e4d59-b785-4231-aea5-476014cc6306-jumbo.jpg?quality=90&auto=webp"/> </p>
-<p>Internal image:</p>
-<p><img data-attachment-key="DDAAFF11"/></p>
-<p>Internal image placeholder (while waiting for the load):</p>
-<p><img width="500" height="500" data-attachment-key="DDAAFFXX"/></p>
-<p><img width="500" height="500"/></p>
+
 
 
 <h1>Marks:</h1>
@@ -379,13 +381,6 @@ let html1 = `
 <p></p>
 <p></p>
 <p></p>
-<h1>Citations and annotations:</h1>
-<p>Internal image with annotation (double-click to open):</p>
-<p><img width="100" height="100" data-attachment-key="DDAAFF22" data-annotation="%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2F6RCWW44F%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B298.2%2C480.2%2C552.6%2C749%5D%5D%7D%7D"/>
-<span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2F5JM6M9R4%22%2C%22backupText%22%3A%22Hui%20et%20al.%2C%202005%22%2C%22locator%22%3A%221177%22%7D%5D%2C%22properties%22%3A%7B%7D%7D"/></p>
-<p></p>
-<p>Highlight with annotation (double-click to open):</p>
-<p><span class="highlight" data-annotation="%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2FNK36R7GU%22%2C%22position%22%3A%7B%22pageIndex%22%3A2%2C%22rects%22%3A%5B%5B45.695%2C466.519%2C284.774%2C474.8%5D%2C%5B33.732%2C456.342%2C284.708%2C464.312%5D%2C%5B33.732%2C445.911%2C284.735%2C453.881%5D%5D%7D%7D">"Treatment effects were reported as risk ratio (RR) with 95% confidence interval (CI) for adverse events or mean difference (MD) with 95% CI for length of intubation and duration of ICU and hospital stay. "</span> <span class="citation" data-citation="%7B%22citationItems%22%3A%5B%7B%22uri%22%3A%22http%3A%2F%2Fzotero.org%2Fusers%2F1234567%2Fitems%2FSW46XL4F%22%2C%22backupText%22%3A%22Liu%20et%20al.%2C%202017%22%2C%22locator%22%3A%22192%22%7D%5D%2C%22properties%22%3A%7B%7D%7D"></span></p>
 <p></p>
 <p></p>
 <p></p>

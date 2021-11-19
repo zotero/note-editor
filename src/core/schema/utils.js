@@ -6,6 +6,15 @@ import { encodeObject, formatCitationItem } from '../utils';
 
 export function buildToHTML(schema) {
 	return function (content, metadata) {
+		// Return an empty string if note is empty to allow Zotero to
+		// determine if note is empty. Though, this won't allow container
+		// metadata to survive after note is cleared and then re-opened
+		if (content.childCount === 1
+			&& content.firstChild.isTextblock
+			&& content.firstChild.content.size === 0) {
+			return '';
+		}
+
 		let fragment = DOMSerializer.fromSchema(schema).serializeFragment(content);
 		let doc = document.implementation.createHTMLDocument('New');
 		let tmp = doc.body;

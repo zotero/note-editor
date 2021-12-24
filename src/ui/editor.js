@@ -36,6 +36,7 @@ function Editor(props) {
 				colorState={editorState.color}
 				menuState={editorState.menu}
 				linkState={editorState.link}
+				citationState={editorState.citation}
 				unsaved={editorState.core.unsaved}
 				searchState={editorState.search}
 				onClickReturn={props.onClickReturn}

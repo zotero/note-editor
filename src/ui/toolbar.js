@@ -17,7 +17,7 @@ import Dropdown from './toolbar-elements/dropdown';
 import TextDropdown from './toolbar-elements/text-dropdown';
 import ColorsDropdown from './toolbar-elements/colors-dropdown';
 
-function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow }) {
+function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkState, citationState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow }) {
 	const intl = useIntl();
 
 	return (
@@ -73,6 +73,12 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 					</button>}
 					{colorState.state.canRemoveAnnotationColors && <button className="option" onClick={() => colorState.state.removeAnnotationColors()}>
 						<FormattedMessage id="noteEditor.removeAnnotationColors"/>
+					</button>}
+					{citationState.state.canAddCitations && <button className="option" onClick={() => citationState.state.addCitations()}>
+						<FormattedMessage id="noteEditor.addCitations"/>
+					</button>}
+					{citationState.state.canRemoveCitations && <button className="option" onClick={() => citationState.state.removeCitations()}>
+						<FormattedMessage id="noteEditor.removeCitations"/>
 					</button>}
 				</Dropdown>
 			</div>

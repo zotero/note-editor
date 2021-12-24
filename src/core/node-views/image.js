@@ -1,3 +1,4 @@
+import { formatCitation } from '../utils';
 
 class ImageView {
 	constructor(node, view, getPos, options) {
@@ -118,6 +119,31 @@ class ImageView {
 			div.appendChild(image);
 			this.dom = div;
 		}
+
+		let formattedCitation = '';
+		if (node.attrs.annotation && node.attrs.annotation.citationItem) {
+			try {
+				let citationItem = JSON.parse(JSON.stringify(node.attrs.annotation.citationItem));
+				let citation = {
+					citationItems: [citationItem],
+					properties: {}
+				};
+
+				options.metadata.fillCitationItemsWithData(citation.citationItems);
+				let missingItemData = citation.citationItems.find(x => !x.itemData);
+				if (!missingItemData) {
+					formattedCitation = formatCitation(citation);
+				}
+			}
+			catch (e) {
+				console.log(e);
+			}
+		}
+
+		if (formattedCitation) {
+			this.dom.title = formattedCitation;
+		}
+
 	}
 
 	selectNode() {

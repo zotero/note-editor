@@ -211,7 +211,11 @@ class EditorCore {
 						// Immediately update image dimensions and trigger note updating, which should happen only once per image
 						updateImageDimensions(node.attrs.nodeID, width, height)(this.view.state, this.view.dispatch);
 					},
-					onOpenURL: options.onOpenURL.bind(this)
+					onOpenURL: options.onOpenURL.bind(this),
+					metadata: this.metadata
+				}),
+				highlight: nodeViews.highlight({
+					metadata: this.metadata
 				}),
 				citation: nodeViews.citation({
 					metadata: this.metadata

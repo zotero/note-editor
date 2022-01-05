@@ -295,12 +295,12 @@ export function insertHTML(pos, html) {
 				tr = tr.replaceWith(range.start, range.end, nodes)
 			}
 			// Remove next empty block if dragging in-between blocks
-			else if ($pos.nodeAfter && !$pos.nodeAfter.content.size) {
+			else if ($pos.nodeAfter && $pos.nodeAfter.isBlock && !$pos.nodeAfter.content.size) {
 				let range = $pos.blockRange(tr.doc.resolve(pos + 1));
 				tr = tr.replaceWith(range.start, range.end, nodes);
 			}
 			// Remove previous empty block if dragging in-between blocks
-			else if ($pos.nodeBefore && !$pos.nodeBefore.content.size) {
+			else if ($pos.nodeBefore && $pos.nodeBefore.isBlock && !$pos.nodeBefore.content.size) {
 				let range = $pos.blockRange(tr.doc.resolve(pos - 1));
 				tr = tr.replaceWith(range.start, range.end, nodes);
 			}

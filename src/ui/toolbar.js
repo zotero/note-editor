@@ -68,6 +68,7 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 					{viewMode !== 'window' && viewMode !== 'ios' && <button className="option" onClick={onOpenWindow}>
 						<FormattedMessage id="noteEditor.editInWindow"/>
 					</button>}
+					{(!unsaved && viewMode !== 'library' || viewMode !== 'window' && viewMode !== 'ios') && <hr/>}
 					{colorState.state.canApplyAnnotationColors && <button className="option" onClick={() => colorState.state.applyAnnotationColors()}>
 						<FormattedMessage id="noteEditor.applyAnnotationColors"/>
 					</button>}

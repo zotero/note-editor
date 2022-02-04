@@ -17,38 +17,13 @@ class Highlight {
 
 		let nodeData = getSingleSelectedNode(state, schema.nodes.highlight, true);
 		if (nodeData) {
-			let { node, pos, index, parent } = nodeData;
+			let { pos } = nodeData;
 			let dom = this.view.nodeDOM(pos);
-			let rect = dom.getBoundingClientRect();
-			let citation = null;
-			// TODO: Add part of this into try / catch to make sure bad data doesn't prevent showing popup here and in other places
-			if (node.attrs.annotation.citationItem) {
-				for (let i = index + 1; i < parent.childCount; i++) {
-					let child = parent.child(i);
-					if (child.type.name === 'citation') {
-						if (this.citationHasItem(child.attrs.citation, node.attrs.annotation.citationItem)) {
-							citation = child;
-						}
-						break;
-					}
-					else if (child.type.name === 'text') {
-						if (child.text.trim().length) {
-							break;
-						}
-					}
-					else {
-						break;
-					}
-				}
-			}
-
 			this.popup = {
 				active: true,
 				node: dom,
-				canAddCitation: !citation && !!node.attrs.annotation.citationItem,
 				open: this.open.bind(this),
-				unlink: this.unlink.bind(this),
-				addCitation: this.addCitation.bind(this)
+				unlink: this.unlink.bind(this)
 			};
 			return;
 		}
@@ -70,31 +45,6 @@ class Highlight {
 		let node = $from.parent;
 		let tr = state.tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0));
 		dispatch(tr);
-	}
-
-	addCitation() {
-		let { state, dispatch } = this.view;
-		let { tr } = state;
-		let { $from } = state.selection;
-		let node = $from.parent;
-		let pos = $from.pos - $from.parentOffset + node.nodeSize - 1;
-
-		let citationItem = JSON.parse(JSON.stringify(node.attrs.annotation.citationItem));
-		let citation = {
-			citationItems: [citationItem],
-			properties: {}
-		};
-
-		let citationNode = state.schema.nodes.citation.create({
-				...node.attrs,
-				citation
-			}
-		);
-		dispatch(tr.insert(pos, [state.schema.text(' '), citationNode]));
-	}
-
-	citationHasItem(citation, citationItem) {
-		return citation.citationItems.find(ci => ci.uris.find(u => citationItem.uris.includes(u)));
 	}
 
 	destroy() {

@@ -48,7 +48,7 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 				{viewMode !== 'ios' && <Button
 					icon={<IconCitation/>}
 					title={intl.formatMessage({ id: 'noteEditor.insertCitation' })}
-					onClick={() => menuState.citation.run()}
+					onClick={() => citationState.insertCitation()}
 				/>}
 				<StateButton
 					state={{ isActive: searchState.active, run: () => searchState.setActive(!searchState.active) }}

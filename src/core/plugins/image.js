@@ -17,7 +17,7 @@ class Image {
 
 		let nodeData = getSingleSelectedNode(state, schema.nodes.image);
 		if (nodeData) {
-			let { node, pos, index, parent } = nodeData;
+			let { node, pos } = nodeData;
 
 			if (!node.attrs.annotation) {
 				this.popup = { active: false };
@@ -25,38 +25,12 @@ class Image {
 			}
 
 			let dom = this.view.nodeDOM(pos);
-			let rect = dom.getBoundingClientRect();
-
-			let next = this.view.state.doc.resolve(pos);
-
-			let citation = null;
-			if (node.attrs.annotation.citationItem) {
-				for (let i = index + 1; i < parent.childCount; i++) {
-					let child = parent.child(i);
-					if (child.type.name === 'citation') {
-						if (this.citationHasItem(child.attrs.citation, node.attrs.annotation.citationItem)) {
-							citation = child;
-						}
-						break;
-					}
-					else if (child.type.name === 'text') {
-						if (child.text.trim().length) {
-							break;
-						}
-					}
-					else if (child.type.name !== 'hardBreak') {
-						break;
-					}
-				}
-			}
 
 			this.popup = {
 				active: true,
 				node: dom,
-				canAddCitation: !citation && !!node.attrs.annotation.citationItem,
 				open: this.open.bind(this),
-				unlink: this.unlink.bind(this),
-				addCitation: this.addCitation.bind(this)
+				unlink: this.unlink.bind(this)
 			};
 			return;
 		}
@@ -85,34 +59,6 @@ class Image {
 			});
 			dispatch(tr);
 		}
-	}
-
-	addCitation() {
-		let { state, dispatch } = this.view;
-		let { tr } = state;
-		let { $to } = state.selection;
-		let nodeData = getSingleSelectedNode(state, schema.nodes.image);
-		if (nodeData) {
-			let { node } = nodeData;
-			let pos = $to.pos;
-
-			let citationItem = JSON.parse(JSON.stringify(node.attrs.annotation.citationItem));
-			let citation = {
-				citationItems: [citationItem],
-				properties: {}
-			};
-
-			let citationNode = state.schema.nodes.citation.create({
-					...node.attrs,
-					citation
-				}
-			);
-			dispatch(tr.insert(pos, [state.schema.text(' '), citationNode]));
-		}
-	}
-
-	citationHasItem(citation, citationItem) {
-		return citation.citationItems.find(ci => ci.uris.find(u => citationItem.uris.includes(u)));
 	}
 
 	destroy() {

@@ -2,25 +2,29 @@
 
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { IconBlockquote, IconDocument, IconUndo } from '../icons';
+import { IconBlockquote, IconCloseSmall, IconDocument, IconUndo } from '../icons';
 import Popup from './popup';
 
-function CitationPopup({ parentRef, pluginState, viewMode }) {
+function CitationPopup({ parentRef, citationState, viewMode }) {
 	function handleOpen() {
-		pluginState.open();
+		citationState.popup.open();
 	}
 
 	function handleShowItem() {
-		pluginState.showItem();
+		citationState.popup.showItem();
 	}
 
 	function handleEdit() {
-		pluginState.edit();
+		citationState.popup.edit();
+	}
+
+	function handleRemove() {
+		citationState.popup.remove();
 	}
 
 	return (
-		<Popup className="citation-popup" parentRef={parentRef} pluginState={pluginState}>
-			{pluginState.canOpen && <button onClick={handleOpen}>
+		<Popup className="citation-popup" parentRef={parentRef} pluginState={citationState.popup}>
+			{citationState.popup.canOpen && <button onClick={handleOpen}>
 				<div className="icon"><IconDocument/></div>
 				<FormattedMessage id="noteEditor.goToPage"/>
 			</button>}
@@ -31,6 +35,10 @@ function CitationPopup({ parentRef, pluginState, viewMode }) {
 			{viewMode !== 'ios' && <button onClick={handleEdit}>
 				<div className="icon"><IconBlockquote/></div>
 				<FormattedMessage id="noteEditor.editCitation"/>
+			</button>}
+			{citationState.popup.canRemove && <button onClick={handleRemove}>
+				<div className="icon"><IconCloseSmall/></div>
+				<FormattedMessage id="noteEditor.removeCitation"/>
 			</button>}
 		</Popup>
 	)

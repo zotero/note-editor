@@ -55,11 +55,11 @@ function Editor(props) {
 				<div className="relative-container">
 					{refReady && !props.disableUI && <Fragment>
 						{editorState.link && <LinkPopup parentRef={editorRef} pluginState={editorState.link.popup}/>}
-						{editorState.highlight && <HighlightPopup parentRef={editorRef} pluginState={editorState.highlight.popup}/>}
-						{editorState.image && <ImagePopup parentRef={editorRef} pluginState={editorState.image.popup}/>}
+						{editorState.highlight && <HighlightPopup parentRef={editorRef} highlightState={editorState.highlight} citationState={editorState.citation}/>}
+						{editorState.image && <ImagePopup parentRef={editorRef} imageState={editorState.image} citationState={editorState.citation}/>}
 						{editorState.citation && <CitationPopup
 							parentRef={editorRef}
-							pluginState={editorState.citation.popup}
+							citationState={editorState.citation}
 							viewMode={props.viewMode}
 						/>}
 					</Fragment>}

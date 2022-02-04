@@ -1,7 +1,7 @@
 import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { schema } from '../schema';
 import { getSingleSelectedNode } from '../commands';
-import { formatCitation, randomString } from '../utils';
+import { basicDeepEqual, formatCitation, randomString } from '../utils';
 
 class Citation {
 	constructor(state, options) {
@@ -10,6 +10,7 @@ class Citation {
 		this.state = {
 			canAddCitations: true,
 			canRemoveCitations: true,
+			canAddCitation: true
 		};
 	}
 
@@ -22,19 +23,28 @@ class Citation {
 		if (nodeData) {
 			let { node, pos } = nodeData;
 			let dom = this.view.nodeDOM(pos);
-			let rect = dom.getBoundingClientRect();
 
 			let canOpen = false;
-			try {
-				canOpen = node.attrs.citation.citationItems[0].locator;
+			// TODO: Support multi-item citations
+			if (node.attrs.citation
+				&& node.attrs.citation.citationItems
+				&& node.attrs.citation.citationItems[0]) {
+				let citationItem = node.attrs.citation.citationItems[0];
+				if (citationItem.locator && (!citationItem.label || citationItem.label === 'page')) {
+					canOpen = true;
+				}
 			}
-			catch (e) {
-			}
+
+			let hasAnnotationPair = this.hasAnnotationPairBefore(state.doc, node, pos);
+
+			canOpen = canOpen && !hasAnnotationPair;
+			let canRemove = hasAnnotationPair;
 
 			this.popup = {
 				active: true,
 				node: dom,
 				canOpen,
+				canRemove,
 				showItem: () => {
 					this.options.onShowItem(node);
 				},
@@ -43,18 +53,36 @@ class Citation {
 				},
 				edit: () => {
 					this.options.onEdit(node);
+				},
+				remove: () => {
+					let { state, dispatch } = this.view;
+					let { tr, doc } = state;
+					let pos2;
+					for (let i = pos; i >= 0; i--) {
+						let node = doc.nodeAt(i);
+						if (node && ['highlight', 'image'].includes(node.type.name)) {
+							pos2 = i + node.nodeSize;
+							break;
+						}
+					}
+
+					tr.delete(pos2, pos + node.nodeSize);
+					dispatch(tr);
 				}
 			};
-			return;
 		}
-
-		this.popup = { active: false };
+		else {
+			this.popup = { active: false };
+		}
 
 		this.state = {
 			canAddCitations: this.canAddCitations(),
 			canRemoveCitations: this.canRemoveCitations(),
 			addCitations: this.addCitations.bind(this),
-			removeCitations: this.removeCitations.bind(this)
+			removeCitations: this.removeCitations.bind(this),
+			canAddCitationAfter: this.canAddCitationAfter.bind(this),
+			addCitationAfter: this.addCitationAfter.bind(this),
+			insertCitation: this.insertCitation.bind(this)
 		};
 	}
 
@@ -62,13 +90,75 @@ class Citation {
 		this.popup = { active: false };
 	}
 
+	insertCitation() {
+		this.view.focus();
+		let { state, dispatch } = this.view;
+		let { selection } = state;
+		let { from, $from } = selection;
+
+		if ($from.parent.type === schema.nodes.highlight) {
+			this.addCitationAfter();
+			return;
+		}
+
+		let citation = {
+			citationItems: [],
+			properties: {}
+		};
+
+		let nodeID = randomString();
+		let citationNode = schema.nodes.citation.create({ nodeID, citation });
+
+		dispatch(state.tr.insert(from, citationNode));
+		// TODO: Fix the temporary work-around
+		window._currentEditorInstance._postMessage({ action: 'openCitationPopup', nodeID, citation });
+	}
+
 	isCitationAndAnnotationPair(annotation, citation) {
-		return (
-			annotation.citationItem
-			&& citation.citationItems.find(
-				ci => ci.uris.find(u => annotation.citationItem.uris.includes(u))
-			)
-		);
+		if (!annotation.citationItem || citation.citationItems.length !== 1) {
+			return false;
+		}
+
+		let citationItem1 = JSON.parse(JSON.stringify(annotation.citationItem));
+		let citationItem2 = JSON.parse(JSON.stringify(citation.citationItems[0]));
+
+		if (!citationItem1.uris.some(u => citationItem2.uris.includes(u))) {
+			return false;
+		}
+
+		delete citationItem1.uris;
+		delete citationItem2.uris;
+
+		return basicDeepEqual(citationItem1, citationItem2);
+	}
+
+	addCitationAfter(testOnly) {
+		let { state, dispatch } = this.view;
+		let { doc, tr } = state;
+
+		let nodeData = getSingleSelectedNode(state, schema.nodes.highlight, true)
+			|| getSingleSelectedNode(state, schema.nodes.image);
+
+		if (nodeData) {
+			let { node, pos, index, parent } = nodeData;
+
+			pos = pos + node.nodeSize;
+
+			if (!this.getCitationPairAfter(doc, node, pos)) {
+				if (testOnly) {
+					return true;
+				}
+
+				this.addCitation(tr, node, pos);
+				dispatch(tr);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	canAddCitationAfter() {
+		return this.addCitationAfter(true);
 	}
 
 	getCitationPairAfter(doc, annotation, pos) {
@@ -101,6 +191,65 @@ class Citation {
 				break;
 			}
 		}
+	}
+
+	hasAnnotationPairBefore(doc, citation, pos) {
+		let annotationPos = null;
+		for (let i = pos; i >= 0; i--) {
+			let node = doc.nodeAt(i);
+			if (node && ['highlight', 'image'].includes(node.type.name)) {
+				if (!this.isCitationAndAnnotationPair(node.attrs.annotation, citation.attrs.citation)) {
+					return false;
+				}
+				annotationPos = i + node.nodeSize;
+				break;
+			}
+		}
+
+		if (annotationPos === null) {
+			return false;
+		}
+
+		for (let i = pos; i < doc.content.size; i++) {
+			let child = doc.nodeAt(i);
+			if (!child) {
+				break;
+			}
+			else if (child.type.name === 'hardBreak') {
+			}
+			else if (child.type.name === 'citation') {
+				return true
+			}
+			else if (child.type.name === 'text') {
+				if (child.text.trim().length) {
+					break;
+				}
+			}
+			else {
+				break;
+			}
+		}
+		return false;
+	}
+
+	removeCitation(tr, annotationNode, pos) {
+		let citationItem = JSON.parse(JSON.stringify(annotationNode.attrs.annotation.citationItem));
+		let citation = {
+			citationItems: [citationItem],
+			properties: {}
+		};
+
+		let formattedCitation = formatCitation(citation);
+		let citationNode = schema.nodes.citation.create(
+			{ nodeID: randomString(), citation },
+			[schema.text('(' + formattedCitation + ')')]
+		);
+
+		let whiteSpaceNode = annotationNode.type === schema.nodes.image
+			? schema.nodes.hardBreak.create()
+			: schema.text(' ');
+
+		tr.insert(pos, [whiteSpaceNode, citationNode])
 	}
 
 	addCitation(tr, annotationNode, pos) {

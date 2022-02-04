@@ -5,21 +5,21 @@ import { FormattedMessage } from 'react-intl';
 import { IconBlockquote, IconDocument, IconUnlink } from '../icons';
 import Popup from './popup';
 
-function HighlightPopup({ parentRef, pluginState }) {
+function HighlightPopup({ parentRef, highlightState, citationState }) {
 	function handleOpen() {
-		pluginState.open();
+		highlightState.popup.open();
 	}
 
 	function handleUnlink() {
-		pluginState.unlink();
+		highlightState.popup.unlink();
 	}
 
-	function handleAdd(event) {
-		pluginState.addCitation();
+	function handleAdd() {
+		citationState.addCitationAfter();
 	}
 
 	return (
-		<Popup className="highlight-popup" parentRef={parentRef} pluginState={pluginState}>
+		<Popup className="highlight-popup" parentRef={parentRef} pluginState={highlightState.popup}>
 			<button onClick={handleOpen}>
 				<div className="icon"><IconDocument/></div>
 				<FormattedMessage id="noteEditor.showOnPage"/>
@@ -28,7 +28,7 @@ function HighlightPopup({ parentRef, pluginState }) {
 				<div className="icon"><IconUnlink/></div>
 				<FormattedMessage id="noteEditor.unlink"/>
 			</button>
-			{pluginState.canAddCitation && <button onClick={handleAdd}>
+			{citationState.canAddCitationAfter() && <button onClick={handleAdd}>
 				<div className="icon"><IconBlockquote/></div>
 				<FormattedMessage id="noteEditor.addCitation"/>
 			</button>}

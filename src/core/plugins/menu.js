@@ -300,26 +300,6 @@ class Menu {
 				commands.toggleDir('rtl')(state, dispatch);
 			}
 		};
-
-		this.citation = {
-			isActive: false,
-			run() {
-				focus();
-				let citation = {
-					citationItems: [],
-					properties: {}
-				};
-
-				let nodeID = randomString();
-				let citationNode = schema.nodes.citation.create({ nodeID, citation });
-				const { selection } = state;
-				const { from } = selection;
-				dispatch(state.tr.insert(from, citationNode));
-				// TODO: Fix temporary work-around
-				window._currentEditorInstance._postMessage({ action: 'openCitationPopup', nodeID, citation });
-
-			}
-		};
 	}
 }
 

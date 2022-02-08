@@ -210,7 +210,7 @@ class Citation {
 			return false;
 		}
 
-		for (let i = pos; i < doc.content.size; i++) {
+		for (let i = annotationPos; i < doc.content.size; i++) {
 			let child = doc.nodeAt(i);
 			if (!child) {
 				break;
@@ -218,7 +218,10 @@ class Citation {
 			else if (child.type.name === 'hardBreak') {
 			}
 			else if (child.type.name === 'citation') {
-				return true
+				if (child === citation) {
+					return true;
+				}
+				return false;
 			}
 			else if (child.type.name === 'text') {
 				if (child.text.trim().length) {
@@ -230,26 +233,6 @@ class Citation {
 			}
 		}
 		return false;
-	}
-
-	removeCitation(tr, annotationNode, pos) {
-		let citationItem = JSON.parse(JSON.stringify(annotationNode.attrs.annotation.citationItem));
-		let citation = {
-			citationItems: [citationItem],
-			properties: {}
-		};
-
-		let formattedCitation = formatCitation(citation);
-		let citationNode = schema.nodes.citation.create(
-			{ nodeID: randomString(), citation },
-			[schema.text('(' + formattedCitation + ')')]
-		);
-
-		let whiteSpaceNode = annotationNode.type === schema.nodes.image
-			? schema.nodes.hardBreak.create()
-			: schema.text(' ');
-
-		tr.insert(pos, [whiteSpaceNode, citationNode])
 	}
 
 	addCitation(tr, annotationNode, pos) {

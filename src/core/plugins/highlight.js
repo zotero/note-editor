@@ -1,7 +1,7 @@
 import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { Fragment, Slice } from 'prosemirror-model';
 import { ReplaceAroundStep, ReplaceStep } from 'prosemirror-transform';
-import { schema } from '../schema';
+import { schema, QUOTATION_MARKS } from '../schema';
 import { getSingleSelectedNode } from '../commands';
 
 class Highlight {
@@ -63,14 +63,17 @@ function unlinkHighlights(tr) {
 			}
 			if (node.type.name === 'highlight') {
 				if (node.content instanceof Fragment && node.content.content.length) {
-					let first = node.content.content[0];
-					let last = node.content.content[node.content.content.length - 1];
-					if (!first.type.isText || !last.type.isText || node.textContent.length < 2
-						|| !['"', '“'].includes(first.text[0])
-						|| !['"', '”'].includes(last.text[last.text.length - 1])) {
-						tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0));
-						updated = true;
-						updatedInLastIteration = true;
+					let $pos = tr.doc.resolve(pos);
+					if ($pos.node(1).type !== schema.nodes.blockquote) {
+						let first = node.content.content[0];
+						let last = node.content.content[node.content.content.length - 1];
+						if (!first.type.isText || !last.type.isText || node.textContent.length < 2
+							|| !QUOTATION_MARKS.includes(first.text[0])
+							|| !QUOTATION_MARKS.includes(last.text[last.text.length - 1])) {
+							tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + 1 + node.content.size, Slice.empty, 0));
+							updated = true;
+							updatedInLastIteration = true;
+						}
 					}
 				}
 				// Remove empty highlight nodes that appear when deleting whole text

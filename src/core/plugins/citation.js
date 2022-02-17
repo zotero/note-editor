@@ -1,5 +1,5 @@
 import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
-import { schema } from '../schema';
+import { schema, QUOTATION_MARKS } from '../schema';
 import { getSingleSelectedNode } from '../commands';
 import { basicDeepEqual, formatCitation, randomString } from '../utils';
 
@@ -270,6 +270,12 @@ class Citation {
 		doc.descendants((node, pos, parent, index) => {
 			let annotation = node.attrs.annotation;
 			if (annotation && annotation.citationItem) {
+				let textContent = node.textContent;
+				if (annotation.type === 'highlight'
+					&& (!QUOTATION_MARKS.includes(textContent[0])
+						|| !QUOTATION_MARKS.includes(textContent[textContent.length - 1]))) {
+					return;
+				}
 				let range = this.getCitationPairAfter(doc, node, pos + node.nodeSize);
 				if (!range) {
 					ranges.push({
@@ -302,6 +308,12 @@ class Citation {
 		state.doc.descendants((node, pos, parent, index) => {
 			let annotation = node.attrs.annotation;
 			if (annotation && annotation.citationItem) {
+				let textContent = node.textContent;
+				if (annotation.type === 'highlight'
+					&& (!QUOTATION_MARKS.includes(textContent[0])
+						|| !QUOTATION_MARKS.includes(textContent[textContent.length - 1]))) {
+					return;
+				}
 				let range = this.getCitationPairAfter(doc, node,pos + node.nodeSize);
 				if (range) {
 					ranges.push(range);

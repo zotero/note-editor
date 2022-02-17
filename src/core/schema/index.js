@@ -5,11 +5,13 @@ import { buildToHTML, buildFromHTML, buildClipboardSerializer } from './utils';
 
 const schema = new Schema({ nodes, marks });
 // Update in Zotero 'editorInstance.js' as well!
-schema.version = 5;
+schema.version = 6;
 
 const toHTML = buildToHTML(schema);
 const fromHTML = buildFromHTML(schema);
 
+// Note: Upgrade schema version if introducing new quotation marks
+const QUOTATION_MARKS = ["'",'"', '“', '”', '‘', '’', '„','«','»'];
 
 export {
 	nodes,
@@ -17,5 +19,6 @@ export {
 	schema,
 	toHTML,
 	fromHTML,
-	buildClipboardSerializer
+	buildClipboardSerializer,
+	QUOTATION_MARKS
 };

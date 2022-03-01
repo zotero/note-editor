@@ -1,23 +1,15 @@
 import { Plugin, PluginKey } from 'prosemirror-state';
 import { Mark } from 'prosemirror-model';
-import { schema } from '../schema';
+import { schema, HIGHLIGHT_COLORS } from '../schema';
 import { removeMarkRangeAtCursor, updateMarkRangeAtCursor } from '../commands';
 import { getMarkRange } from '../helpers';
-
-const BACKGROUND_COLORS = [
-	['yellow', '#ffd400'],
-	['red', '#ff6666'],
-	['green', '#5fb236'],
-	['blue', '#2ea8e5'],
-	['purple', '#a28ae5']
-];
 
 const MAX_AVAILABLE_COLORS = 30;
 
 class Color {
 	constructor(state, options) {
 		this.state = {
-			availableColors: BACKGROUND_COLORS,
+			availableColors: HIGHLIGHT_COLORS,
 			activeColors: []
 		};
 	}
@@ -46,15 +38,18 @@ class Color {
 			if (mark) {
 				let color = mark.attrs.color;
 				color = color.toLowerCase();
+				if (HIGHLIGHT_COLORS.map(x => x[1].slice(0, 7)).includes(color)) {
+					color += '80';
+				}
 				if (!availableColors.find(x => x[1] === color)
-					&& !BACKGROUND_COLORS.find(x => x[1] === color)) {
+					&& !HIGHLIGHT_COLORS.find(x => x[1] === color)) {
 					availableColors.push(['', color]);
 				}
 			}
 		});
 
 		availableColors.sort((a, b) => a[1] < b[1]);
-		availableColors = [...BACKGROUND_COLORS, ...availableColors];
+		availableColors = [...HIGHLIGHT_COLORS, ...availableColors];
 		availableColors = availableColors.slice(0, MAX_AVAILABLE_COLORS);
 
 		let { from, to } = state.selection;
@@ -104,6 +99,11 @@ class Color {
 
 					let $from = state.doc.resolve(from);
 					let range = getMarkRange($from, schema.marks.backgroundColor, { color });
+
+					// Add 50% opacity
+					if (color.length === 7) {
+						color = color + '80';
+					}
 
 					if (remove) {
 						if (range && range.from === from && range.to === to) {

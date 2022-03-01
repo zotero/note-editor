@@ -1,3 +1,5 @@
+import { HIGHLIGHT_COLORS } from './colors';
+
 export default {
 	strong: {
 		inclusive: true,
@@ -91,7 +93,17 @@ export default {
 			style: 'background-color',
 			getAttrs: value => ({ color: value })
 		}],
-		toDOM: mark => ['span', { style: `background-color: ${mark.attrs.color}` }, 0]
+		toDOM: mark => {
+			let color = mark.attrs.color;
+			if (color) {
+				color = color.toLowerCase();
+				// Add 50% opacity if it has one of highlight colors
+				if (HIGHLIGHT_COLORS.map(x => x[1].slice(0, 7)).includes(color)) {
+					color += '80';
+				}
+			}
+			return ['span', { style: 'background-color: ' + color }, 0]
+		}
 	},
 
 

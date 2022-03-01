@@ -27,7 +27,7 @@ export default function ColorsDropdown({ colorState }) {
 	return (
 		<Dropdown
 			className={cx('colors-dropdown', {clear})}
-			icon={<IconHighlighter color={activeColor}/>}
+			icon={<IconHighlighter color={activeColor && (activeColor[0] === '#' ? activeColor.slice(0, 7) : activeColor)}/>}
 			title={intl.formatMessage({ id: 'noteEditor.highlightText' })}
 		>
 			<div className="grid">
@@ -48,7 +48,7 @@ export default function ColorsDropdown({ colorState }) {
 								onClick={() => handleColorPick(code)}
 								onMouseDown={(event) => event.preventDefault()}
 							>
-								<IconColor color={code} active={colorState.state.activeColors.includes(code)}/>
+								<IconColor color={code[0] === '#' ? code.slice(0, 7) : code} active={colorState.state.activeColors.includes(code)}/>
 							</button>
 						)
 					})

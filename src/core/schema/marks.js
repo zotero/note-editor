@@ -91,19 +91,19 @@ export default {
 		attrs: { color: {} },
 		parseDOM: [{
 			style: 'background-color',
-			getAttrs: value => ({ color: value })
-		}],
-		toDOM: mark => {
-			let color = mark.attrs.color;
-			if (color) {
-				color = color.toLowerCase();
-				// Add 50% opacity if it has one of highlight colors
-				if (HIGHLIGHT_COLORS.map(x => x[1].slice(0, 7)).includes(color)) {
-					color += '80';
+			getAttrs: value => {
+				let color = value;
+				if (color) {
+					color = color.toLowerCase();
+					// Add 50% opacity if it has one of highlight colors
+					if (HIGHLIGHT_COLORS.map(x => x[1].slice(0, 7)).includes(color)) {
+						color += '80';
+					}
 				}
+				return { color };
 			}
-			return ['span', { style: 'background-color: ' + color }, 0]
-		}
+		}],
+		toDOM: mark => ['span', { style: `background-color: ${mark.attrs.color}` }, 0]
 	},
 
 

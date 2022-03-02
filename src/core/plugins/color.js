@@ -98,9 +98,11 @@ class Color {
 					let to = pos + 1 + node.content.size;
 
 					let $from = state.doc.resolve(from);
-					let range = getMarkRange($from, schema.marks.backgroundColor, { color });
+					// Try to find color with 50% opacity or fallback to the older color code without opacity
+					let range = getMarkRange($from, schema.marks.backgroundColor, { color: color + '80' })
+						|| getMarkRange($from, schema.marks.backgroundColor, { color });
 
-					// Add 50% opacity
+					// Add 50% opacity to the annotation color, which will be set as a background color
 					if (color.length === 7) {
 						color = color + '80';
 					}

@@ -52,7 +52,6 @@ class EditorInstance {
 		this._disableUI = options.disableUI;
 		this._placeholder = options.placeholder;
 		this._dir = window.dir = options.dir;
-		this._hasBackup = options.hasBackup;
 		this._enableReturnButton = options.enableReturnButton;
 		this._isAttachmentNote = options.isAttachmentNote;
 		this._localizedStrings = options.localizedStrings;
@@ -257,10 +256,6 @@ class EditorInstance {
 			// 	}
 			// 	return;
 			// }
-			case 'openBackup': {
-				this._postMessage({ action: 'openBackup' });
-				return;
-			}
 			case 'cut': {
 				zoteroExecCommand(document, 'cut', false, null);
 				return;
@@ -379,13 +374,6 @@ class EditorInstance {
 						]
 					]
 				},
-			],
-			[
-				{
-					name: 'openBackup',
-					label: this._getLocalizedString('noteEditor.viewNoteBackup'),
-					enabled: this._hasBackup
-				}
 			]
 		];
 

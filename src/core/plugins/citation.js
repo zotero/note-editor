@@ -8,9 +8,9 @@ class Citation {
 		this.options = options;
 		this.popup = { active: false };
 		this.state = {
-			canAddCitations: true,
-			canRemoveCitations: true,
-			canAddCitation: true
+			canAddCitations: false,
+			canRemoveCitations: false,
+			canAddCitation: false
 		};
 	}
 

@@ -16,6 +16,7 @@ import AlignDropdown from './toolbar-elements/align-dropdown';
 import Dropdown from './toolbar-elements/dropdown';
 import TextDropdown from './toolbar-elements/text-dropdown';
 import ColorsDropdown from './toolbar-elements/colors-dropdown';
+import FontColorsDropdown from './toolbar-elements/font-colors-dropdown';
 
 function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkState, citationState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow }) {
 	const intl = useIntl();
@@ -34,6 +35,7 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 			<div className="middle">
 				<TextDropdown menuState={menuState}/>
 				<ColorsDropdown colorState={colorState}/>
+				<FontColorsDropdown menuState={menuState}/>
 				<StateButton
 					state={menuState.clearFormatting}
 					icon={<IconRemoveFormatting/>}

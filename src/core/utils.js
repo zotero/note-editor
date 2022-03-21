@@ -44,11 +44,11 @@ export const getActiveColor = function (state) {
 		marksWithColor.length > 1
 		|| (marksWithColor.length === 1 && marks.length > 1)
 	) {
-		return null;
+		return '';
 	}
 	return marksWithColor.length
 		? marksWithColor[0].attrs.color
-		: 'default';
+		: '';
 };
 
 export const randomString = function (len, chars) {

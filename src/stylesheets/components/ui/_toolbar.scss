@@ -161,6 +161,55 @@
 	}
 }
 
+.font-colors-dropdown {
+	.popup {
+		font-size: 14px;
+		width: 256px;
+		left: -112px;
+		display: flex;
+		justify-content: center;
+
+		.grid {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: flex-end;
+			padding: 7px;
+			border-bottom: 1px solid #d9d9d9;
+
+			.color-button {
+				width: 24px;
+				height: 24px;
+				display: flex;
+				align-items: center;
+				justify-content: space-around;
+
+				&:hover {
+					background-color: #F0F0F0;
+				}
+			}
+
+			&:last-child {
+				border-bottom: none;
+			}
+
+			.icon-color {
+				border: 1px solid rgba(0, 0, 0, 0.08);
+			}
+
+			.clear {
+				border: 2px solid black;
+				background-color: unset;
+			}
+
+		}
+	}
+
+	&.clear .popup {
+		width: 160px;
+		left: -65px;
+	}
+}
+
 .align-dropdown {
 	.popup {
 		display: flex;

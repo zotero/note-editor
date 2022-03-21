@@ -199,9 +199,9 @@ class Menu {
 
 		this.textColor = {
 			color: getActiveColor(state),
-			run(color) {
+			run: (color) => {
 				focus();
-				commands.toggleMark(schema.marks.textColor, { color }, true)(state, dispatch);
+				commands.toggleMark(schema.marks.textColor, { color })(this.view.state)(this.view.state, this.view.dispatch);
 			}
 		};
 

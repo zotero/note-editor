@@ -405,6 +405,17 @@ $indent-width: 30;
 	}
 }
 
+
+/* rtl:begin:ignore */
+.primary-editor {
+	& > p, h1, h2, h3, h4, h5, h6, pre, blockquote, table {
+		&[dir=rtl]:before {
+			display: none;
+		}
+	}
+}
+/* rtl:end:ignore */
+
 .primary-editor {
 	& > p, h1, h2, h3, h4, h5, h6, pre, blockquote, table, ul, ol, hr {
 		max-width: 700px;

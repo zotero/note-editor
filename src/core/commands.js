@@ -1,10 +1,11 @@
-import { TextSelection } from 'prosemirror-state';
+import { NodeSelection, TextSelection } from 'prosemirror-state';
 import { findParentNode } from 'prosemirror-utils';
 import { wrapInList, liftListItem, sinkListItem } from 'prosemirror-schema-list';
-import { formatCitation, SetAttrsStep } from './utils';
-import { fromHTML, schema } from './schema';
 import { Fragment, Slice } from 'prosemirror-model';
 import { setBlockType } from 'prosemirror-commands';
+import { canSplit } from 'prosemirror-transform';
+import { formatCitation, SetAttrsStep } from './utils';
+import { fromHTML, schema } from './schema';
 import { getMarkAttributes, getMarkRangeAtCursor, getMarkRange, isMarkActive } from './helpers';
 
 // Alternative commands to work with marks containing attributes,
@@ -469,4 +470,45 @@ export function getSingleSelectedNode(state, type, inside) {
 		return nodes[0];
 	}
 	return null;
+}
+
+// Preserve attrs
+export function customSplitBlock(state, dispatch) {
+	const { $from, $to } = state.selection
+	if (state.selection instanceof NodeSelection && state.selection.node.isBlock) {
+		if (!$from.parentOffset || !canSplit(state.doc, $from.pos)) return false
+		if (dispatch) dispatch(state.tr.split($from.pos).scrollIntoView())
+		return true
+	}
+
+	if (!$from.parent.isBlock) return false
+
+	if (dispatch) {
+		let atEnd = $to.parentOffset === $to.parent.content.size
+		let tr = state.tr
+		if (state.selection instanceof TextSelection) tr.deleteSelection()
+		let deflt = $from.depth === 0 ? null : $from.node(-1).contentMatchAt($from.indexAfter(-1)).defaultType
+		// HERE: All attrs
+		let types = atEnd && deflt ? [{ type: deflt, attrs: $from.node().attrs }] : null
+		let can = canSplit(tr.doc, $from.pos, 1, types)
+		if (!types && !can && canSplit(tr.doc, tr.mapping.map($from.pos), 1, deflt && [{ type: deflt }])) {
+			// HERE: All attrs
+			types = [{ type: deflt, attrs: $from.node().attrs }]
+			can = true
+		}
+		if (can) {
+			tr.split(tr.mapping.map($from.pos), 1, types)
+			if (
+				!$from.parentOffset &&
+				$from.parent.type !== deflt &&
+				$from.node(-1).canReplace(
+					$from.index(-1),
+					$from.indexAfter(-1),
+					Fragment.from(deflt.create(), $from.parent))) {
+				tr.setNodeMarkup(tr.mapping.map($from.before()), deflt)
+			}
+		}
+		dispatch(tr.scrollIntoView())
+	}
+	return true
 }

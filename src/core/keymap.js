@@ -1,12 +1,12 @@
 import {
 	wrapIn, setBlockType, chainCommands, toggleMark, exitCode,
-	joinUp, joinDown, lift, selectParentNode
+	joinUp, joinDown, lift, newlineInCode, liftEmptyBlock, createParagraphNear
 } from 'prosemirror-commands';
-import { wrapInList, splitListItem, liftListItem, sinkListItem } from 'prosemirror-schema-list';
+import { wrapInList, splitListItem } from 'prosemirror-schema-list';
 import { undo, redo } from 'prosemirror-history';
 import { undoInputRule } from 'prosemirror-inputrules';
 import { schema } from './schema';
-import { changeIndent, removeBlockIndent } from './commands';
+import { changeIndent, removeBlockIndent, customSplitBlock } from './commands';
 
 const mac = typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false;
 
@@ -61,7 +61,6 @@ export function buildKeymap(options) {
 	if (mac) bind('Ctrl-Enter', cmd);
 
 	// List item
-	bind('Enter', splitListItem(schema.nodes.listItem));
 	bind('Shift-Tab', changeIndent(-1, true));
 	bind('Tab', changeIndent(1, true));
 
@@ -78,6 +77,14 @@ export function buildKeymap(options) {
 		dispatch(state.tr.replaceSelectionWith(schema.nodes.horizontalRule.create()).scrollIntoView());
 		return true;
 	});
+
+	bind('Enter', chainCommands(
+		splitListItem(schema.nodes.listItem),
+		newlineInCode,
+		createParagraphNear,
+		liftEmptyBlock,
+		customSplitBlock
+	),);
 
 	return keys;
 }

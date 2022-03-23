@@ -170,7 +170,7 @@ function getClosestListItemNode($pos) {
 export function changeIndent(dir = 1) {
 	return function (state, dispatch, view) {
 		let { selection } = state;
-		let { $from } = selection;
+		let { $from, $to } = selection;
 		let { listItem } = state.schema.nodes;
 		let node = getClosestListItemNode($from);
 		if (node) {
@@ -183,12 +183,40 @@ export function changeIndent(dir = 1) {
 			return true;
 		}
 
-		// Block Tab for now
-		if (dir > 0) {
-			return true;
+		let range = $from.blockRange($to);
+		let allSupportIndent = true;
+		let nodes = [];
+		let pos = range.start + 1;
+		for (let i = range.startIndex; i < range.endIndex; i++) {
+			let node = range.parent.child(i);
+			nodes.push([pos, node]);
+			pos += node.nodeSize;
+			if (!node.type.attrs.indent) {
+				allSupportIndent = false;
+			}
 		}
 
-		// Allow Shift + Tab
+		let { tr } = state;
+
+		if (allSupportIndent) {
+			let changed = false;
+			for (let [pos, node] of nodes) {
+				let indent = node.attrs.indent || 0;
+				if (dir === 1 ? indent < 7 : indent >= 1) {
+					indent += dir;
+					if (indent === 0) {
+						indent = null;
+					}
+					tr.setBlockType(pos, pos, node.type, { ...node.attrs, indent });
+					changed = true;
+				}
+			}
+
+			if (changed) {
+				dispatch(tr);
+				return true;
+			}
+		}
 		return false;
 	};
 }

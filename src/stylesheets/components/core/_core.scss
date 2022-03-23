@@ -462,6 +462,9 @@ li {
 	line-height: 1.5;
 }
 
+
+/* rtl:begin:ignore */
+
 ol > li::before {
 	position: absolute;
 	display: flex;
@@ -475,8 +478,21 @@ ol > li::before {
 	counter-increment: li;
 }
 
+
 ul > li:before {
 	position: absolute;
 	margin-left: -15px;
 	content: "\2022";
 }
+
+
+ol[dir=rtl] > li::before {
+	text-align: right;
+	margin-right: -25px;
+}
+
+ul[dir=rtl] > li::before {
+	margin-right: -15px;
+}
+
+/* rtl:end:ignore */

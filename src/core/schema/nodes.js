@@ -197,22 +197,39 @@ export default {
 	orderedList: {
 		group: 'block',
 		content: 'listItem+',
-		attrs: { order: { default: 1 } },
+		attrs: {
+			order: { default: 1 },
+			dir: { default: null }
+		},
 		parseDOM: [{
 			tag: 'ol',
 			getAttrs: dom => ({
-				order: dom.hasAttribute('start') ? +dom.getAttribute('start') : 1
+				order: dom.hasAttribute('start') ? +dom.getAttribute('start') : 1,
+				dir: getDir(dom),
 			})
 		}],
-		toDOM: node => (node.attrs.order === 1 ? ['ol', 0] : ['ol', { start: node.attrs.order }, 0])
+		toDOM: node => (node.attrs.order === 1
+			? ['ol', { dir: node.attrs.dir }, 0]
+			: ['ol', {
+				start: node.attrs.order,
+				dir: node.attrs.dir
+			}, 0])
 	},
 
 
 	bulletList: {
 		group: 'block',
 		content: 'listItem+',
-		parseDOM: [{ tag: 'ul' }],
-		toDOM: () => ['ul', 0]
+		attrs: {
+			dir: { default: null }
+		},
+		parseDOM: [{
+			tag: 'ul',
+			getAttrs: dom => ({
+				dir: getDir(dom),
+			})
+		}],
+		toDOM: (node) => ['ul', { dir: node.attrs.dir, }, 0]
 	},
 
 

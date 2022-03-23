@@ -8,14 +8,10 @@ import { IconClose, IconColor, IconTextColor } from '../icons';
 import Dropdown from './dropdown';
 
 const COLORS = [
-	'#000000',  '#666666', '#999999',  '#CCCCCC', '#FFFFFF',
-	'#330000',  '#990000', '#CC0000',  '#FF6666', '#FFCCCC',
-	'#663300',  '#CC6600', '#FF6600',  '#FF9966', '#FFCC99',
-	'#663333',  '#CC9933', '#FFCC33',  '#FFFF66', '#FFFF99',
-	'#003300',  '#009900', '#33CC00',  '#66FF99', '#99FF99',
-	'#003333',  '#339999', '#00CCCC',  '#33FFFF', '#99FFFF',
-	'#330099',  '#6600CC', '#6633FF',  '#9999FF', '#CCCCFF',
-	'#330033',  '#993399', '#CC33CC',  '#FF99FF', '#FFCCFF',
+	'#000000','#660000','#993300','#666600','#006600','#336666','#333399','#663366',
+	'#999999','#CC0000','#FF6600','#FFCC00','#33CC00','#33CCFF','#6633FF','#CC33CC',
+	'#CCCCCC','#FF0000','#FF9900','#FFFF00','#33FF33','#66CCCC','#6666CC','#CC66CC',
+	'#FFFFFF','#FFCCCC','#FFCC99','#FFFFCC','#99FF99','#99FFFF','#CCCCFF','#FFCCFF',
 ];
 
 export default function FontColorsDropdown({ menuState }) {

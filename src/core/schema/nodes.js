@@ -123,7 +123,7 @@ export default {
 
 
 	heading: {
-		content: '(text | hardBreak)*',
+		content: '(text | hardBreak | citation | highlight)*',
 		group: 'block',
 		defining: true,
 		attrs: {

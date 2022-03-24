@@ -34,7 +34,7 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 			</div>
 			<div className="middle">
 				<TextDropdown menuState={menuState}/>
-				<FontColorsDropdown menuState={menuState}/>
+				{/*<FontColorsDropdown menuState={menuState}/>*/}
 				<ColorsDropdown colorState={colorState}/>
 				<StateButton
 					state={menuState.clearFormatting}

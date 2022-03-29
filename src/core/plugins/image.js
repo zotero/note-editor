@@ -112,10 +112,12 @@ export function image(options) {
 		},
 		appendTransaction(transactions, oldState, newState) {
 			if ((!transactions.some(tr => tr.docChanged)
-				|| transactions.some(tr => tr.getMeta('system')))
+					|| transactions.some(tr => tr.getMeta('system')))
+				&& !window.shortlyAllowImageImport
 				&& !transactions.some(tr => tr.getMeta('autoImportImages'))) {
 				return;
 			}
+			window.shortlyAllowImageImport = false;
 			let images = [];
 			newState.doc.descendants((node, pos) => {
 				if (node.type.name === 'image') {

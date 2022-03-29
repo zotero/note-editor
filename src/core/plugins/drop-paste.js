@@ -152,11 +152,15 @@ export function dropPaste(options) {
 						return true;
 					}
 				}
-				// Disable image pasting because on Windows it's inserted into contenteditable,
-				// but event.clipboardData.files is empty and there is no .getData('text/html')
-				// as well. When image import will be fully functioning, we can re-enable again
+				// Allow image pasting on Windows. It's inserted into contenteditable, while
+				// event.clipboardData.files remains empty and there is no .getData('text/html') as well.
+				// TODO: Allow on all platforms, because it's likely that the next Zotero Firefox version should allow this on macOS
 				if (!text && !html) {
-					return true;
+					window.shortlyAllowImageImport = true;
+					let platform = window.navigator?.userAgentData?.platform ?? window.navigator.platform;
+					if (!platform.startsWith('Win')) {
+						return true;
+					}
 				}
 				return false;
 			},

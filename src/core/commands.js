@@ -7,6 +7,7 @@ import { canSplit } from 'prosemirror-transform';
 import { formatCitation, SetAttrsStep } from './utils';
 import { fromHTML, schema } from './schema';
 import { getMarkAttributes, getMarkRangeAtCursor, getMarkRange, isMarkActive } from './helpers';
+import { serializeCitationInnerText } from './schema/utils';
 
 // Alternative commands to work with marks containing attributes,
 // as ProseMirror doesn't take into account mark attributes
@@ -539,4 +540,24 @@ export function customSplitBlock(state, dispatch) {
 		dispatch(tr.scrollIntoView())
 	}
 	return true
+}
+
+export function customTextBetween (slice, from, to, blockSeparator, leafText) {
+	var text = "", separated = true;
+	slice.nodesBetween(from, to, function (node, pos) {
+		if (node.type === schema.nodes.citation) {
+			text += serializeCitationInnerText(node);
+		}
+		else if (node.isText) {
+			text += node.text.slice(Math.max(from, pos) - pos, to - pos);
+			separated = !blockSeparator;
+		} else if (node.isLeaf && leafText) {
+			text += leafText;
+			separated = !blockSeparator;
+		} else if (!separated && node.isBlock) {
+			text += blockSeparator;
+			separated = true;
+		}
+	}, 0);
+	return text
 }

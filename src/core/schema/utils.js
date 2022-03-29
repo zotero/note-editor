@@ -156,3 +156,24 @@ export function serializeCitationInnerHTML(node) {
 	children.push(')');
 	return children;
 }
+
+export function serializeCitationInnerText(node) {
+	let children = ['('];
+	try {
+		let citation = JSON.parse(JSON.stringify(node.attrs.citation));
+		node.type.schema.cached.metadata.fillCitationItemsWithData(citation.citationItems);
+		citation.citationItems.forEach((citationItem, index, array) => {
+			if (citationItem.itemData) {
+				children.push(formatCitationItem(citationItem));
+				if (index !== array.length - 1) {
+					children.push('; ');
+				}
+			}
+		});
+	}
+	catch (e) {
+		console.log(e);
+	}
+	children.push(')');
+	return children.join('');
+}

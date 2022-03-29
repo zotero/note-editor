@@ -19,6 +19,7 @@ import { buildKeymap } from './keymap';
 import { buildInputRules } from './input-rules';
 import {
 	attachImportedImage,
+	customTextBetween,
 	insertHTML,
 	setCitation,
 	touchCitations,
@@ -203,6 +204,9 @@ class EditorCore {
 			}),
 
 			clipboardSerializer: buildClipboardSerializer(this.provider, schema, this.metadata),
+			clipboardTextSerializer: (slice) => {
+				return customTextBetween(slice.content, 0, slice.content.size, '\n\n');
+			},
 
 			nodeViews: {
 				image: nodeViews.image({

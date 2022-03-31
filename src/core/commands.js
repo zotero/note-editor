@@ -306,8 +306,42 @@ export function toggleDir(dir) {
 
 export function insertHTML(pos, html) {
 	return function (state, dispatch) {
-		let nodes = fromHTML(html, true).content.content;
-		if (Number.isInteger(pos)) {
+		let slice = fromHTML(html, true);
+		let nodes = slice.content.content;
+		let size = slice.content.size;
+		if (pos === null) {
+			let { tr } = state;
+			let { selection } = tr;
+			pos = selection.to;
+
+			let $pos = tr.doc.resolve(pos);
+			$pos = tr.doc.resolve($pos.posAtIndex(0, 1));
+			let range = $pos.blockRange($pos);
+			if (!selection.$from.nodeBefore) {
+				if ($pos.parent.content.size) {
+					pos = state.tr.doc.content.size;
+					tr.replace(pos, pos, slice);
+				}
+				else {
+					tr.replace(range.start + 1, range.end, slice);
+					pos = range.start - 3;
+				}
+			}
+			else {
+				if ($pos.parent.content.size) {
+					tr.replace(range.end, range.end, slice);
+					pos = range.end - 1;
+				}
+				else {
+					tr.replace(range.start + 1, range.end, slice);
+					pos = range.start - 3;
+				}
+			}
+			pos += size;
+			tr.setSelection(new TextSelection(tr.doc.resolve(pos))).scrollIntoView();
+			dispatch(tr);
+		}
+		else if (Number.isInteger(pos)) {
 			let negative = false;
 			if (pos < 0) {
 				negative = true;
@@ -322,20 +356,22 @@ export function insertHTML(pos, html) {
 			let $pos = tr.doc.resolve(pos);
 			if ($pos.parent && $pos.parent.type.isBlock && !$pos.parent.content.size) {
 				let range = $pos.blockRange($pos);
-				tr = tr.replaceWith(range.start, range.end, nodes)
+				tr = tr.replace(range.start + 1, range.end, slice);
 			}
 			// Remove next empty block if dragging in-between blocks
 			else if ($pos.nodeAfter && $pos.nodeAfter.isBlock && !$pos.nodeAfter.content.size) {
-				let range = $pos.blockRange(tr.doc.resolve(pos + 1));
-				tr = tr.replaceWith(range.start, range.end, nodes);
+				let $pos = tr.doc.resolve(pos + 1);
+				let range = $pos.blockRange($pos);
+				tr = tr.replace(range.start + 1, range.end, slice);
 			}
 			// Remove previous empty block if dragging in-between blocks
 			else if ($pos.nodeBefore && $pos.nodeBefore.isBlock && !$pos.nodeBefore.content.size) {
-				let range = $pos.blockRange(tr.doc.resolve(pos - 1));
-				tr = tr.replaceWith(range.start, range.end, nodes);
+				let $pos = tr.doc.resolve(pos - 1);
+				let range = $pos.blockRange($pos);
+				tr = tr.replace(range.start + 1, range.end, slice);
 			}
 			else {
-				tr = tr.insert(pos, nodes);
+				tr = tr.replace(pos, pos, slice);
 			}
 
 			if (negative) {

@@ -100,7 +100,13 @@ async function insertImages(view, pos, files) {
 	}
 	await Promise.all(promises);
 	if (nodes.length) {
-		dispatch(state.tr.insert(pos, nodes));
+		if (pos !== null) {
+			dispatch(state.tr.insert(pos, nodes));
+		}
+		else {
+			let slice = new Slice(new Fragment(nodes), 0, 0);
+			dispatch(state.tr.replaceSelection(slice, false));
+		}
 	}
 }
 
@@ -127,11 +133,11 @@ export function dropPaste(options) {
 					options.onInsertObject('zotero/annotation', data);
 					return true;
 				}
-				// This probably can be used on Chrome
-				// else if (event.clipboardData.files.length) {
-				// 	insertImages(view, pos.pos, event.clipboardData.files);
-				// 	return true;
-				// }
+				// This was tested and works on macOS and Firefox 72
+				else if (event.clipboardData.files.length) {
+					insertImages(view, null, event.clipboardData.files);
+					return true;
+				}
 				let text = event.clipboardData.getData('text/plain');
 				let html = event.clipboardData.getData('text/html');
 				if (!event.shiftKey && html) {
@@ -154,13 +160,10 @@ export function dropPaste(options) {
 				}
 				// Allow image pasting on Windows. It's inserted into contenteditable, while
 				// event.clipboardData.files remains empty and there is no .getData('text/html') as well.
+				// Update: Allow on all platforms and hope that it would help for Linux users
 				// TODO: Allow on all platforms, because it's likely that the next Zotero Firefox version should allow this on macOS
 				if (!text && !html) {
 					window.shortlyAllowImageImport = true;
-					let platform = window.navigator?.userAgentData?.platform ?? window.navigator.platform;
-					if (!platform.startsWith('Win')) {
-						return true;
-					}
 				}
 				return false;
 			},

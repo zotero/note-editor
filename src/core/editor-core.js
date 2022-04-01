@@ -6,8 +6,13 @@ import { gapCursor } from 'prosemirror-gapcursor';
 import { keymap } from 'prosemirror-keymap';
 import { history } from 'prosemirror-history';
 import { baseKeymap } from 'prosemirror-commands';
-import { tableEditing } from 'prosemirror-tables';
 import applyDevTools from 'prosemirror-dev-tools';
+
+import {
+	tableEditing,
+	columnResizing,
+	fixTables
+} from "prosemirror-tables";
 
 import { schema, toHTML, buildClipboardSerializer } from './schema';
 import Metadata from './schema/metadata';
@@ -117,8 +122,14 @@ class EditorCore {
 		let tr = schemaTransform(state);
 		if (tr) {
 			state = state.apply(tr);
-			doc = state.doc;
 		}
+
+		let fix = fixTables(state);
+		if (fix) {
+			state = state.apply(fix.setMeta("addToHistory", false));
+		}
+
+		doc = state.doc;
 
 		let that = this;
 		this.view = new EditorView(null, {
@@ -197,7 +208,7 @@ class EditorCore {
 						text: options.placeholder
 					}),
 					...(this.readOnly ? [] : [drag()]),
-					// columnResizing(),
+					columnResizing(),
 					tableEditing(),
 					history()
 				]

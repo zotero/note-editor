@@ -3,8 +3,8 @@
 	"version": "1.0.0",
 	"description": "",
 	"scripts": {
-		"build": "NODE_ENV=production webpack --display-modules",
-		"build:ios": "NODE_ENV=production webpack --config-name ios",
+		"build": "cross-env NODE_ENV=production webpack --display-modules",
+		"build:ios": "cross-env NODE_ENV=production webpack --config-name ios",
 		"start": "webpack-dev-server",
 		"test": "echo \"No tests yet\""
 	},
@@ -48,6 +48,7 @@
 		"babel-loader": "^8.2.2",
 		"babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
 		"copy-webpack-plugin": "^4.6.0",
+		"cross-env": "^7.0.3",
 		"css-loader": "^2.0.0",
 		"eslint": "^7.30.0",
 		"eslint-plugin-react": "^7.24.0",

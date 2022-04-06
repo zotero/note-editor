@@ -139,4 +139,12 @@ export default {
 	'noteEditor.edit': 'Edit',
 	'noteEditor.applyAnnotationColors': 'Apply Annotation Colors',
 	'noteEditor.removeAnnotationColors': 'Remove Annotation Colors',
+	'noteEditor.insertTable': 'Insert Table',
+	'noteEditor.insertRowBefore': 'Insert Row Above',
+	'noteEditor.insertRowAfter': 'Insert Row Below',
+	'noteEditor.insertColumnBefore': 'Insert Column Left',
+	'noteEditor.insertColumnAfter': 'Insert Column Right',
+	'noteEditor.deleteRow': 'Delete row',
+	'noteEditor.deleteColumn': 'Delete column',
+	'noteEditor.deleteTable': 'Delete table'
 };

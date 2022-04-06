@@ -48,6 +48,7 @@ import { nodeID } from './plugins/node-id';
 import { drag } from './plugins/drag';
 import { pullItemData } from './plugins/pull-item-data';
 import { trailingParagraph } from './plugins/trailing-paragraph';
+import { table, tableKey } from './plugins/table';
 
 // TODO: Avoid resetting cursor and losing the recently typed and unsaved
 //  text when a newly synced note is set
@@ -201,6 +202,7 @@ class EditorCore {
 							options.onOpenCitationPopup(node.attrs.nodeID, citation);
 						}
 					}),
+					table(),
 					// TODO: Trailing paragraph should only be inserted when appending transaction
 					// trailingParagraph(),
 					// inlineFix(),
@@ -208,7 +210,7 @@ class EditorCore {
 						text: options.placeholder
 					}),
 					...(this.readOnly ? [] : [drag()]),
-					columnResizing(),
+					columnResizing({ lastColumnResizable: false }),
 					tableEditing(),
 					history()
 				]
@@ -356,7 +358,8 @@ class EditorCore {
 			search: searchKey.getState(state),
 			highlight: highlightKey.getState(state),
 			image: imageKey.getState(state),
-			citation: citationKey.getState(state)
+			citation: citationKey.getState(state),
+			table: tableKey.getState(state)
 		};
 	}
 

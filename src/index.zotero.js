@@ -6,6 +6,7 @@ import { randomString } from './core/utils';
 import { schema } from './core/schema';
 import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
+import { insertTable } from './core/commands';
 
 let currentInstance = null;
 
@@ -302,6 +303,38 @@ class EditorInstance {
 				this._editorCore.pluginState.menu.alignRight.run();
 				return;
 			}
+			case 'insertTable': {
+				this._editorCore.pluginState.table.insertTable(2, 2);
+				return;
+			}
+			case 'insertColumnBefore': {
+				this._editorCore.pluginState.table.insertColumnBefore();
+				return;
+			}
+			case 'insertColumnAfter': {
+				this._editorCore.pluginState.table.insertColumnAfter();
+				return;
+			}
+			case 'insertRowBefore': {
+				this._editorCore.pluginState.table.insertRowBefore();
+				return;
+			}
+			case 'insertRowAfter': {
+				this._editorCore.pluginState.table.insertRowAfter();
+				return;
+			}
+			case 'deleteRow': {
+				this._editorCore.pluginState.table.deleteRow();
+				return;
+			}
+			case 'deleteColumn': {
+				this._editorCore.pluginState.table.deleteColumn();
+				return;
+			}
+			case 'deleteTable': {
+				this._editorCore.pluginState.table.deleteTable();
+				return;
+			}
 		}
 	}
 
@@ -374,6 +407,54 @@ class EditorInstance {
 						]
 					]
 				},
+			],
+			[
+				{
+					name: 'insertTable',
+					label: this._getLocalizedString('noteEditor.insertTable'),
+					enabled: !this._readOnly && !this._editorCore.pluginState.table.isTableSelected()
+				}
+			],
+			[
+				{
+					name: 'insertRowBefore',
+					label: this._getLocalizedString('noteEditor.insertRowBefore'),
+					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
+				},
+				{
+					name: 'insertRowAfter',
+					label: this._getLocalizedString('noteEditor.insertRowAfter'),
+					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
+				}
+			],
+			[
+				{
+					name: 'insertColumnBefore',
+					label: this._getLocalizedString('noteEditor.insertColumnBefore'),
+					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
+				},
+				{
+					name: 'insertColumnAfter',
+					label: this._getLocalizedString('noteEditor.insertColumnAfter'),
+					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
+				}
+			],
+			[
+				{
+					name: 'deleteRow',
+					label: this._getLocalizedString('noteEditor.deleteRow'),
+					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
+				},
+				{
+					name: 'deleteColumn',
+					label: this._getLocalizedString('noteEditor.deleteColumn'),
+					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
+				},
+				{
+					name: 'deleteTable',
+					label: this._getLocalizedString('noteEditor.deleteTable'),
+					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
+				}
 			]
 		];
 

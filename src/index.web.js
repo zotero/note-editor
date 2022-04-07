@@ -417,6 +417,7 @@ let html1 = `
 <asdfasdf>
 <p style="background-image:  linear-gradient(rgba(0, 0, 255, 0.5), rgba(255, 255, 0, 0.5)), url('https://mdn.mozillademos.org/files/7693/catfront.png');">Background image extracted</p>
 <div style="background-image: asdf;">Invalid background color</div>
+<p><span style="background: red;">This has a red background</span></p>
 </asdfasdf>
 
   <video width = "500" height = "300" controls>

@@ -1,3 +1,4 @@
+import { Fragment } from 'prosemirror-model';
 import {
 	wrappingInputRule,
 	inputRules,
@@ -42,7 +43,7 @@ export function buildInputRules() {
 	let rules = [
 		...smartQuotes,
 		ellipsis,
-		emDash,
+		// emDash,
 		wrappingInputRule(/^\s*>\s$/, schema.nodes.blockquote),
 		wrappingInputRule(/^\s*(1\.)\s$/, schema.nodes.orderedList),
 		wrappingInputRule(/^\s*([-+*])\s$/, schema.nodes.bulletList),
@@ -53,6 +54,9 @@ export function buildInputRules() {
 		markInputRule(/^(?:[^*`]+)(\*([^\s*][^*]+?)\*)$|^(\*([^\s*][^*]+)\*)$/, schema.marks.em, 1),
 		markInputRule(/^(?:[^`]+)(~~([^\s~][^~]+)~~)$|^(~~([^\s~][^~]+)~~)$/, schema.marks.strike, 2),
 		markInputRule(/(`[^\s`].*`)$/, schema.marks.code, 1),
+		new InputRule(/^\-\-\-$|^\*\*\*$/, (state, match, start, end) => {
+			return state.tr.replaceWith(start - 1, end, Fragment.from(schema.nodes.horizontalRule.create()));
+		}),
 		textblockTypeInputRule(new RegExp("^(#{1,6}) $"), schema.nodes.heading, match => ({level: match[1].length})),
 	];
 	return inputRules({ rules });

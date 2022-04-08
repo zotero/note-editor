@@ -1,5 +1,5 @@
 import { DOMParser, DOMSerializer, Schema } from 'prosemirror-model';
-import { schema } from './index';
+import { HIGHLIGHT_COLORS, schema } from './index';
 import { encodeObject, formatCitationItem } from '../utils';
 
 // Note: TinyMCE is automatically removing div nodes without text and triggering immediate update/sync
@@ -78,62 +78,71 @@ export function buildFromHTML(schema) {
 
 export function buildClipboardSerializer(provider, schema, metadata) {
 	let base = DOMSerializer.fromSchema(schema);
-	return new DOMSerializer(Object.assign({}, base.nodes, {
-		image(node) {
-			let annotation;
-			if (node.attrs.annotation) {
-				annotation = JSON.parse(JSON.stringify(node.attrs.annotation));
-				if (annotation.citationItem) {
-					metadata.fillCitationItemsWithData([annotation.citationItem]);
+	return new DOMSerializer(
+		Object.assign({}, base.nodes, {
+			image(node) {
+				let annotation;
+				if (node.attrs.annotation) {
+					annotation = JSON.parse(JSON.stringify(node.attrs.annotation));
+					if (annotation.citationItem) {
+						metadata.fillCitationItemsWithData([annotation.citationItem]);
+					}
 				}
-			}
 
-			let attrs = {
-				src: node.attrs.src,
-				alt: node.attrs.alt,
-				title: node.attrs.title,
-				width: node.attrs.width,
-				height: node.attrs.height,
-				'data-annotation': annotation && encodeObject(annotation)
-			};
+				let attrs = {
+					src: node.attrs.src,
+					alt: node.attrs.alt,
+					title: node.attrs.title,
+					width: node.attrs.width,
+					height: node.attrs.height,
+					'data-annotation': annotation && encodeObject(annotation)
+				};
 
-			let data = provider.getCachedData(node.attrs.nodeID, 'image');
-			if (data) {
-				if (attrs.src) {
-					attrs['data-original-src'] = attrs.src;
+				let data = provider.getCachedData(node.attrs.nodeID, 'image');
+				if (data) {
+					if (attrs.src) {
+						attrs['data-original-src'] = attrs.src;
+					}
+					attrs.src = data.src;
 				}
-				attrs.src = data.src;
-			}
-			return ['img', attrs];
-		},
-		citation(node) {
-			let citation;
-			if (node.attrs.citation) {
-				citation = JSON.parse(JSON.stringify(node.attrs.citation));
-				if (Array.isArray(citation.citationItems)) {
-					metadata.fillCitationItemsWithData(citation.citationItems);
+				return ['img', attrs];
+			},
+			citation(node) {
+				let citation;
+				if (node.attrs.citation) {
+					citation = JSON.parse(JSON.stringify(node.attrs.citation));
+					if (Array.isArray(citation.citationItems)) {
+						metadata.fillCitationItemsWithData(citation.citationItems);
+					}
 				}
-			}
-			let children = serializeCitationInnerHTML(node);
-			return ['span', {
-				class: 'citation',
-				'data-citation': citation && encodeObject(citation)
-			}, ...children];
-		},
-		highlight(node) {
-			let annotation;
-			if (node.attrs.annotation) {
-				annotation = JSON.parse(JSON.stringify(node.attrs.annotation));
-				if (annotation.citationItem) {
-					metadata.fillCitationItemsWithData([annotation.citationItem]);
+				let children = serializeCitationInnerHTML(node);
+				return ['span', {
+					class: 'citation',
+					'data-citation': citation && encodeObject(citation)
+				}, ...children];
+			},
+			highlight(node) {
+				let annotation;
+				if (node.attrs.annotation) {
+					annotation = JSON.parse(JSON.stringify(node.attrs.annotation));
+					if (annotation.citationItem) {
+						metadata.fillCitationItemsWithData([annotation.citationItem]);
+					}
 				}
+				return ['span', {
+					class: 'highlight',
+					'data-annotation': annotation && encodeObject(annotation)
+				}, 0];
 			}
-			return ['span', {
-				class: 'highlight',
-				'data-annotation': annotation && encodeObject(annotation)
-			}, 0];
+		}),
+		Object.assign({}, base.marks, {
+			// Remove alpha channel from rgba hex color code
+			backgroundColor(mark) {
+				let color = mark.attrs.color;
+				return ['span', { style: `background-color: ${color[0] === '#' ? color.slice(0, 7) : color}` }, 0];
+			}
 		}
-	}), base.marks);
+	));
 }
 
 export function serializeCitationInnerHTML(node) {

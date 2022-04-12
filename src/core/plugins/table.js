@@ -1,4 +1,4 @@
-import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
+import { Plugin, PluginKey, TextSelection, Selection } from 'prosemirror-state';
 
 import {
 	addColumnAfter,
@@ -14,7 +14,8 @@ import {
 	toggleHeaderColumn,
 	toggleHeaderCell,
 	goToNextCell,
-	deleteTable
+	deleteTable,
+	TableMap
 } from "prosemirror-tables";
 
 import { schema } from '../schema';
@@ -33,6 +34,14 @@ class Table {
 	update(state, oldState) {
 		if (!this.view) {
 			return;
+		}
+
+		let { $from } = this.view.state.selection;
+		for (let i = $from.depth; i >= 0; i--) {
+			let node = $from.node(i);
+			if(node.type === this.view.state.schema.nodes.table) {
+				this.node = node;
+			}
 		}
 
 		if (oldState && oldState.doc.eq(state.doc) && oldState.selection.eq(state.selection)) {
@@ -94,30 +103,101 @@ class Table {
 
 	insertTable(rows, columns) {
 		let { state, dispatch } = this.view;
-		const { table, table_row, table_cell } = schema.nodes;
-		const rowNodes = [];
+		let { table, table_row, table_cell } = schema.nodes;
+		let rowNodes = [];
 		for (let i = 0; i < rows; i++) {
-			const cellNodes = [];
+			let cellNodes = [];
 			for (let j = 0; j < columns; j++) {
 				cellNodes.push(table_cell.createAndFill());
 			}
 			rowNodes.push(table_row.create(null, Fragment.from(cellNodes)));
 		}
-		let tableNode = table.create(null, Fragment.from(rowNodes));
-		let tr = state.tr.replaceSelectionWith(tableNode);
+		let node = table.create(null, Fragment.from(rowNodes));
+		let tr = state.tr.replaceSelectionWith(node);
 		dispatch(tr);
 	}
 
 	isTableSelected() {
-		const { $from } = this.view.state.selection;
+		let { $from } = this.view.state.selection;
 		for (let i = $from.depth; i > 0; i--) {
-			const node = $from.node(i);
+			let node = $from.node(i);
 			if(node.type === schema.nodes.table) {
 				return true;
 			}
 		}
 		return false;
 	}
+
+	moveCursorTo (pos) {
+		let { state, dispatch } = this.view;
+		let offset = this.tablePos();
+		if (offset) {
+			let { tr } = state;
+			tr.setSelection(Selection.near(tr.doc.resolve(pos + offset)));
+			dispatch(tr);
+		}
+	}
+
+	tablePos() {
+		let { $from } = this.view.state.selection;
+		for (let i = $from.depth; i > 0; i--) {
+			let node = $from.node(i);
+			if (node.type === this.view.state.schema.nodes.table) {
+				return $from.start(i);
+			}
+		}
+	}
+
+	getCurrentCellPos() {
+		let { $from } = this.view.state.selection;
+		let { table_cell, table_header } = this.view.state.schema.nodes;
+		for (let i = $from.depth; i >= 0; i--) {
+			let node = $from.node(i);
+			if (node.type === table_cell || node.type === table_header) {
+				return $from.start(i);
+			}
+		}
+	}
+
+	goToNextCell(direction) {
+		let { state, dispatch } = this.view;
+		if (!this.node) {
+			return false;
+		}
+		let offset = this.tablePos();
+		if (!offset) {
+			return false;
+		}
+		let map = TableMap.get(this.node);
+		let cellPos = this.getCurrentCellPos();
+		let firstCellPos = map.positionAt(0, 0, this.node) + offset + 1;
+		let lastCellPos = map.positionAt(map.height - 1, map.width - 1, this.node) + offset + 1;
+
+		if (cellPos === firstCellPos && direction === -1) {
+			let pos = map.positionAt(0, 0, this.node);
+			this.moveCursorTo(pos);
+			addRowBefore(this.view.state, dispatch);
+			this.moveCursorTo(pos);
+			return true;
+		}
+		else if (cellPos === lastCellPos && direction === 1) {
+			let prevRowPos = map.positionAt(map.height - 1, 0, this.node);
+			this.moveCursorTo(prevRowPos);
+			addRowAfter(this.view.state, dispatch);
+			let nextPos = TableMap.get(this.node).positionAt(map.height, 0, this.node);
+			this.moveCursorTo(nextPos);
+			return true;
+		}
+		if (!this.view.hasFocus()) {
+			this.view.focus();
+		}
+		let result = goToNextCell(direction)(state, dispatch);
+		if (result) {
+			let { state } = this.view;
+			dispatch(state.tr.setSelection(Selection.near(state.selection.$from)));
+		}
+		return result;
+	};
 
 	destroy() {
 

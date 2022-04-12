@@ -168,7 +168,13 @@ class EditorCore {
 						find: () => {
 							this.pluginState.search.setActive(true);
 							return true;
-						}
+						},
+						goToPreviousCell: () => {
+							return this.pluginState.table.goToNextCell(-1);
+						},
+						goToNextCell: () => {
+							return this.pluginState.table.goToNextCell(1);
+						},
 					})),
 					keymap(baseKeymap),
 					dropCursor(),

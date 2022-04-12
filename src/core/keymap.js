@@ -60,9 +60,14 @@ export function buildKeymap(options) {
 	bind('Shift-Enter', cmd);
 	if (mac) bind('Ctrl-Enter', cmd);
 
-	// List item
-	bind('Shift-Tab', changeIndent(-1, true));
-	bind('Tab', changeIndent(1, true));
+	bind('Shift-Tab', chainCommands(
+		options.goToPreviousCell,
+		changeIndent(-1, true)
+	));
+	bind('Tab', chainCommands(
+		options.goToNextCell,
+		changeIndent(1, true)
+	));
 
 	bind('Shift-Ctrl-0', setBlockType(schema.nodes.paragraph));
 	bind('Shift-Ctrl-\\', setBlockType(schema.nodes.codeBlock));

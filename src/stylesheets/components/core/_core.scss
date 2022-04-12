@@ -138,14 +138,6 @@ $indent-width: 30;
 	overflow-x: auto;
 }
 
-.primary-editortable {
-	border-collapse: collapse;
-	table-layout: fixed;
-	width: 100%;
-	overflow: hidden;
-	border: 1px solid black;
-}
-
 .primary-editortd, .primary-editorth {
 	vertical-align: top;
 	box-sizing: border-box;
@@ -303,6 +295,7 @@ $indent-width: 30;
 		width: 100%;
 		margin: 0;
 		overflow: hidden;
+		border: 1px solid #cccccc;
 
 		td, th {
 			min-width: 1em;

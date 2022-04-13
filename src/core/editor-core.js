@@ -216,7 +216,6 @@ class EditorCore {
 						text: options.placeholder
 					}),
 					...(this.readOnly ? [] : [drag()]),
-					columnResizing({ lastColumnResizable: false }),
 					tableEditing(),
 					history()
 				]

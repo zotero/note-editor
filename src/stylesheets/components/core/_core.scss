@@ -282,8 +282,8 @@ $indent-width: 30;
 		table-layout: fixed;
 		width: 100%;
 		margin: 0;
-		overflow: hidden;
 		border: 1px solid #cccccc;
+		border-top: 0;
 
 		td, th {
 			min-width: 1em;
@@ -380,7 +380,7 @@ $indent-width: 30;
 }
 
 .primary-editor {
-	& > p, h1, h2, h3, h4, h5, h6, pre, blockquote, .tableWrapper {
+	& > p, h1, h2, h3, h4, h5, h6, pre, blockquote, table {
 		position: relative;
 
 		&:before {

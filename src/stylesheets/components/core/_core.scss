@@ -133,18 +133,6 @@ $indent-width: 30;
 	background-color: orange;
 }
 
-
-.primary-editor.tableWrapper {
-	overflow-x: auto;
-}
-
-.primary-editortd, .primary-editorth {
-	vertical-align: top;
-	box-sizing: border-box;
-	position: relative;
-	border: 1px solid black;
-}
-
 .primary-editor.column-resize-handle {
 	position: absolute;
 	right: -2px;
@@ -349,7 +337,6 @@ $indent-width: 30;
 
 	.tableWrapper {
 		margin: 1em 0;
-		overflow-x: auto;
 	}
 
 	.resize-cursor {
@@ -393,7 +380,7 @@ $indent-width: 30;
 }
 
 .primary-editor {
-	& > p, h1, h2, h3, h4, h5, h6, pre, blockquote, table {
+	& > p, h1, h2, h3, h4, h5, h6, pre, blockquote, .tableWrapper {
 		position: relative;
 
 		&:before {

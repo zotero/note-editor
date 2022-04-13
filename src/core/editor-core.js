@@ -241,7 +241,8 @@ class EditorCore {
 				}),
 				citation: nodeViews.citation({
 					metadata: this.metadata
-				})
+				}),
+				table: nodeViews.table()
 			},
 			dispatchTransaction(tr) {
 				if (that.readOnly && tr.docChanged) {

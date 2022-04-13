@@ -187,12 +187,19 @@ export function dropPaste(options) {
 				}
 
 				if (moved) {
-					// This is basically deleteTable from prosemirror-tables
+					let { tr } = state;
+					// This was adapted from deleteTable that is in prosemirror-tables
 					var $pos = state.selection.$anchor;
 					for (var d = $pos.depth; d > 0; d--) {
 						var node = $pos.node(d);
 						if (node.type.spec.tableRole == 'table') {
-							if (dispatch) { dispatch(state.tr.delete($pos.before(d), $pos.after(d)).scrollIntoView()); }
+							tr.delete($pos.before(d), $pos.after(d)).scrollIntoView();
+
+							let pos2 = tr.mapping.map(pos.pos);
+							tr.replaceRange(pos2, pos2, slice);
+
+							dispatch(tr);
+							return true;
 						}
 					}
 				}

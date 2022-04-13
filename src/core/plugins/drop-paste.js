@@ -185,6 +185,18 @@ export function dropPaste(options) {
 					options.onInsertObject('zotero/item', data, pos.pos);
 					return true;
 				}
+
+				if (moved) {
+					// This is basically deleteTable from prosemirror-tables
+					var $pos = state.selection.$anchor;
+					for (var d = $pos.depth; d > 0; d--) {
+						var node = $pos.node(d);
+						if (node.type.spec.tableRole == 'table') {
+							if (dispatch) { dispatch(state.tr.delete($pos.before(d), $pos.after(d)).scrollIntoView()); }
+						}
+					}
+				}
+
 				if (!moved && html) {
 					slice = transformSlice(schema, slice, options.ignoreImages);
 					dispatch(state.tr.replaceRange(pos.pos, pos.pos, slice));

@@ -103,6 +103,16 @@ function handleEnter(state, dispatch) {
 	}
 }
 
+function handleBackspace(state, dispatch) {
+	let { tr } = state;
+	let { $from, $to } = state.selection;
+	if ($from.pos === $to.pos) {
+		if ($from.nodeBefore.type === schema.nodes.highlight) {
+			dispatch(tr.setSelection(TextSelection.create(tr.doc, $from.pos - 1)));
+		}
+	}
+}
+
 export let highlightKey = new PluginKey('highlight');
 
 export function highlight(options) {
@@ -179,6 +189,9 @@ export function highlight(options) {
 			handleKeyDown(view, event) {
 				if (event.key === 'Enter') {
 					handleEnter(view.state, view.dispatch);
+				}
+				else if (event.key === 'Backspace') {
+					handleBackspace(view.state, view.dispatch);
 				}
 			}
 		}

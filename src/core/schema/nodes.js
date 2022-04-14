@@ -396,8 +396,9 @@ export default {
 						annotation.attachmentURI = annotation.uri;
 						delete annotation.uri;
 					}
+					return { annotation };
 				}
-				return { annotation };
+				return false;
 			}
 		}],
 		toDOM: node => ['span', {

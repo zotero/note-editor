@@ -292,6 +292,9 @@ $indent-width: 30;
 			box-sizing: border-box;
 			position: relative;
 
+			// In newer Firefox versions wrapping works without breaking all words
+			word-break: break-all;
+
 			> * {
 				margin-bottom: 0;
 			}

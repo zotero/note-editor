@@ -62,6 +62,9 @@ class EditorInstance {
 		window.localizedStrings = options.localizedStrings;
 
 		this._setFont(options.font);
+		if (options.style) {
+			this._setStyle(options.style);
+		}
 		this._init(options.value);
 	}
 
@@ -78,6 +81,15 @@ class EditorInstance {
 		let root = document.documentElement;
 		root.style.setProperty('--font-family', font.fontFamily);
 		root.style.setProperty('--font-size', font.fontSize + 'px');
+	}
+
+	_setStyle(style) {
+		let node = document.querySelector('head > style');
+		if (!node) {
+			node = document.createElement("style");
+			document.head.appendChild(node);
+		}
+		node.innerHTML = style;
 	}
 
 	_postMessage(message) {
@@ -220,10 +232,13 @@ class EditorInstance {
 				this._editorCore.focus();
 				return;
 			}
-			// TODO: Rename to 'setFont'
-			case 'updateFont': {
+			case 'setFont': {
 				let { font } = message;
 				this._setFont(font);
+			}
+			case 'setStyle': {
+				let { style } = message;
+				this._setStyle(style);
 			}
 		}
 	}

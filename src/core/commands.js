@@ -308,7 +308,7 @@ export function insertHTML(pos, html) {
 	return function (state, dispatch) {
 		let slice = fromHTML(html, true);
 		let nodes = slice.content.content;
-		let size = slice.content.size;
+		let docSizeBefore = state.tr.doc.content.size;
 		if (pos === null) {
 			let { tr } = state;
 			let { selection } = tr;
@@ -317,13 +317,14 @@ export function insertHTML(pos, html) {
 			let $pos = tr.doc.resolve(pos);
 			$pos = tr.doc.resolve($pos.posAtIndex(0, 1));
 			let range = $pos.blockRange($pos);
+			let slice = new Slice(Fragment.fromArray(nodes), 0, 0);
 			if (!selection.$from.nodeBefore) {
 				if ($pos.parent.content.size) {
 					pos = state.tr.doc.content.size;
 					tr.replace(pos, pos, slice);
 				}
 				else {
-					tr.replace(range.start + 1, range.end, slice);
+					tr.replace(range.start, range.end, slice);
 					pos = range.start - 3;
 				}
 			}
@@ -337,11 +338,12 @@ export function insertHTML(pos, html) {
 					pos = range.start - 3;
 				}
 			}
-			pos += size;
+			pos += tr.doc.content.size - docSizeBefore;
 			tr.setSelection(new TextSelection(tr.doc.resolve(pos))).scrollIntoView();
 			dispatch(tr);
 		}
 		else if (Number.isInteger(pos)) {
+			let slice = new Slice(Fragment.fromArray(nodes), 0, 0);
 			let negative = false;
 			if (pos < 0) {
 				negative = true;

@@ -159,7 +159,9 @@ class EditorCore {
 							}
 						}
 					}),
-					buildInputRules(),
+					buildInputRules({
+						enableSmartQuotes: this.options.smartQuotes,
+					}),
 					keymap(buildKeymap({
 						toggleLink: () => {
 							this.pluginState.link.toggle();

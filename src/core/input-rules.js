@@ -39,9 +39,8 @@ function linkInputRule() {
 	});
 }
 
-export function buildInputRules() {
+export function buildInputRules({ enableSmartQuotes }) {
 	let rules = [
-		...smartQuotes,
 		ellipsis,
 		// emDash,
 		wrappingInputRule(/^\s*>\s$/, schema.nodes.blockquote),
@@ -59,5 +58,10 @@ export function buildInputRules() {
 		}),
 		textblockTypeInputRule(new RegExp("^(#{1,6}) $"), schema.nodes.heading, match => ({level: match[1].length})),
 	];
+
+	if (enableSmartQuotes) {
+		rules = [...smartQuotes, ...rules];
+	}
+
 	return inputRules({ rules });
 }

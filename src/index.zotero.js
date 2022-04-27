@@ -56,6 +56,7 @@ class EditorInstance {
 		this._enableReturnButton = options.enableReturnButton;
 		this._isAttachmentNote = options.isAttachmentNote;
 		this._localizedStrings = options.localizedStrings;
+		this._smartQuotes = options.smartQuotes;
 		this._editorCore = null;
 
 		// TODO: Don't use global var
@@ -104,6 +105,7 @@ class EditorInstance {
 			unsaved: this._unsaved,
 			placeholder: this._placeholder,
 			isAttachmentNote: this._isAttachmentNote,
+			smartQuotes: this._smartQuotes,
 			onSubscribe: (subscription) => {
 				let { id, type, nodeID, data } = subscription;
 				subscription = { id, type, nodeID, data };

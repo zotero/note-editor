@@ -10,6 +10,7 @@ import {
 } from 'prosemirror-inputrules';
 
 import { schema } from './schema';
+import { TextSelection } from 'prosemirror-state';
 
 function markInputRule(regexp, markType, size) {
   return new InputRule(regexp, (state, match, start, end) => {
@@ -46,6 +47,12 @@ export function buildInputRules({ enableSmartQuotes }) {
 		wrappingInputRule(/^\s*>\s$/, schema.nodes.blockquote),
 		wrappingInputRule(/^\s*(1\.)\s$/, schema.nodes.orderedList),
 		wrappingInputRule(/^\s*([-+*])\s$/, schema.nodes.bulletList),
+		new InputRule(/^```$/, (state, match, start, end) => {
+			let { tr } = state;
+			return tr
+				.replaceWith(start - 1, end, Fragment.from(schema.nodes.codeBlock.create()))
+				.setSelection(new TextSelection(tr.doc.resolve(start)));
+		}),
 		linkInputRule(),
 		markInputRule(/(?:[^`0-9A-Za-z]+)(__([^\s_][^_]+)__)$|^(__([^\s _][^_]+)__)$/, schema.marks.strong, 2),
 		markInputRule(/^(?:[^`]+)(\*\*([^\s*][^*]+)\*\*)$|^(\*\*([^\s*][^*]+)\*\*)$/, schema.marks.strong, 2),

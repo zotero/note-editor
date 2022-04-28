@@ -6,7 +6,9 @@ import {
 	textblockTypeInputRule,
 	smartQuotes,
 	ellipsis,
-	emDash
+	emDash,
+	openDoubleQuote,
+	closeDoubleQuote
 } from 'prosemirror-inputrules';
 
 import { schema } from './schema';
@@ -67,7 +69,9 @@ export function buildInputRules({ enableSmartQuotes }) {
 	];
 
 	if (enableSmartQuotes) {
-		rules = [...smartQuotes, ...rules];
+		// Re-enable smart single quotes after upgrading Firefox version, because on regular Firefox it works fine.
+		// Just use smartQuotes
+		rules = [openDoubleQuote, closeDoubleQuote/*, openSingleQuote, closeSingleQuote*/, ...rules];
 	}
 
 	return inputRules({ rules });

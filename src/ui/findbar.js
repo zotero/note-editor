@@ -10,6 +10,7 @@ function Findbar({ searchState, active }) {
 	const [findValue, setFindValue] = useState('');
 	const [replaceValue, setReplaceValue] = useState('');
 	const searchInputRef = useRef();
+	const replaceInputRef = useRef();
 
 	useEffect(() => {
 		if (active) {
@@ -28,25 +29,14 @@ function Findbar({ searchState, active }) {
 	}
 
 	function handleFindPrev() {
-		// props.view.dom.focus();
 		searchState.prev();
 	}
 
 	function handleFindNext(event) {
-		// props.view.dom.focus();
 		searchState.next();
 	}
 
-	function handleCaseToggle() {
-		searchState.setCaseSensitive(!searchState.caseSensitive);
-	}
-
-	function handleWordToggle() {
-		searchState.setWholeWords(!searchState.wholeWords);
-	}
-
 	function handleReplace() {
-		// props.view.dom.focus();
 		searchState.replace(replaceValue);
 	}
 
@@ -67,16 +57,38 @@ function Findbar({ searchState, active }) {
 		if (event.key === 'Escape') {
 			searchState.setActive(false);
 		}
+		else if (event.key === 'Enter' && event.shiftKey) {
+			handleFindPrev();
+			event.preventDefault();
+		}
+		else if (event.key === 'Enter' && !event.shiftKey) {
+			handleFindNext();
+			event.preventDefault();
+		}
 	}
 
 	function handleReplaceInputKeyDown(event) {
 		if (event.key === 'Escape') {
 			searchState.setActive(false);
 		}
+		else if (event.key === 'Enter') {
+			handleReplace();
+		}
+		else if (event.key === 'ArrowUp') {
+			handleFindPrev();
+			event.preventDefault();
+		}
+		else if (event.key === 'ArrowDown') {
+			handleFindNext();
+			event.preventDefault();
+		}
 	}
 
 	function handleReplaceCheckboxChange() {
 		setShowReplace(!showReplace);
+		setTimeout(() => {
+			replaceInputRef.current.focus();
+		});
 	}
 
 	return active && (
@@ -85,7 +97,8 @@ function Findbar({ searchState, active }) {
 				<div className="input-box">
 					<div className="input">
 						<input
-							ref={searchInputRef} type="text"
+							ref={searchInputRef}
+							type="text"
 							placeholder={intl.formatMessage({ id: 'noteEditor.find' })}
 							value={searchState.searchTerm || ''}
 							onChange={handleFindInputChange} onKeyDown={handleFindInputKeyDown}
@@ -109,11 +122,12 @@ function Findbar({ searchState, active }) {
 				<div className="input-box">
 					<div className="input">
 						<input
+							ref={replaceInputRef}
 							type="text"
 							placeholder={intl.formatMessage({ id: 'noteEditor.replace' })}
 							value={replaceValue}
 							onChange={handleReplaceInputChange}
-							onKeyDown={handleFindInputKeyDown}
+							onKeyDown={handleReplaceInputKeyDown}
 						/>
 					</div>
 					<div className="buttons">

@@ -1,10 +1,7 @@
 import { TextSelection } from 'prosemirror-state';
 import { Plugin, PluginKey } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
-
-// TODO: Keyboard navigation
-// TODO: Focus the first result when typing
-// TODO: Search in citations
+import { schema } from '../schema';
 
 class Search {
 	constructor(options = {}) {
@@ -13,10 +10,21 @@ class Search {
 		this.caseSensitive = false;
 		this.wholeWords = false;
 		this.findClass = 'find';
+		this.findSelectedClass = 'find-selected';
 
 		this.decorations = DecorationSet.empty;
 		this.results = [];
-		this.needsUpdate = true;
+		this.selectedResultIndex = 0;
+		this.triggerUpdate = true;
+	}
+
+	focusSelectedResult() {
+		setTimeout(() => {
+			let node = this.view.dom.querySelector('.' + this.findSelectedClass);
+			if (node) {
+				node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+		});
 	}
 
 	setActive(active) {
@@ -26,75 +34,75 @@ class Search {
 			// up/down arrow keys doesn't work in Firefox if editor area is not focused
 			this.view.dom.focus();
 		}
-		this.needsUpdate = true;
+		this.triggerUpdate = true;
 		dispatch(state.tr);
 	}
 
 	setSearchTerm(searchTerm) {
 		let { state, dispatch } = this.view;
 		this.searchTerm = searchTerm;
-		this.needsUpdate = true;
-		this.needsFocus = true;
+		this.triggerUpdate = true;
+		this.triggerFocus = true;
+		this.selectedResultIndex = 0;
 		dispatch(state.tr);
 	}
 
 	setWholeWords(enable) {
 		let { state, dispatch } = this.view;
 		this.wholeWords = enable;
-		this.needsUpdate = true;
+		this.triggerUpdate = true;
 		dispatch(state.tr);
 	}
 
 	setCaseSensitive(enable) {
 		let { state, dispatch } = this.view;
 		this.caseSensitive = enable;
-		this.needsUpdate = true;
+		this.triggerUpdate = true;
 		dispatch(state.tr);
 	}
 
 	prev() {
-		this.view.dom.focus();
 		let { state, dispatch } = this.view;
 		let { tr } = state;
-		let pos = state.selection.from;
-		let result = this.results.slice().reverse().find(result => result.to < pos);
-		if (!result) {
-			if (this.results.length) {
-				result = this.results[this.results.length - 1];
-			}
-			else {
-				return;
-			}
+
+		if (!this.results.length) {
+			return;
 		}
 
-		tr.setSelection(TextSelection.between(state.doc.resolve(result.from), state.doc.resolve(result.to)));
-		tr.scrollIntoView();
+		let pos = state.selection.from;
+		let index = this.results.slice().reverse().findIndex(x => x.to < pos);
+		this.selectedResultIndex = index === -1 ? this.results.length - 1 : this.results.length - index - 1;
+		let result = this.results[this.selectedResultIndex];
+		tr.setSelection(TextSelection.between(state.doc.resolve(result.from), state.doc.resolve(result.from)));
+
+		this.triggerUpdate = true;
 		dispatch(tr);
+
+		this.focusSelectedResult();
 	}
 
 	next() {
-		this.view.dom.focus();
 		let { state, dispatch } = this.view;
 		let { tr } = state;
-		let pos = state.selection.to;
-		let result = this.results.find(result => result.from >= pos);
-		if (!result) {
-			if (this.results.length) {
-				result = this.results[0];
-			}
-			else {
-				return;
-			}
+
+		if (!this.results.length) {
+			return;
 		}
 
-		tr.setSelection(TextSelection.between(state.doc.resolve(result.from), state.doc.resolve(result.to)));
-		tr.scrollIntoView();
+		let pos = state.selection.from;
+		let index = this.results.findIndex(x => x.from > pos);
+		this.selectedResultIndex = index === -1 ? 0 : index;
+		let result = this.results[this.selectedResultIndex];
+		tr.setSelection(TextSelection.between(state.doc.resolve(result.from), state.doc.resolve(result.from)));
+
+		this.triggerUpdate = true;
 		dispatch(tr);
+		this.focusSelectedResult();
 	}
 
 	search(doc) {
 		this.results = [];
-		const mergedTextNodes = [];
+		let mergedTextNodes = [];
 		let index = 0;
 
 		if (!this.searchTerm) {
@@ -124,10 +132,20 @@ class Search {
 			}
 			else {
 				index += 1;
+				if (node.type === schema.nodes.citation) {
+					let res = this.view.domAtPos(pos);
+					if (res) {
+						mergedTextNodes[index++] = {
+							text: res.node.childNodes[res.offset].innerText,
+							pos,
+							isCitation: true
+						};
+					}
+				}
 			}
 		});
 
-		mergedTextNodes.forEach(({ text, pos }) => {
+		mergedTextNodes.forEach(({ text, pos, isCitation }) => {
 			searchRe.lastIndex = 0;
 			let m;
 			while ((m = searchRe.exec(text))) {
@@ -135,55 +153,94 @@ class Search {
 					break;
 				}
 
-				this.results.push({
-					from: pos + m.index,
-					to: pos + m.index + m[0].length
-				});
+				if (isCitation) {
+					this.results.push({
+						from: pos,
+						to: pos + 1,
+						isCitation
+					});
+				}
+				else {
+					this.results.push({
+						from: pos + m.index,
+						to: pos + m.index + m[0].length
+					});
+				}
 			}
 		});
 	}
 
 	replace(replace) {
-		this.view.dom.focus();
 		let { state, dispatch } = this.view;
-		let from = state.selection.from;
-		let to = state.selection.to;
-		let result = this.results.find(result => result.from === from && result.to === to);
-		if (!result) {
-			this.next();
+		let { tr } = state;
+
+		if (!this.results.length) {
 			return;
 		}
+		let result = this.results[this.selectedResultIndex];
 
-		let tr = state.tr.insertText(replace, result.from, result.to);
-		let rebasedTo = tr.mapping.map(result.to);
-		tr.setSelection(TextSelection.between(tr.doc.resolve(rebasedTo), tr.doc.resolve(rebasedTo)));
+		this.triggerUpdate = true;
+		this.triggerFocus = true;
+
+		if (result.isCitation) {
+			tr.setSelection(TextSelection.between(tr.doc.resolve(result.to), tr.doc.resolve(result.to)));
+		}
+		else {
+			tr.insertText(replace, result.from, result.to);
+			tr.setSelection(TextSelection.between(tr.doc.resolve(result.from + replace.length), tr.doc.resolve(result.from + replace.length)));
+		}
 		dispatch(tr);
-
-		this.next();
 	}
 
 	replaceAll(replace) {
 		let { state, dispatch } = this.view;
 		let tr = state.tr;
 		for (let result of this.results) {
+			if (result.isCitation) {
+				continue;
+			}
 			tr.insertText(replace, tr.mapping.map(result.from), tr.mapping.map(result.to));
 		}
 		dispatch(tr);
 	}
 
-	updateDecorations(tr) {
+	updateState(tr) {
 		if (this.active) {
-			if (this.needsUpdate || tr.docChanged) {
-				this.search(tr.doc);
-				let list = this.results.map((deco, index) => (
-					Decoration.inline(deco.from, deco.to, { class: this.findClass })
-				));
-				this.decorations = DecorationSet.create(tr.doc, list);
-				this.needsUpdate = false;
+			if (tr.docChanged) {
+				this.triggerUpdate = true;
 			}
 		}
 		else {
 			this.decorations = DecorationSet.empty;
+		}
+	}
+
+	updateView() {
+		if (this.triggerUpdate) {
+			this.triggerUpdate = false;
+
+			let { state, dispatch } = this.view;
+			let { tr } = state;
+
+			this.search(tr.doc);
+
+			if (this.triggerFocus && this.results.length) {
+				this.triggerFocus = false;
+				let pos = state.selection.from;
+				let index = this.results.findIndex(x => x.from >= pos);
+				this.selectedResultIndex = index === -1 ? 0 : index;
+				let result = this.results[this.selectedResultIndex];
+				tr.setSelection(TextSelection.between(state.doc.resolve(result.from), state.doc.resolve(result.from)));
+				this.focusSelectedResult();
+			}
+			let list = this.results.map((deco, index) => (
+				Decoration.inline(deco.from, deco.to, {
+					class: index === this.selectedResultIndex
+						? this.findSelectedClass : this.findClass
+				})
+			));
+			this.decorations = DecorationSet.create(tr.doc, list);
+			dispatch(tr);
 		}
 	}
 }
@@ -198,14 +255,18 @@ export function search() {
 				return new Search();
 			},
 			apply: (tr, pluginState) => {
-				pluginState.updateDecorations(tr);
+				pluginState.updateState(tr);
 				return pluginState;
 			}
 		},
 		view: (view) => {
 			let pluginState = searchKey.getState(view.state);
 			pluginState.view = view;
-			return {};
+			return {
+				update(view, lastState) {
+					pluginState.updateView(view.state, lastState);
+				}
+			};
 		},
 		props: {
 			decorations(state) {

@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { IconChevronDown, IconChevronUp } from './icons';
 
@@ -11,6 +11,23 @@ function Findbar({ searchState, active }) {
 	const [replaceValue, setReplaceValue] = useState('');
 	const searchInputRef = useRef();
 	const replaceInputRef = useRef();
+
+	const handleKeydownCallback = useCallback(handleKeydown, []);
+
+	useEffect(() => {
+		window.addEventListener('keydown', handleKeydownCallback);
+		return () => {
+			window.removeEventListener('keydown', handleKeydownCallback);
+		};
+	}, [handleKeydownCallback]);
+
+	function handleKeydown(event) {
+		if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+			searchState.setActive(true);
+			searchInputRef.current.focus();
+			event.preventDefault();
+		}
+	}
 
 	useEffect(() => {
 		if (active) {

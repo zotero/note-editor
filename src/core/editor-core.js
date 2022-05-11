@@ -167,10 +167,6 @@ class EditorCore {
 							this.pluginState.link.toggle();
 							return true;
 						},
-						find: () => {
-							this.pluginState.search.setActive(true);
-							return true;
-						},
 						goToPreviousCell: () => {
 							return this.pluginState.table.goToNextCell(-1);
 						},

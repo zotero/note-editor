@@ -66,6 +66,10 @@ export const randomString = function (len, chars) {
 	return randomstring;
 };
 
+export function removeDiacritics(text) {
+	return text.normalize("NFD").replace(/[\u0300-\u036f]/g, '');
+}
+
 export function encodeObject(value) {
 	if (typeof value !== 'object') {
 		return null;

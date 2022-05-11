@@ -2,6 +2,7 @@ import { TextSelection } from 'prosemirror-state';
 import { Plugin, PluginKey } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 import { schema } from '../schema';
+import { removeDiacritics } from '../utils';
 
 class Search {
 	constructor(options = {}) {
@@ -110,6 +111,7 @@ class Search {
 		}
 
 		let searchTerm = this.searchTerm.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+		searchTerm = removeDiacritics(searchTerm);
 		let searchRe = new RegExp(
 			this.wholeWords ? `\\b(${searchTerm})\\b` : searchTerm,
 			!this.caseSensitive ? 'gui' : 'gu'
@@ -117,17 +119,15 @@ class Search {
 
 		doc.descendants((node, pos) => {
 			if (node.isText) {
+				let text = removeDiacritics(node.text);
 				if (mergedTextNodes[index]) {
 					mergedTextNodes[index] = {
-						text: mergedTextNodes[index].text + node.text,
+						text: mergedTextNodes[index].text + text,
 						pos: mergedTextNodes[index].pos
 					};
 				}
 				else {
-					mergedTextNodes[index] = {
-						text: node.text,
-						pos
-					};
+					mergedTextNodes[index] = { text, pos };
 				}
 			}
 			else {
@@ -135,11 +135,9 @@ class Search {
 				if (node.type === schema.nodes.citation) {
 					let res = this.view.domAtPos(pos);
 					if (res) {
-						mergedTextNodes[index++] = {
-							text: res.node.childNodes[res.offset].innerText,
-							pos,
-							isCitation: true
-						};
+						let text = res.node.childNodes[res.offset].innerText;
+						text = removeDiacritics(text);
+						mergedTextNodes[index++] = { text, pos, isCitation: true };
 					}
 				}
 			}

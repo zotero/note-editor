@@ -102,10 +102,12 @@ function Findbar({ searchState, active }) {
 	}
 
 	function handleReplaceCheckboxChange() {
+		if (!showReplace) {
+			setTimeout(() => {
+				replaceInputRef.current.focus();
+			});
+		}
 		setShowReplace(!showReplace);
-		setTimeout(() => {
-			replaceInputRef.current.focus();
-		});
 	}
 
 	return active && (

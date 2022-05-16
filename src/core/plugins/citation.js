@@ -197,7 +197,7 @@ class Citation {
 		let annotationPos = null;
 		for (let i = pos; i >= 0; i--) {
 			let node = doc.nodeAt(i);
-			if (node && ['highlight', 'image'].includes(node.type.name)) {
+			if (node && node.attrs.annotation) {
 				if (!this.isCitationAndAnnotationPair(node.attrs.annotation, citation.attrs.citation)) {
 					return false;
 				}

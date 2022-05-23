@@ -25,6 +25,7 @@ function Findbar({ searchState, active }) {
 		if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
 			searchState.setActive(true);
 			searchInputRef.current.focus();
+			searchInputRef.current.select();
 			event.preventDefault();
 		}
 	}
@@ -34,6 +35,7 @@ function Findbar({ searchState, active }) {
 			setTimeout(() => {
 				if (searchInputRef.current) {
 					searchInputRef.current.focus();
+					searchInputRef.current.select();
 				}
 			}, 100);
 		}

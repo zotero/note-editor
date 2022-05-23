@@ -111,7 +111,8 @@ class Search {
 		}
 
 		let searchTerm = this.searchTerm.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-		searchTerm = removeDiacritics(searchTerm);
+		let chars = removeDiacritics(searchTerm);
+		searchTerm = chars.reduce((str, char) => str + char[1], '');
 		let searchRe = new RegExp(
 			this.wholeWords ? `\\b(${searchTerm})\\b` : searchTerm,
 			!this.caseSensitive ? 'gui' : 'gu'
@@ -119,15 +120,14 @@ class Search {
 
 		doc.descendants((node, pos) => {
 			if (node.isText) {
-				let text = removeDiacritics(node.text);
+				let chars = removeDiacritics(node.text);
 				if (mergedTextNodes[index]) {
-					mergedTextNodes[index] = {
-						text: mergedTextNodes[index].text + text,
-						pos: mergedTextNodes[index].pos
-					};
+					let shift = [...new Set(mergedTextNodes[index].chars.map(x => x[0]))].length;
+					chars = chars.map(x => [x[0] + shift, x[1]]);
+					mergedTextNodes[index].chars = [...mergedTextNodes[index].chars, ...chars];
 				}
 				else {
-					mergedTextNodes[index] = { text, pos };
+					mergedTextNodes[index] = { chars, pos };
 				}
 			}
 			else {
@@ -136,21 +136,21 @@ class Search {
 					let res = this.view.domAtPos(pos);
 					if (res) {
 						let text = res.node.childNodes[res.offset].innerText;
-						text = removeDiacritics(text);
-						mergedTextNodes[index++] = { text, pos, isCitation: true };
+						let chars = removeDiacritics(text);
+						mergedTextNodes[index++] = { chars, pos, isCitation: true };
 					}
 				}
 			}
 		});
 
-		mergedTextNodes.forEach(({ text, pos, isCitation }) => {
+		mergedTextNodes.forEach(({ chars, pos, isCitation }) => {
+			let text = chars.reduce((str, char) => str + char[1], '');
 			searchRe.lastIndex = 0;
 			let m;
 			while ((m = searchRe.exec(text))) {
 				if (m[0] === '') {
 					break;
 				}
-
 				if (isCitation) {
 					this.results.push({
 						from: pos,
@@ -160,8 +160,8 @@ class Search {
 				}
 				else {
 					this.results.push({
-						from: pos + m.index,
-						to: pos + m.index + m[0].length
+						from: pos + chars[m.index][0],
+						to: pos + chars[m.index + m[0].length - 1][0] + 1
 					});
 				}
 			}

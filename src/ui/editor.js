@@ -55,9 +55,9 @@ function Editor(props) {
 				<div className="relative-container">
 					{refReady && !props.disableUI && <Fragment>
 						{editorState.link && <LinkPopup parentRef={editorRef} pluginState={editorState.link.popup}/>}
-						{editorState.highlight && <HighlightPopup parentRef={editorRef} highlightState={editorState.highlight} citationState={editorState.citation}/>}
-						{editorState.image && <ImagePopup parentRef={editorRef} imageState={editorState.image} citationState={editorState.citation}/>}
-						{editorState.citation && <CitationPopup
+						{!['web'].includes(props.viewMode) && editorState.highlight && <HighlightPopup parentRef={editorRef} highlightState={editorState.highlight} citationState={editorState.citation}/>}
+						{!['web'].includes(props.viewMode) && editorState.image && <ImagePopup parentRef={editorRef} imageState={editorState.image} citationState={editorState.citation}/>}
+						{!['web'].includes(props.viewMode) && editorState.citation && <CitationPopup
 							parentRef={editorRef}
 							citationState={editorState.citation}
 							viewMode={props.viewMode}

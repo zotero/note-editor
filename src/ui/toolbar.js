@@ -46,8 +46,8 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 					title={intl.formatMessage({ id: 'noteEditor.insertLink' })}
 					onClick={() => linkState.toggle()}
 				/>
-				{viewMode === 'ios' && <AlignDropdown menuState={menuState}/>}
-				{viewMode !== 'ios' && <Button
+				{['ios', 'web'].includes(viewMode) && <AlignDropdown menuState={menuState}/>}
+				{!['ios', 'web'].includes(viewMode) && <Button
 					icon={<IconCitation/>}
 					title={intl.formatMessage({ id: 'noteEditor.insertCitation' })}
 					onClick={() => citationState.insertCitation()}
@@ -59,7 +59,7 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 				/>
 			</div>
 			<div className="end">
-				<Dropdown
+				{!['web'].includes(viewMode) && <Dropdown
 					className="more-dropdown"
 					icon={<IconMore/>}
 					title={intl.formatMessage({ id: 'noteEditor.more' })}
@@ -83,7 +83,7 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 					{citationState.state.canRemoveCitations && <button className="option" onClick={() => citationState.state.removeCitations()}>
 						<FormattedMessage id="noteEditor.removeCitations"/>
 					</button>}
-				</Dropdown>
+				</Dropdown>}
 			</div>
 		</div>
 	);

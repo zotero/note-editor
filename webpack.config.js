@@ -2,7 +2,104 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const WriteFilePlugin = require('write-file-webpack-plugin');
 
+const configDev = {
+	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+	devtool: 'source-map',
+	entry: [
+		'./src/index.dev.js',
+		'./src/stylesheets/main.scss'
+	],
+	output: {
+		path: path.join(__dirname, './build'),
+		filename: 'dev/editor.js',
+		library: 'zotero-editor',
+		libraryTarget: 'umd',
+		publicPath: '/',
+		umdNamedDefine: true
+	},
+	module: {
+		rules: [
+			{
+				test: /\.(js|jsx)$/,
+				exclude: /node_modules/,
+				use: {
+					loader: 'babel-loader',
+					options: {
+						presets: [
+							'@babel/preset-react',
+							[
+								'@babel/preset-env',
+								{
+									modules: false
+								}
+							]
+						],
+						'plugins': [
+							'@babel/plugin-transform-runtime',
+							'@babel/plugin-proposal-class-properties'
+						]
+					}
+				}
+			},
+			{
+				test: /\.scss$/,
+				use: [
+					{
+						loader: 'file-loader',
+						options: {
+							name: 'dev/editor.css'
+						}
+					},
+					{
+						loader: 'extract-loader'
+					},
+					{
+						loader: 'css-loader',
+						options: {
+							sourceMap: true,
+							url: false
+						}
+					},
+					{
+						loader: 'postcss-loader',
+						options: {
+							sourceMap: true
+						}
+					},
+					{
+						loader: 'sass-loader',
+						options: {
+							sourceMap: true
+						}
+					}
+				]
+			}
+		]
+	},
+	resolve: {
+		extensions: ['*', '.js']
+	},
+	plugins: [
+		new CopyWebpackPlugin([
+				{ from: 'res/', to: 'dev/' },
+				{ from: 'html/editor.dev.html', to: 'dev/editor.html' }
+			], { copyUnmodified: true }
+		),
+		new WriteFilePlugin()
+	],
+	devServer: {
+		port: 3002,
+		contentBase: path.join(__dirname, 'build/'),
+		openPage: 'dev/editor.html',
+		open: false,
+		watchOptions: {
+			poll: true
+		}
+	}
+};
+
 const configWeb = {
+	name: 'web',
 	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 	devtool: 'source-map',
 	entry: [
@@ -86,16 +183,7 @@ const configWeb = {
 			], { copyUnmodified: true }
 		),
 		new WriteFilePlugin()
-	],
-	devServer: {
-		port: 3002,
-		contentBase: path.join(__dirname, 'build/'),
-		openPage: 'web/editor.html',
-		open: false,
-		watchOptions: {
-			poll: true
-		}
-	}
+	]
 };
 
 const configZotero = {
@@ -273,5 +361,4 @@ const configIOS = {
 	]
 };
 
-
-module.exports = [configWeb, configZotero, configIOS];
+module.exports = [configDev, configWeb, configZotero, configIOS];

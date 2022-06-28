@@ -52,7 +52,7 @@ function buildMathCommand(pattern, nodeType) {
 	}
 }
 
-const INLINE_MATH_PATTERN = /\$([^\$]*)\$$/;
+const INLINE_MATH_PATTERN = /\$([^\$]+)\$$/;
 const createInlineMath = buildMathCommand(INLINE_MATH_PATTERN, schema.nodes.math_inline);
 const mathKeymap = {
 	'Backspace': mathBackspaceCmd,

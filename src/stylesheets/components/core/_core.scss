@@ -375,13 +375,12 @@ $indent-width: 30;
 	}
 }
 
-
 .drag-handle {
 	position: absolute;
 	width: 24px;
 	height: 24px;
 	z-index: 99;
-	background-image: url(drag-handle.svg);
+	background-image: url(../../res/drag-handle.svg);
 	background-repeat: no-repeat;
 	background-position: top 1px left;
 	cursor: grab;

@@ -3,13 +3,12 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Zotero Note Editor</title>
-	<link rel="stylesheet" href="editor.css">
 	<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js?autorun=true"></script>
 
 	<style>
 		#editor-container {
-			width: var(--width);
-			inset-inline-start: 0;
+			width: var(--width) !important;
+			inset-inline-start: 0 !important;
 		}
 
 		#resizer {
@@ -41,6 +40,5 @@
 <div id="editor-container"></div>
 <div id="resizer"></div>
 <pre id="dev" class="prettyprint"></pre>
-<script src="editor.js"></script>
 </body>
 </html>

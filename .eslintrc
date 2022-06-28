@@ -18,15 +18,15 @@
 		},
 		"sourceType": "module",
 		"babelOptions": {
-      "configFile": "./.babelrc-es"
-    }
+			"configFile": "./babel.config.js"
+		}
 	},
 	"plugins": [
 		"react"
 	],
 	"settings": {
 		"react": {
-			"version": "16.8"
+			"version": "16.14"
 		}
 	},
 	"rules": {}

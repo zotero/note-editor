@@ -6,7 +6,6 @@ import { gapCursor } from 'prosemirror-gapcursor';
 import { keymap } from 'prosemirror-keymap';
 import { history } from 'prosemirror-history';
 import { baseKeymap } from 'prosemirror-commands';
-import applyDevTools from 'prosemirror-dev-tools';
 
 import { mathPlugin, mathKeymap } from './math';
 

@@ -1,6 +1,5 @@
-import { Plugin } from 'prosemirror-state/src';
+import { Plugin, PluginKey } from 'prosemirror-state';
 import { schema } from '../schema';
-import { PluginKey } from 'prosemirror-state';
 
 // TODO: Do other transformations as well i.e. insert space between highlights, citations
 

@@ -2,8 +2,10 @@
 // Popover pointer
 //
 
+@use "sass:math";
+
 @mixin popover-pointer($width, $height, $offset: 50%, $position: null) {
-	$border-x: $width / 2;
+	$border-x: math.div($width, 2);
 	$border-y: $height;
 
 	&::before,

@@ -1,21 +1,29 @@
 const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const WriteFilePlugin = require('write-file-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const configDev = {
-	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+	name: 'dev',
+	mode: 'development',
 	devtool: 'source-map',
-	entry: [
-		'./src/index.dev.js',
-		'./src/stylesheets/main.scss'
-	],
+	entry: {
+		editor: ['./src/index.dev.js', './src/stylesheets/main.scss'],
+	},
+	optimization: {
+		minimize: false,
+	},
 	output: {
-		path: path.join(__dirname, './build'),
-		filename: 'dev/editor.js',
-		library: 'zotero-editor',
-		libraryTarget: 'umd',
-		publicPath: '/',
-		umdNamedDefine: true
+		path: path.resolve(__dirname, './build/dev'),
+		filename: '[name].js',
+		publicPath: '',
+		library: {
+			name: 'zotero-editor',
+			type: 'umd',
+			umdNamedDefine: true,
+		},
 	},
 	module: {
 		rules: [
@@ -24,95 +32,89 @@ const configDev = {
 				exclude: /node_modules/,
 				use: {
 					loader: 'babel-loader',
-					options: {
-						presets: [
-							'@babel/preset-react',
-							[
-								'@babel/preset-env',
-								{
-									modules: false
-								}
-							]
-						],
-						'plugins': [
-							'@babel/plugin-transform-runtime',
-							'@babel/plugin-proposal-class-properties'
-						]
-					}
-				}
+				},
 			},
 			{
-				test: /\.scss$/,
+				test: /\.s?css$/,
 				use: [
-					{
-						loader: 'file-loader',
-						options: {
-							name: 'dev/editor.css'
-						}
-					},
-					{
-						loader: 'extract-loader'
-					},
+					MiniCssExtractPlugin.loader,
 					{
 						loader: 'css-loader',
-						options: {
-							sourceMap: true,
-							url: false
-						}
 					},
 					{
 						loader: 'postcss-loader',
-						options: {
-							sourceMap: true
-						}
 					},
 					{
 						loader: 'sass-loader',
-						options: {
-							sourceMap: true
-						}
-					}
-				]
-			}
-		]
-	},
-	resolve: {
-		extensions: ['*', '.js']
+					},
+				],
+			},
+			{
+				test: /\.svg$/,
+				type: 'asset/resource',
+				generator: {
+					filename: 'assets/icons/[name].[hash:8][ext]',
+				},
+			},
+			{
+				test: /\.woff2$/,
+				type: 'asset/resource',
+				generator: {
+					filename: 'assets/fonts/[name].[hash:8][ext]',
+				},
+			},
+			{
+				test: /\.(ttf|woff)$/,
+				type: 'asset/resource',
+				generator: {
+					emit: false,
+				},
+			},
+		],
 	},
 	plugins: [
-		new CopyWebpackPlugin([
-				{ from: 'res/', to: 'dev/' },
-				{ from: 'html/editor.dev.html', to: 'dev/editor.html' }
-			], { copyUnmodified: true }
-		),
-		new WriteFilePlugin()
+		new CleanWebpackPlugin(),
+		new MiniCssExtractPlugin({
+			filename: '[name].css',
+		}),
+		new HtmlWebpackPlugin({
+			template: './html/editor.dev.html',
+			filename: './[name].html',
+		}),
 	],
 	devServer: {
+		static: {
+			directory: path.resolve(__dirname, 'build/'),
+			watch: true,
+		},
+		devMiddleware: {
+			writeToDisk: true,
+		},
+		open: '/dev/editor.html',
 		port: 3002,
-		contentBase: path.join(__dirname, 'build/'),
-		openPage: 'dev/editor.html',
-		open: false,
-		watchOptions: {
-			poll: true
-		}
-	}
+	},
 };
 
 const configWeb = {
 	name: 'web',
-	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+	mode: 'production',
 	devtool: 'source-map',
-	entry: [
-		'./src/index.web.js',
-		'./src/stylesheets/main.scss'
-	],
+	entry: {
+		editor: ['./src/index.web.js', './src/stylesheets/main.scss'],
+	},
+	optimization: {
+		minimize: true,
+		minimizer: [new TerserPlugin({ extractComments: false }), new CssMinimizerPlugin()],
+	},
 	output: {
-		path: path.join(__dirname, './build'),
-		filename: 'web/editor.js',
-		library: 'zotero-editor',
-		libraryTarget: 'umd',
-		publicPath: '/',
-		umdNamedDefine: true
+		path: path.resolve(__dirname, './build/web'),
+		filename: '[name].js',
+		publicPath: '',
+		library: {
+			name: 'zotero-editor',
+			type: 'umd',
+			umdNamedDefine: true,
+		},
 	},
 	module: {
 		rules: [
@@ -121,88 +123,78 @@ const configWeb = {
 				exclude: /node_modules/,
 				use: {
 					loader: 'babel-loader',
-					options: {
-						presets: [
-							'@babel/preset-react',
-							[
-								'@babel/preset-env',
-								{
-									modules: false
-								}
-							]
-						],
-						'plugins': [
-							'@babel/plugin-transform-runtime',
-							'@babel/plugin-proposal-class-properties'
-						]
-					}
-				}
+				},
 			},
 			{
-				test: /\.scss$/,
+				test: /\.s?css$/,
 				use: [
-					{
-						loader: 'file-loader',
-						options: {
-							name: 'web/editor.css'
-						}
-					},
-					{
-						loader: 'extract-loader'
-					},
+					MiniCssExtractPlugin.loader,
 					{
 						loader: 'css-loader',
-						options: {
-							sourceMap: true,
-							url: false
-						}
 					},
 					{
 						loader: 'postcss-loader',
-						options: {
-							sourceMap: true
-						}
 					},
 					{
 						loader: 'sass-loader',
-						options: {
-							sourceMap: true
-						}
-					}
-				]
-			}
-		]
-	},
-	resolve: {
-		extensions: ['*', '.js']
+					},
+				],
+			},
+			{
+				test: /\.svg$/,
+				type: 'asset/resource',
+				generator: {
+					filename: 'assets/icons/[name].[hash:8][ext]',
+				},
+			},
+			{
+				test: /\.woff2$/,
+				type: 'asset/resource',
+				generator: {
+					filename: 'assets/fonts/[name].[hash:8][ext]',
+				},
+			},
+			{
+				test: /\.(ttf|woff)$/,
+				type: 'asset/resource',
+				generator: {
+					emit: false,
+				},
+			},
+		],
 	},
 	plugins: [
-		new CopyWebpackPlugin([
-				{ from: 'res/', to: 'web/' },
-				{ from: 'html/editor.web.html', to: 'web/editor.html' }
-			], { copyUnmodified: true }
-		),
-		new WriteFilePlugin()
-	]
+		new CleanWebpackPlugin(),
+		new MiniCssExtractPlugin({
+			filename: '[name].css',
+		}),
+		new HtmlWebpackPlugin({
+			template: './html/editor.web.html',
+			filename: './[name].html',
+		}),
+	],
 };
 
 const configZotero = {
-	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+	name: 'zotero',
+	mode: 'production',
 	devtool: false,
-	entry: [
-		'./src/index.zotero.js',
-		'./src/stylesheets/main.scss'
-	],
-	output: {
-		path: path.join(__dirname, './build/zotero'),
-		filename: 'editor.js',
-		library: 'zotero-editor',
-		libraryTarget: 'umd',
-		publicPath: '/',
-		umdNamedDefine: true
+	entry: {
+		editor: ['./src/index.zotero.js', './src/stylesheets/main.scss'],
 	},
 	optimization: {
-		minimize: false
+		minimize: true,
+		minimizer: [new CssMinimizerPlugin()],
+	},
+	output: {
+		path: path.resolve(__dirname, './build/zotero'),
+		filename: '[name].js',
+		publicPath: '',
+		library: {
+			name: 'zotero-editor',
+			type: 'umd',
+			umdNamedDefine: true,
+		},
 	},
 	module: {
 		rules: [
@@ -213,81 +205,87 @@ const configZotero = {
 					loader: 'babel-loader',
 					options: {
 						presets: [
-							'@babel/preset-react',
-							[
-								'@babel/preset-env',
-								{
-									useBuiltIns: false,
-									modules: false
-								}
-							]
-
+							['@babel/preset-env', { useBuiltIns: false }],
 						],
-						'plugins': [
-							'@babel/plugin-transform-runtime',
-							'@babel/plugin-proposal-class-properties'
-						]
-					}
-				}
+					},
+				},
 			},
 			{
-				test: /\.scss$/,
+				test: /\.s?css$/,
 				use: [
+					MiniCssExtractPlugin.loader,
 					{
-						loader: 'file-loader',
-						options: {
-							name: 'editor.css'
-						}
+						loader: 'css-loader',
 					},
 					{
-						loader: 'extract-loader'
+						loader: 'postcss-loader',
 					},
 					{
-						loader: 'css-loader?-url'
+						loader: 'sass-loader',
 					},
-					{
-						loader: 'postcss-loader'
-					},
-					{
-						loader: 'sass-loader'
-					}
-				]
-			}
-		]
-	},
-	resolve: {
-		extensions: ['*', '.js']
+				],
+			},
+			{
+				test: /\.svg$/,
+				type: 'asset/resource',
+				generator: {
+					filename: 'assets/icons/[name].[hash:8][ext]',
+				},
+			},
+			{
+				test: /\.woff2$/,
+				type: 'asset/resource',
+				generator: {
+					filename: 'assets/fonts/[name].[hash:8][ext]',
+				},
+			},
+			{
+				test: /\.(ttf|woff)$/,
+				type: 'asset/resource',
+				generator: {
+					emit: false,
+				},
+			},
+		],
 	},
 	plugins: [
-		new CopyWebpackPlugin([
-				{ from: 'res/', to: './' },
-				{ from: 'html/editor.zotero.html', to: './editor.html' }
-			], { copyUnmodified: true }
-		)
+		new CleanWebpackPlugin(),
+		new MiniCssExtractPlugin({
+			filename: '[name].css',
+		}),
+		new HtmlWebpackPlugin({
+			template: './html/editor.zotero.html',
+			filename: './[name].html',
+		}),
 	],
 	externals: {
-		'react': 'React',
+		react: 'React',
 		'react-dom': 'ReactDOM',
 		'react-intl': 'ReactIntl',
-		'prop-types': 'PropTypes'
-	}
+		'prop-types': 'PropTypes',
+	},
 };
 
 const configIOS = {
 	name: 'ios',
-	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-	devtool: 'source-map',
-	entry: [
-		'./src/index.ios.js',
-		'./src/stylesheets/main.scss'
-	],
+	mode: 'production',
+	devtool: false,
+	entry: {
+		editor: ['./src/index.ios.js', './src/stylesheets/main.scss'],
+	},
+	optimization: {
+		minimize: true,
+		minimizer: [new TerserPlugin({ extractComments: false }), new CssMinimizerPlugin()],
+	},
 	output: {
-		path: path.join(__dirname, './build'),
-		filename: 'ios/editor.js',
-		library: 'zotero-editor',
-		libraryTarget: 'umd',
-		publicPath: '/',
-		umdNamedDefine: true
+		path: path.resolve(__dirname, './build/ios'),
+		filename: '[name].js',
+		publicPath: '',
+		library: {
+			name: 'zotero-editor',
+			type: 'umd',
+			umdNamedDefine: true,
+		},
 	},
 	module: {
 		rules: [
@@ -296,69 +294,56 @@ const configIOS = {
 				exclude: /node_modules/,
 				use: {
 					loader: 'babel-loader',
-					options: {
-						presets: [
-							'@babel/preset-react',
-							[
-								'@babel/preset-env',
-								{
-									modules: false
-								}
-							]
-						],
-						'plugins': [
-							'@babel/plugin-transform-runtime',
-							'@babel/plugin-proposal-class-properties'
-						]
-					}
-				}
+				},
 			},
 			{
-				test: /\.scss$/,
+				test: /\.s?css$/,
 				use: [
-					{
-						loader: 'file-loader',
-						options: {
-							name: 'ios/editor.css'
-						}
-					},
-					{
-						loader: 'extract-loader'
-					},
+					MiniCssExtractPlugin.loader,
 					{
 						loader: 'css-loader',
-						options: {
-							sourceMap: true,
-							url: false
-						}
 					},
 					{
 						loader: 'postcss-loader',
-						options: {
-							sourceMap: true
-						}
 					},
 					{
 						loader: 'sass-loader',
-						options: {
-							sourceMap: true
-						}
-					}
-				]
-			}
-		]
-	},
-	resolve: {
-		extensions: ['*', '.js']
+					},
+				],
+			},
+			{
+				test: /\.svg$/,
+				type: 'asset/resource',
+				generator: {
+					filename: 'assets/icons/[name].[hash:8][ext]',
+				},
+			},
+			{
+				test: /\.woff2$/,
+				type: 'asset/resource',
+				generator: {
+					filename: 'assets/fonts/[name].[hash:8][ext]',
+				},
+			},
+			{
+				test: /\.(ttf|woff)$/,
+				type: 'asset/resource',
+				generator: {
+					emit: false,
+				},
+			},
+		],
 	},
 	plugins: [
-		new CopyWebpackPlugin([
-				{ from: 'res/', to: 'ios/' },
-				{ from: 'html/editor.ios.html', to: 'ios/editor.html' }
-			], { copyUnmodified: true }
-		),
-		new WriteFilePlugin()
-	]
+		new CleanWebpackPlugin(),
+		new MiniCssExtractPlugin({
+			filename: '[name].css',
+		}),
+		new HtmlWebpackPlugin({
+			template: './html/editor.ios.html',
+			filename: './[name].html',
+		}),
+	],
 };
 
 module.exports = [configDev, configWeb, configZotero, configIOS];

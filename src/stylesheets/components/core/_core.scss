@@ -412,14 +412,6 @@ $indent-width: 30;
 }
 /* rtl:end:ignore */
 
-.primary-editor {
-	& > p, h1, h2, h3, h4, h5, h6, pre, blockquote, table, ul, ol, hr {
-		max-width: 700px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-}
-
 .ProseMirror-selectednode {
 	background-color: #f4f4f4;
 	border-radius: 4px;

@@ -107,7 +107,7 @@ function handleBackspace(state, dispatch) {
 	let { tr } = state;
 	let { $from, $to } = state.selection;
 	if ($from.pos === $to.pos) {
-		if ($from.nodeBefore.type === schema.nodes.highlight) {
+		if ($from.nodeBefore && $from.nodeBefore.type === schema.nodes.highlight) {
 			dispatch(tr.setSelection(TextSelection.create(tr.doc, $from.pos - 1)));
 		}
 	}

@@ -49,6 +49,7 @@ import { drag } from './plugins/drag';
 import { pullItemData } from './plugins/pull-item-data';
 import { trailingParagraph } from './plugins/trailing-paragraph';
 import { table, tableKey } from './plugins/table';
+import { markdownSerializer } from './plugins/markdown-serializer';
 
 // TODO: Avoid resetting cursor and losing the recently typed and unsaved
 //  text when a newly synced note is set
@@ -215,14 +216,12 @@ class EditorCore {
 					}),
 					...(this.readOnly ? [] : [drag()]),
 					tableEditing(),
-					history()
+					history(),
+					markdownSerializer()
 				]
 			}),
 
 			clipboardSerializer: buildClipboardSerializer(this.provider, schema, this.metadata),
-			clipboardTextSerializer: (slice) => {
-				return customTextBetween(slice.content, 0, slice.content.size, '\n\n');
-			},
 
 			nodeViews: {
 				image: nodeViews.image({

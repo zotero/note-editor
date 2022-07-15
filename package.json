@@ -22,6 +22,7 @@
 		"prosemirror-history": "^1.1.3",
 		"prosemirror-inputrules": "^1.1.3",
 		"prosemirror-keymap": "^1.1.4",
+		"prosemirror-markdown": "^1.9.3",
 		"prosemirror-model": "^1.14.2",
 		"prosemirror-schema-basic": "^1.1.2",
 		"prosemirror-schema-list": "^1.1.4",

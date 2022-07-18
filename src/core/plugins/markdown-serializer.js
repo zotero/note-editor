@@ -134,6 +134,7 @@ export function markdownSerializer() {
 					if (typeof zoteroTranslateToMarkdown !== 'undefined') {
 						let ref = serializeForClipboard(view, slice);
 						let dom = ref.dom;
+						dom.querySelectorAll('img').forEach(node => node.remove())
 						return zoteroTranslateToMarkdown(dom.innerHTML);
 					}
 					else {

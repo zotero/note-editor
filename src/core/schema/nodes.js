@@ -1,3 +1,4 @@
+import { Fragment } from 'prosemirror-model';
 import { tableNodes } from 'prosemirror-tables';
 import { encodeObject, decodeObject, randomString, formatCitationItem } from '../utils';
 import { serializeCitationInnerHTML } from './utils';
@@ -97,7 +98,7 @@ export default {
 	// Block nodes
 	paragraph: {
 		group: 'block',
-		content: '(text | hardBreak | image | citation | highlight)*',
+		content: '(text | hardBreak | image | citation | highlight | math_inline)*',
 		attrs: {
 			indent: { default: null },
 			align: { default: null },
@@ -149,6 +150,28 @@ export default {
 			dir: node.attrs.dir,
 			'data-indent': node.attrs.indent
 		}, 0]
+	},
+
+
+	math_display: {
+		group: 'block math',
+		content: 'text*',
+		atom: true,
+		code: true,
+		toDOM: node => ['pre', {
+			class: 'math'
+		}, '$$' + node.textContent + '$$'],
+		parseDOM: [{
+			tag: 'pre.math',
+			getContent(dom, schema) {
+				let text = dom.textContent;
+				text = text.trim();
+				if (text.slice(0, 2) === '$$' && text.slice(-2) === '$$') {
+				  text = text.slice(2, -2);
+				}
+				return Fragment.from(schema.text(text));
+			  }
+		}]
 	},
 
 
@@ -405,5 +428,27 @@ export default {
 			class: 'highlight',
 			'data-annotation': encodeObject(node.attrs.annotation)
 		}, 0]
+	},
+
+
+	math_inline: {
+		group: 'inline math',
+		content: 'text*',
+		inline: true,
+		atom: true,
+		toDOM: node => ['span', {
+			class: 'math'
+		}, '$' + node.textContent + '$'],
+		parseDOM: [{
+			tag: 'span.math',
+			getContent(dom, schema) {
+				let text = dom.textContent;
+				text = text.trim();
+				if (text.slice(0, 1) === '$' && text.slice(-1) === '$') {
+				  text = text.slice(1, -1);
+				}
+				return Fragment.from(schema.text(text));
+			}
+		}]
 	}
 };

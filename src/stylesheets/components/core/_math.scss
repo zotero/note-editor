@@ -1,0 +1,29 @@
+
+@import "~@benrbray/prosemirror-math/style/math.css";
+@import "~katex/dist/katex.min.css";
+
+.math-node.empty-math .math-render::before {
+	content: "Click to insert LaTex ...";
+    color: black;
+}
+
+.math-node .math-render.parse-error::before {
+	content: "Cannot parse LaTeX.";
+	cursor: help;
+}
+
+.math-node .ProseMirror-focused {
+    outline: none;
+}
+
+math-display {
+    position: relative;
+
+    &:before {
+        position: absolute;
+        width: 64px;
+        height: 85%;
+        margin-left: -64px;
+        content: "";
+    }
+}

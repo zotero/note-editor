@@ -7,7 +7,7 @@ import { wrapInList } from 'prosemirror-schema-list';
 import * as commands from '../commands';
 import { schema } from '../schema';
 
-import { TextSelection } from 'prosemirror-state';
+import { TextSelection, NodeSelection } from 'prosemirror-state';
 import nodeIsActive, { getActiveColor, randomString } from '../utils';
 import { NodeRange } from 'prosemirror-model';
 import { findWrapping, liftTarget } from 'prosemirror-transform';
@@ -212,6 +212,17 @@ class Menu {
 				clear()(state, dispatch);
 			}
 		};
+
+		this.math_display = {
+			isActive: false,
+			run() {
+				let { $from } = state.selection;
+				let mathNode = schema.nodes.math_display.create();
+				let tr = state.tr.replaceSelectionWith(mathNode);
+				tr = tr.setSelection(NodeSelection.create(tr.doc, $from.pos-1));
+				dispatch(tr);
+			}
+		}
 
 		let insideList = nodeIsActive(state, schema.nodes.orderedList) || nodeIsActive(state, schema.nodes.bulletList);
 		let insideBlockquote = nodeIsActive(state, schema.nodes.blockquote);

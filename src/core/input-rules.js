@@ -12,6 +12,8 @@ import {
 import { schema } from './schema';
 import { TextSelection } from 'prosemirror-state';
 
+import { makeBlockMathInputRule, makeInlineMathInputRule } from './math';
+
 function markInputRule(regexp, markType, size) {
   return new InputRule(regexp, (state, match, start, end) => {
     let to = end;
@@ -54,6 +56,8 @@ export function buildInputRules({ enableSmartQuotes }) {
 				.setSelection(new TextSelection(tr.doc.resolve(start)));
 		}),
 		linkInputRule(),
+		makeBlockMathInputRule(/^\$\$\s+$/, schema.nodes.math_display),
+		makeInlineMathInputRule(/\$([^\$]+)\$(?=[^\w\d])[\s\S]$/, schema.nodes.math_inline),
 		markInputRule(/(?:[^`0-9A-Za-z]+)(__([^\s_][^_]+)__)$|^(__([^\s _][^_]+)__)$/, schema.marks.strong, 2),
 		markInputRule(/^(?:[^`]+)(\*\*([^\s*][^*]+)\*\*)$|^(\*\*([^\s*][^*]+)\*\*)$/, schema.marks.strong, 2),
 		markInputRule(/(?:[^_`0-9A-Za-z]+)(_([^\s_][^_]+?)_)$|^(_([^\s_][^_]+)_)$/, schema.marks.em, 1),

@@ -20,7 +20,8 @@ const blockTypes = [
 	['codeBlock', <code><FormattedMessage id="noteEditor.monospaced"/></code>],
 	['bulletList', <code><FormattedMessage id="noteEditor.bulletList"/></code>],
 	['orderedList', <span><FormattedMessage id="noteEditor.orderedList"/></span>],
-	['blockquote', <span><FormattedMessage id="noteEditor.blockquote"/></span>]
+	['blockquote', <span><FormattedMessage id="noteEditor.blockquote"/></span>],
+	['math_display', <span><FormattedMessage id="noteEditor.mathBlock"/></span>]
 ];
 
 export default function TextDropdown({ menuState }) {

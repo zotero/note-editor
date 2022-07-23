@@ -30,6 +30,14 @@ function getMarkdownSerializer() {
 		state.write(serializeCitationInnerText(node));
 	};
 
+	serializer.nodes['math_display'] = (state, node) => {
+		state.write('$$' + node.textContent + '$$\n\n');
+	};
+
+	serializer.nodes['math_inline'] = (state, node) => {
+		state.write('$' + node.textContent + '$');
+	};
+
 	serializer.nodes['image'] = (state, node) => {
 	};
 

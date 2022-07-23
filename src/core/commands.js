@@ -586,6 +586,12 @@ export function customTextBetween (slice, from, to, blockSeparator, leafText) {
 		if (node.type === schema.nodes.citation) {
 			text += serializeCitationInnerText(node);
 		}
+		else if (node.type === schema.nodes.math_display) {
+			text += '$$' + node.textContent + '$$';
+		}
+		else if (node.type === schema.nodes.math_inline) {
+			text += '$' + node.textContent + '$';
+		}
 		else if (node.isText) {
 			text += node.text.slice(Math.max(from, pos) - pos, to - pos);
 			separated = !blockSeparator;

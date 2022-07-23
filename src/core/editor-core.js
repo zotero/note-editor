@@ -8,6 +8,8 @@ import { history } from 'prosemirror-history';
 import { baseKeymap } from 'prosemirror-commands';
 import applyDevTools from 'prosemirror-dev-tools';
 
+import { mathPlugin, mathKeymap } from './math';
+
 import {
 	tableEditing,
 	columnResizing,
@@ -143,6 +145,7 @@ class EditorCore {
 				doc,
 
 				plugins: [
+					mathPlugin,
 					readOnly({ enable: this.readOnly }),
 					dropPaste({
 						ignoreImages: this.isAttachmentNote,
@@ -163,6 +166,7 @@ class EditorCore {
 					buildInputRules({
 						enableSmartQuotes: this.options.smartQuotes,
 					}),
+					keymap(mathKeymap),
 					keymap(buildKeymap({
 						toggleLink: () => {
 							this.pluginState.link.toggle();

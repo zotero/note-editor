@@ -88,6 +88,7 @@ export default {
 	'general.purple': 'Purple',
 	'general.showInLibrary': 'Show in Library',
 	'noteEditor.blockquote': 'Block Quote',
+	'noteEditor.mathBlock': 'Math Block',
 	'noteEditor.italic': 'Italic',
 	'noteEditor.cut': 'Cut',
 	'noteEditor.orderedList': 'Numbered List',

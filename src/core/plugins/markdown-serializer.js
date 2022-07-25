@@ -33,6 +33,14 @@ function getMarkdownSerializer() {
 	serializer.nodes['image'] = (state, node) => {
 	};
 
+	serializer.nodes['math_inline'] = (state, node) => {
+		state.renderInline(node);
+	};
+
+	serializer.nodes['math_display'] = (state, node) => {
+		state.renderContent(node);
+	};
+
 	serializer.nodes['table'] = (state, node) => {
 		state.renderContent(node)
 	};

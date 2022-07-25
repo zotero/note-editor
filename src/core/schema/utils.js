@@ -55,6 +55,12 @@ export function buildToHTML(schema) {
 			}
 		}
 
+		// Decreasing schema version number if not using the new math features
+		if (schema.version === 9
+			&& !document.querySelectorAll('pre.math, span.math').length) {
+			container.setAttribute('data-schema-version', 8);
+		}
+
 		return tmp.innerHTML.trim();
 	};
 }

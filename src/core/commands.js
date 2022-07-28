@@ -358,22 +358,20 @@ export function insertHTML(pos, html) {
 			let $pos = tr.doc.resolve(pos);
 			if ($pos.parent && $pos.parent.type.isBlock && !$pos.parent.content.size) {
 				let range = $pos.blockRange($pos);
-				tr = tr.replace(range.start + 1, range.end, slice);
+				tr = tr.replaceWith(range.start, range.end, nodes)
 			}
 			// Remove next empty block if dragging in-between blocks
 			else if ($pos.nodeAfter && $pos.nodeAfter.isBlock && !$pos.nodeAfter.content.size) {
-				let $pos = tr.doc.resolve(pos + 1);
-				let range = $pos.blockRange($pos);
-				tr = tr.replace(range.start + 1, range.end, slice);
+				let range = $pos.blockRange(tr.doc.resolve(pos + 1));
+				tr = tr.replaceWith(range.start, range.end, nodes);
 			}
 			// Remove previous empty block if dragging in-between blocks
 			else if ($pos.nodeBefore && $pos.nodeBefore.isBlock && !$pos.nodeBefore.content.size) {
-				let $pos = tr.doc.resolve(pos - 1);
-				let range = $pos.blockRange($pos);
-				tr = tr.replace(range.start + 1, range.end, slice);
+				let range = $pos.blockRange(tr.doc.resolve(pos - 1));
+				tr = tr.replaceWith(range.start, range.end, nodes);
 			}
 			else {
-				tr = tr.replace(pos, pos, slice);
+				tr = tr.insert(pos, nodes);
 			}
 
 			if (negative) {

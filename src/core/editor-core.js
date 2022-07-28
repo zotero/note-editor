@@ -152,16 +152,6 @@ class EditorCore {
 					}),
 					transform(),
 					nodeID(),
-					// Pulls item data into metadata when doc is being modified,
-					// therefore the updated metadata is already available when serializing
-					pullItemData({
-						onPull: (citationItems) => {
-							let updated = this.metadata.addPulledCitationItems(citationItems);
-							if (updated) {
-								this.updateCitationItemsList();
-							}
-						}
-					}),
 					buildInputRules({
 						enableSmartQuotes: this.options.smartQuotes,
 					}),
@@ -220,7 +210,17 @@ class EditorCore {
 					...(this.readOnly ? [] : [drag()]),
 					tableEditing(),
 					history(),
-					markdownSerializer()
+					markdownSerializer(),
+					// Pulls item data into metadata when doc is being modified,
+					// therefore the updated metadata is already available when serializing
+					pullItemData({
+						onPull: (citationItems) => {
+							let updated = this.metadata.addPulledCitationItems(citationItems);
+							if (updated) {
+								this.updateCitationItemsList();
+							}
+						}
+					}),
 				]
 			}),
 

@@ -86,20 +86,24 @@ class Drag {
 				relativeContainer.append(this.dragHandleNode);
 			}
 
+			let rtl = this.node.closest('[dir="rtl"]');
+
 			let padding = rect.left - parentRect.left - 4;
-			if (document.getElementsByTagName("html")[0].dir === 'rtl') {
+			if (rtl) {
 				padding = parentRect.right - rect.right;
 			}
 
 			if (this.node.nodeName === 'LI') {
-				padding += 22;
+				padding -= 22;
 			}
 
-			if (document.getElementsByTagName("html")[0].dir === 'rtl') {
+			if (rtl) {
 				this.dragHandleNode.style.right = padding - 22 + 'px';
+				this.dragHandleNode.style.left = 'unset';
 			}
 			else {
 				this.dragHandleNode.style.left = padding - 22 + 'px';
+				this.dragHandleNode.style.right = 'unset';
 			}
 
 			this.dragHandleNode.style.display = 'block';

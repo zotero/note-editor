@@ -453,43 +453,21 @@ ol {
 
 li {
 	position: relative;
-	list-style-type: none;
-	padding-left: 40px;
-	margin-left: -40px;
 	line-height: 1.5;
 }
 
-
 /* rtl:begin:ignore */
 
-ol > li::before {
+li:before {
 	position: absolute;
-	display: flex;
-	justify-content: flex-end;
-	flex-direction: row;
-	text-align: right;
-	width: 20px;
-	white-space: nowrap;
-	margin-left: -25px;
-	content: counter(li) ".";
-	counter-increment: li;
+	margin-left: -100px;
+	width: 100px;
+	height: 1.5em;
+	content: "";
 }
 
-
-ul > li:before {
-	position: absolute;
-	margin-left: -15px;
-	content: "\2022";
-}
-
-
-ol[dir=rtl] > li::before {
-	text-align: right;
-	margin-right: -25px;
-}
-
-ul[dir=rtl] > li::before {
-	margin-right: -15px;
+ul[dir=rtl] li::before, ol[dir=rtl] li::before {
+	margin-right: -100px;
 }
 
 /* rtl:end:ignore */

@@ -51,6 +51,7 @@ import { pullItemData } from './plugins/pull-item-data';
 import { trailingParagraph } from './plugins/trailing-paragraph';
 import { table, tableKey } from './plugins/table';
 import { markdownSerializer } from './plugins/markdown-serializer';
+import { math } from './plugins/math';
 
 // TODO: Avoid resetting cursor and losing the recently typed and unsaved
 //  text when a newly synced note is set
@@ -200,6 +201,7 @@ class EditorCore {
 							options.onOpenCitationPopup(node.attrs.nodeID, citation);
 						}
 					}),
+					math(),
 					table(),
 					// TODO: Trailing paragraph should only be inserted when appending transaction
 					// trailingParagraph(),

@@ -169,7 +169,7 @@ export default {
 				if (text.slice(0, 2) === '$$' && text.slice(-2) === '$$') {
 				  text = text.slice(2, -2);
 				}
-				return Fragment.from(schema.text(text));
+				return text.length ? Fragment.from(schema.text(text)) : Fragment.empty;
 			  }
 		}]
 	},
@@ -447,7 +447,7 @@ export default {
 				if (text.slice(0, 1) === '$' && text.slice(-1) === '$') {
 				  text = text.slice(1, -1);
 				}
-				return Fragment.from(schema.text(text));
+				return text.length ? Fragment.from(schema.text(text)) : Fragment.empty;
 			}
 		}]
 	}

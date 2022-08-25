@@ -6,7 +6,6 @@ import { randomString } from './core/utils';
 import { schema } from './core/schema';
 import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
-import { insertTable } from './core/commands';
 
 let currentInstance = null;
 
@@ -320,6 +319,10 @@ class EditorInstance {
 				this._editorCore.pluginState.menu.alignRight.run();
 				return;
 			}
+			case 'insertMath': {
+				this._editorCore.insertMath();
+				return;
+			}
 			case 'insertTable': {
 				this._editorCore.pluginState.table.insertTable(2, 2);
 				return;
@@ -427,9 +430,22 @@ class EditorInstance {
 			],
 			[
 				{
-					name: 'insertTable',
-					label: this._getLocalizedString('noteEditor.insertTable'),
-					enabled: !this._readOnly && !this._editorCore.pluginState.table.isTableSelected()
+					label: this._getLocalizedString('general.insert'),
+					enabled: !this._readOnly,
+					groups: [
+						[
+							{
+								name: 'insertTable',
+								label: this._getLocalizedString('noteEditor.table'),
+								enabled: !this._readOnly && !this._editorCore.pluginState.table.isTableSelected()
+							},
+							{
+								name: 'insertMath',
+								label: this._getLocalizedString('noteEditor.math'),
+								enabled: !this._readOnly && true
+							}
+						]
+					]
 				}
 			],
 			[

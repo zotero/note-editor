@@ -27,6 +27,7 @@ import {
 	attachImportedImage,
 	customTextBetween,
 	insertHTML,
+	insertMath,
 	setCitation,
 	touchCitations,
 	triggerImagesImport,
@@ -388,6 +389,10 @@ class EditorCore {
 
 	insertHTML(pos, html) {
 		insertHTML(pos, html)(this.view.state, this.view.dispatch);
+	}
+
+	insertMath() {
+		insertMath()(this.view.state, this.view.dispatch);
 	}
 
 	hasSelection() {

@@ -603,3 +603,23 @@ export function customTextBetween (slice, from, to, blockSeparator, leafText) {
 	}, 0);
 	return text
 }
+
+export function insertMath() {
+	return function (state, dispatch) {
+		let { selection } = state;
+		let { from, $from } = selection;
+		if ($from.parent.isBlock && !$from.parent.content.size) {
+			let range = $from.blockRange($from);
+			let node = schema.nodes.math_display.create(null);
+			let tr = state.tr.replaceWith(range.start, range.end, node);
+			tr.setSelection(NodeSelection.create(tr.doc, range.start));
+			dispatch(tr);
+		}
+		else {
+			let node = schema.nodes.math_inline.create(null);
+			let tr = state.tr.insert(from, node);
+			tr.setSelection(NodeSelection.create(tr.doc, from));
+			dispatch(tr);
+		}
+	}
+}

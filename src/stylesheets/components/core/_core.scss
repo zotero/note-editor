@@ -458,15 +458,16 @@ li {
 
 /* rtl:begin:ignore */
 
-li:before {
+li:after {
 	position: absolute;
+	top: 0;
 	margin-left: -100px;
 	width: 100px;
 	height: 1.5em;
 	content: "";
 }
 
-ul[dir=rtl] li::before, ol[dir=rtl] li::before {
+ul[dir=rtl] li::after, ol[dir=rtl] li::after {
 	margin-right: -100px;
 }
 

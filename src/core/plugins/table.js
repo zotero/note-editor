@@ -103,6 +103,8 @@ class Table {
 
 	insertTable(rows, columns) {
 		let { state, dispatch } = this.view;
+		let { selection } = state;
+		let { from } = selection;
 		let { table, table_row, table_cell } = schema.nodes;
 		let rowNodes = [];
 		for (let i = 0; i < rows; i++) {
@@ -114,6 +116,8 @@ class Table {
 		}
 		let node = table.create(null, Fragment.from(rowNodes));
 		let tr = state.tr.replaceSelectionWith(node);
+		// Put cursor into table->tr->td->p
+		tr.setSelection(new TextSelection(tr.doc.resolve(from + 3)));
 		dispatch(tr);
 	}
 

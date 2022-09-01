@@ -3,6 +3,14 @@ import { ReplaceStep } from 'prosemirror-transform';
 import { schema } from '../schema';
 import { SetAttrsStep } from '../utils';
 import { getSingleSelectedNode } from '../commands';
+import { Fragment, Slice } from 'prosemirror-model';
+
+// TODO: Avoid duplicating code in (drop-paste.js)
+
+const IMPORT_IMAGE_TYPES = [
+	'image/jpeg',
+	'image/png'
+];
 
 class Image {
 	constructor(state, options) {
@@ -59,6 +67,51 @@ class Image {
 			});
 			dispatch(tr);
 		}
+	}
+
+	async insert(pos, files) {
+		let { state, dispatch } = this.view;
+		let nodes = [];
+		let promises = [];
+		for (let file of files) {
+			if (IMPORT_IMAGE_TYPES.includes(file.type)) {
+				promises.push(new Promise((resolve) => {
+					let reader = new FileReader();
+					reader.onload = function () {
+						let dataURL = this.result;
+						nodes.push(schema.nodes.image.create({
+							tempSrc: dataURL
+						}));
+						resolve();
+					};
+					reader.onerror = () => {
+						resolve();
+					};
+					reader.readAsDataURL(file);
+				}));
+			}
+		}
+		await Promise.all(promises);
+		if (nodes.length) {
+			if (pos !== null) {
+				dispatch(state.tr.insert(pos, nodes));
+			}
+			else {
+				let slice = new Slice(new Fragment(nodes), 0, 0);
+				dispatch(state.tr.replaceSelection(slice, false));
+			}
+		}
+	}
+
+	openFilePicker() {
+		var input = document.createElement('input');
+		input.type = 'file';
+		input.accept = IMPORT_IMAGE_TYPES.join(', ');
+		input.multiple = true;
+		input.addEventListener('change', (event) => {
+			this.insert(null, event.target.files);
+		});
+		input.click();
 	}
 
 	destroy() {

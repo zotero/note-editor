@@ -323,6 +323,10 @@ class EditorInstance {
 				this._editorCore.insertMath();
 				return;
 			}
+			// window.openImageFilePicker will be called over eval, because it has to be a user-initiated event
+			// case 'insertImage': {
+			// 	return;
+			// }
 			case 'insertTable': {
 				this._editorCore.pluginState.table.insertTable(2, 2);
 				return;
@@ -435,6 +439,11 @@ class EditorInstance {
 					groups: [
 						[
 							{
+								name: 'insertImage',
+								label: this._getLocalizedString('noteEditor.image'),
+								enabled: !this._readOnly && !this._isAttachmentNote
+							},
+							{
 								name: 'insertTable',
 								label: this._getLocalizedString('noteEditor.table'),
 								enabled: !this._readOnly && !this._editorCore.pluginState.table.isTableSelected()
@@ -442,7 +451,7 @@ class EditorInstance {
 							{
 								name: 'insertMath',
 								label: this._getLocalizedString('noteEditor.math'),
-								enabled: !this._readOnly && true
+								enabled: !this._readOnly
 							}
 						]
 					]
@@ -522,3 +531,10 @@ window.getDataSync = (onlyChanged) => {
 	}
 	return null;
 };
+
+// Called from Zotero, because file picker can only be opened from user-triggered event or privileged code
+window.openImageFilePicker = () => {
+	if (currentInstance) {
+		currentInstance._editorCore.pluginState.image.openFilePicker();
+	}
+}

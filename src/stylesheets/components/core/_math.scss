@@ -30,6 +30,13 @@ math-display {
 
 math-inline {
 	font-size: 1.1em !important;
+
+	.math-src {
+		div[contenteditable] {
+			white-space: normal;
+			word-break: break-word;
+		}
+	}
 }
 
 math-display {

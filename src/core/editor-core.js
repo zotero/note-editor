@@ -271,7 +271,9 @@ class EditorCore {
 				that.onUpdateState && that.onUpdateState();
 			},
 			handleDOMEvents: {
-				mousedown: (view, event) => {
+				// Node (image, citation) selection happens on mouseup, therefore we can't open context menu on mousedown.
+				// This limitation probably comes from ProseMirror side
+				mouseup: (view, event) => {
 					if (event.button === 2) {
 						setTimeout(() => {
 							const { $from } = view.state.selection;

@@ -403,6 +403,18 @@ class EditorCore {
 		return selection.content.size > 0;
 	}
 
+	getSelectedImageDataURL() {
+		let { state } = this.view;
+		let { node } = state.selection;
+		if (node && node.type === schema.nodes.image) {
+			let data = this.provider.getCachedData(node.attrs.nodeID, 'image');
+			if (data && data.src.includes('base64')) {
+				return data.src;
+			}
+		}
+		return null;
+	}
+
 	getHTML() {
 		return toHTML(this.view.state.doc.content, this.metadata);
 	}

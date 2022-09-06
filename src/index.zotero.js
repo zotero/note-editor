@@ -359,6 +359,20 @@ class EditorInstance {
 				this._editorCore.pluginState.table.deleteTable();
 				return;
 			}
+			case 'copyImage': {
+				let dataURL = this._editorCore.getSelectedImageDataURL();
+				if (dataURL) {
+					zoteroCopyImage(dataURL);
+				}
+				return;
+			}
+			case 'saveImageAs': {
+				let dataURL = this._editorCore.getSelectedImageDataURL();
+				if (dataURL) {
+					zoteroSaveImageAs(dataURL);
+				}
+				return;
+			}
 		}
 	}
 
@@ -497,6 +511,18 @@ class EditorInstance {
 					label: this._getLocalizedString('noteEditor.deleteTable'),
 					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
 				}
+			],
+			[
+				{
+					name: 'copyImage',
+					label: this._getLocalizedString('noteEditor.copyImage'),
+					enabled: !!this._editorCore.getSelectedImageDataURL()
+				},
+				{
+					name: 'saveImageAs',
+					label: this._getLocalizedString('noteEditor.saveImageAs'),
+					enabled: !!this._editorCore.getSelectedImageDataURL()
+				},
 			]
 		];
 

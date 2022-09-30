@@ -78,6 +78,14 @@ import { math } from './plugins/math';
 // About images:
 // - On load, dimensions are updated automatically which happens when note is opened
 
+// A temporary work-around to disable spell checking for raw TeX
+window.addEventListener('focus', (event) => {
+	let container = event.target.closest('.math-src');
+	if (container) {
+		container.spellcheck = false;
+	}
+}, true);
+
 class EditorCore {
 	constructor(options) {
 		this.options = options;

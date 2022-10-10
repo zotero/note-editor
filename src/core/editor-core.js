@@ -80,9 +80,11 @@ import { math } from './plugins/math';
 
 // A temporary work-around to disable spell checking for raw TeX
 window.addEventListener('focus', (event) => {
-	let container = event.target.closest('.math-src');
-	if (container) {
-		container.spellcheck = false;
+	if (event.target && event.target.nodeType === window.Node.ELEMENT_NODE) {
+		let container = event.target.closest('.math-src');
+		if (container) {
+			container.spellcheck = false;
+		}
 	}
 }, true);
 

@@ -434,6 +434,7 @@ export default {
 	math_inline: {
 		group: 'inline math',
 		content: 'text*',
+		marks: '',
 		inline: true,
 		atom: true,
 		toDOM: node => ['span', {

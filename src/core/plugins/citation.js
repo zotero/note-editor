@@ -139,7 +139,7 @@ class Citation {
 		let nodeData = getSingleSelectedNode(state, schema.nodes.highlight, true)
 			|| getSingleSelectedNode(state, schema.nodes.image);
 
-		if (nodeData) {
+		if (nodeData && nodeData.node.attrs.annotation) {
 			let { node, pos, index, parent } = nodeData;
 
 			pos = pos + node.nodeSize;

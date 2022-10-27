@@ -141,8 +141,11 @@ class EditorInstance {
 				this._editorCore.attachImportedImage(nodeID, attachmentKey);
 				return;
 			}
+			case 'focus': {
+				this._editorCore.focus();
+			}
 		}
-	}
+	};
 }
 
 window.addEventListener('message', function (event) {

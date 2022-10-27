@@ -22,6 +22,10 @@ class EditorInstance {
 		this._init(options.value);
 	}
 
+	getDataSync(onlyChanged) {
+		return this._editorCore.getData(onlyChanged);
+	}
+
 	_getLocalizedString(key) {
 		let string = this._localizedStrings[key];
 		return string || key;
@@ -147,6 +151,13 @@ class EditorInstance {
 		}
 	};
 }
+
+window.getDataSync = (onlyChanged) => {
+	if (currentInstance) {
+		return currentInstance.getDataSync(onlyChanged);
+	}
+	return null;
+};
 
 window.addEventListener('message', function (event) {
 	if (event.source !== window.parent) {

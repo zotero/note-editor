@@ -32,7 +32,7 @@ class EditorInstance {
 	}
 
 	_postMessage(message) {
-		window.postMessage(message, '*');
+		window.postMessage({ instanceID: this.instanceID, message }, '*');
 	}
 
 	_init(value) {
@@ -154,7 +154,10 @@ class EditorInstance {
 
 window.getDataSync = (onlyChanged) => {
 	if (currentInstance) {
-		return currentInstance.getDataSync(onlyChanged);
+		const data = currentInstance.getDataSync(onlyChanged);
+		if (data) {
+			return { instanceID: currentInstance.instanceID, data };
+		}
 	}
 	return null;
 };

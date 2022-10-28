@@ -168,6 +168,9 @@ window.addEventListener('message', function (event) {
 	}
 	let message = event.data;
 	if (message.action === 'init') {
+		if (currentInstance) {
+			currentInstance.uninit();
+		}
 		currentInstance = new EditorInstance(message);
 	}
 });

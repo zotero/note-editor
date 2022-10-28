@@ -141,6 +141,7 @@ export function markdownSerializer() {
 				let { selection } = state;
 				let { $from } = selection;
 				let depth = $from.depth;
+				let parent;
 				do {
 					parent = $from.node(depth);
 					depth--;

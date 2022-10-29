@@ -122,6 +122,7 @@ class EditorInstance {
 			document.getElementById('editor-container')
 		);
 		window.addEventListener('message', this._messageHandler);
+		this._postMessage({ action: 'initialized' });
 	}
 
 	uninit() {

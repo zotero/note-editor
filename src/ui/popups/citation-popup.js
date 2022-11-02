@@ -32,7 +32,7 @@ function CitationPopup({ parentRef, citationState, viewMode }) {
 				<div className="icon"><IconUndo/></div>
 				<FormattedMessage id="noteEditor.showItem"/>
 			</button>
-			{viewMode !== 'ios' && <button onClick={handleEdit}>
+			{!['ios', 'web'].includes(viewMode) && <button onClick={handleEdit}>
 				<div className="icon"><IconBlockquote/></div>
 				<FormattedMessage id="noteEditor.editCitation"/>
 			</button>}

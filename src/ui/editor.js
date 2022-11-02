@@ -57,7 +57,7 @@ function Editor(props) {
 						{editorState.link && <LinkPopup parentRef={editorRef} pluginState={editorState.link.popup}/>}
 						{!['web'].includes(props.viewMode) && editorState.highlight && <HighlightPopup parentRef={editorRef} highlightState={editorState.highlight} citationState={editorState.citation}/>}
 						{!['web'].includes(props.viewMode) && editorState.image && <ImagePopup parentRef={editorRef} imageState={editorState.image} citationState={editorState.citation}/>}
-						{!['web'].includes(props.viewMode) && editorState.citation && <CitationPopup
+						{editorState.citation && <CitationPopup
 							parentRef={editorRef}
 							citationState={editorState.citation}
 							viewMode={props.viewMode}

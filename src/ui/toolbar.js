@@ -17,6 +17,7 @@ import Dropdown from './toolbar-elements/dropdown';
 import TextDropdown from './toolbar-elements/text-dropdown';
 import ColorsDropdown from './toolbar-elements/colors-dropdown';
 import FontColorsDropdown from './toolbar-elements/font-colors-dropdown';
+import InsertDropdown from './toolbar-elements/insert-dropdown';
 
 function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkState, citationState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow }) {
 	const intl = useIntl();
@@ -57,6 +58,7 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 					icon={<IconSearch/>}
 					title={intl.formatMessage({ id: 'noteEditor.findAndReplace' })}
 				/>
+				{viewMode === 'web' && <InsertDropdown />}
 			</div>
 			<div className="end">
 				{!['web'].includes(viewMode) && <Dropdown

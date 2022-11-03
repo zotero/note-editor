@@ -290,7 +290,7 @@ export class SetAttrsStep extends Step {
 	apply(doc) {
 		let target = doc.nodeAt(this.pos);
 		if (!target) return StepResult.fail('No node at given position');
-		let newNode = target.type.create(this.attrs, Fragment.empty, target.marks);
+		let newNode = target.type.create(this.attrs, null, target.marks);
 		let slice = new Slice(Fragment.from(newNode), 0, target.isLeaf ? 0 : 1);
 		return StepResult.fromReplace(doc, this.pos, this.pos + 1, slice);
 	}

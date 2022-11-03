@@ -149,5 +149,8 @@ export default {
 	'noteEditor.insertColumnAfter': 'Insert Column Right',
 	'noteEditor.deleteRow': 'Delete row',
 	'noteEditor.deleteColumn': 'Delete column',
-	'noteEditor.deleteTable': 'Delete table'
+	'noteEditor.deleteTable': 'Delete table',
+	'noteEditor.insertImage': 'Insert Image',
+	'noteEditor.insertTable': 'Insert Table',
+	'noteEditor.insertMath': 'Insert Math Block',
 };

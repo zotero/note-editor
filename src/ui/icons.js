@@ -236,6 +236,40 @@ export function IconColor({ color, active }) {
 	);
 }
 
+export function IconInsert() {
+	return (
+		<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg">
+			<path d="m20 12h-16m8-8v16" fill="none" stroke="currentColor" stroke-width="2" />
+		</svg>
+	);
+}
+
+export function IconImage() {
+	return (
+		<svg width="24px" height="24px" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+			<path d="m2.5 2.5h19v19h-19v-19z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+			<path d="m9.2 7.2c0.15 1.4-1.6 2.2-2.8 1.7-1.6-0.59-1.3-3.2 0.37-3.5 1.2-0.31 2.5 0.56 2.4 1.8zm8.5 2.9c-1.9 2.2-3.8 4.4-5.7 6.7-0.95-1.3-1.9-2.5-2.8-3.8-2.2 2.2-4.4 4.4-6.6 6.7v1.9h19v-6.7c-1.3-1.6-2.5-3.2-3.8-4.8z" fill="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+		</svg>
+	);
+}
+
+export function IconTable() {
+	return (
+		<svg width="24px" height="24px" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+			<path d="m3 3h18v3h-18z" fill="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+			<path d="m12 2.5v19m-9.5-8h19m-19-11h19v19h-19c0-6.3 0-13-1e-7 -19z" fill="none" stroke="currentColor" />
+		</svg>
+	)
+}
+
+export function IconMath() {
+	return (
+		<svg width="24px" height="24px" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+			<path fill="currentColor" stroke-width="2" d="m15.6 8.65c0.485 0 0.679 0 0.679-0.419 0-0.22-0.194-0.22-0.63-0.22h-1.96c0.461-2.27 0.8-3.83 0.994-4.54 0.145-0.529 0.655-1.04 1.28-1.04 0.509 0 1.02 0.198 1.26 0.396-0.945 0.0881-1.24 0.727-1.24 1.1 0 0.441 0.364 0.705 0.824 0.705 0.485 0 1.21-0.374 1.21-1.21 0-0.925-1.02-1.43-2.08-1.43-1.04 0-2.06 0.705-2.55 1.56-0.436 0.771-0.679 1.56-1.24 4.45h-1.62c-0.461 0-0.703 0-0.703 0.396 0 0.242 0.145 0.242 0.63 0.242h1.55c-0.436 2.05-1.43 7.03-1.99 9.38-0.412 1.92-0.776 3.52-1.99 3.52-0.0727 0-0.776 0-1.21-0.419 1.24-0.0881 1.24-1.06 1.24-1.08 0-0.441-0.364-0.705-0.824-0.705-0.485 0-1.21 0.374-1.21 1.21 0 0.947 1.07 1.43 2.01 1.43 2.47 0 3.49-4.03 3.76-5.13 0.436-1.7 1.62-7.56 1.75-8.22z" />
+		</svg>
+	)
+}
+
 export function IconChevronUp() {
 	return (
 		<svg width="10px" height="10px" viewBox="0 0 10 10" version="1.1" xmlns="http://www.w3.org/2000/svg">

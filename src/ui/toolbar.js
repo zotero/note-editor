@@ -19,7 +19,7 @@ import ColorsDropdown from './toolbar-elements/colors-dropdown';
 import FontColorsDropdown from './toolbar-elements/font-colors-dropdown';
 import InsertDropdown from './toolbar-elements/insert-dropdown';
 
-function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkState, citationState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow }) {
+function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkState, citationState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow, onInsertTable, onInsertMath, onInsertImage }) {
 	const intl = useIntl();
 
 	return (
@@ -58,7 +58,11 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 					icon={<IconSearch/>}
 					title={intl.formatMessage({ id: 'noteEditor.findAndReplace' })}
 				/>
-				{viewMode === 'web' && <InsertDropdown />}
+				{viewMode === 'web' && <InsertDropdown
+					onInsertTable={ onInsertTable }
+					onInsertMath={ onInsertMath }
+					onInsertImage={ onInsertImage }
+				/>}
 			</div>
 			<div className="end">
 				{!['web'].includes(viewMode) && <Dropdown

@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useRef, useState, useLayoutEffect, useEffect, Fragment } from 'react';
+import React, { useCallback, useRef, useState, useLayoutEffect, useEffect, Fragment } from 'react';
 import { useIntl } from 'react-intl';
 
 import Toolbar from './toolbar';
@@ -28,6 +28,18 @@ function Editor(props) {
 		editorRef.current.appendChild(props.editorCore.view.dom);
 	}, []);
 
+	const handleInsertTable = useCallback(() => {
+		props.editorCore.pluginState.table.insertTable(2, 2);
+	}, [props.editorCore]);
+
+	const handleInsertMath = useCallback(() => {
+		props.editorCore.insertMath()
+	}, [props.editorCore]);
+
+	const handleInsertImage = useCallback(() => {
+		props.editorCore.pluginState.image.openFilePicker();
+	}, [props.editorCore]);
+
 	return (
 		<div className="editor">
 			{!props.disableUI && <Toolbar
@@ -42,6 +54,9 @@ function Editor(props) {
 				onClickReturn={props.onClickReturn}
 				onShowNote={props.onShowNote}
 				onOpenWindow={props.onOpenWindow}
+				onInsertTable={handleInsertTable}
+				onInsertMath={handleInsertMath}
+				onInsertImage={handleInsertImage}
 			/>}
 			<Findbar searchState={editorState.search} active={editorState.search.active}/>
 			{props.showUpdateNotice && <Noticebar>

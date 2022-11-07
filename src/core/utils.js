@@ -409,3 +409,7 @@ export function removeDiacritics(str) {
 	}
 	return chars;
 }
+
+export function mod(n, m) {
+	return ((n % m) + m) % m;
+}

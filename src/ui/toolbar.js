@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useCallback, useRef} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Button, StateButton } from './toolbar-elements/button';
@@ -18,12 +18,61 @@ import TextDropdown from './toolbar-elements/text-dropdown';
 import ColorsDropdown from './toolbar-elements/colors-dropdown';
 import FontColorsDropdown from './toolbar-elements/font-colors-dropdown';
 import InsertDropdown from './toolbar-elements/insert-dropdown';
+import { mod } from '../core/utils';
 
 function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkState, citationState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow, onInsertTable, onInsertMath, onInsertImage }) {
 	const intl = useIntl();
+	const toolbarRef = useRef(null);
+	const lastFocusedIndex = useRef(0);
+	const isFocused = useRef(false);
+
+	const getCandidateNodes = useCallback(() =>
+		Array.from(toolbarRef.current.querySelectorAll('button:not([disabled])')), []
+	);
+
+	const handleFocus = useCallback((ev) => {
+		if (viewMode !== 'web') {
+			return;
+		}
+		isFocused.current = true;
+		const candidateNodes = getCandidateNodes();
+		candidateNodes.forEach(node => node.tabIndex = "-1");
+		candidateNodes?.[lastFocusedIndex.current].focus();
+	}, [viewMode, getCandidateNodes]);
+
+	const handleBlur = useCallback((ev) => {
+		if (viewMode !== 'web') {
+			return;
+		}
+		const candidateNodes = getCandidateNodes();
+		if (candidateNodes.includes(ev.relatedTarget)) {
+			return;
+		}
+		toolbarRef.current.querySelectorAll('button').forEach(node => node.removeAttribute('tabindex'));
+	}, [viewMode]);
+
+	const handleKeyDown = useCallback((ev) => {
+		if (viewMode !== 'web') {
+			return;
+		}
+		const candidateNodes = getCandidateNodes();
+		if (ev.key === 'ArrowLeft') {
+			lastFocusedIndex.current = mod((lastFocusedIndex.current - 1), candidateNodes.length);
+		}
+		else if (ev.key === 'ArrowRight') {
+			lastFocusedIndex.current = mod((lastFocusedIndex.current + 1), candidateNodes.length);
+		}
+		candidateNodes?.[lastFocusedIndex.current].focus();
+	}, [viewMode, getCandidateNodes]);
 
 	return (
-		<div className="toolbar">
+		<div
+			className="toolbar"
+			onFocus={handleFocus}
+			onBlur={handleBlur}
+			onKeyDown={handleKeyDown}
+			ref={toolbarRef}
+		>
 			<div className="start">
 				{enableReturnButton &&
 					<Button

@@ -24,18 +24,19 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 	const intl = useIntl();
 	const toolbarRef = useRef(null);
 	const lastFocusedIndex = useRef(0);
-	const isFocused = useRef(false);
 
 	const getCandidateNodes = useCallback(() =>
-		Array.from(toolbarRef.current.querySelectorAll('button:not([disabled])')), []
+		Array.from(toolbarRef.current.querySelectorAll('button:not([disabled])')).filter(n => !n.closest('.popup')), []
 	);
 
 	const handleFocus = useCallback((ev) => {
 		if (viewMode !== 'web') {
 			return;
 		}
-		isFocused.current = true;
 		const candidateNodes = getCandidateNodes();
+		if(!candidateNodes.includes(ev.target)) {
+			return;
+		}
 		candidateNodes.forEach(node => node.tabIndex = "-1");
 		candidateNodes?.[lastFocusedIndex.current].focus();
 	}, [viewMode, getCandidateNodes]);
@@ -45,7 +46,7 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 			return;
 		}
 		const candidateNodes = getCandidateNodes();
-		if (candidateNodes.includes(ev.relatedTarget)) {
+		if (ev.relatedTarget?.closest('.toolbar') === toolbarRef.current) {
 			return;
 		}
 		toolbarRef.current.querySelectorAll('button').forEach(node => node.removeAttribute('tabindex'));
@@ -62,7 +63,9 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 		else if (ev.key === 'ArrowRight') {
 			lastFocusedIndex.current = mod((lastFocusedIndex.current + 1), candidateNodes.length);
 		}
-		candidateNodes?.[lastFocusedIndex.current].focus();
+		if (['ArrowLeft', 'ArrowRight'].includes(ev.key)) {
+			candidateNodes?.[lastFocusedIndex.current].focus();
+		}
 	}, [viewMode, getCandidateNodes]);
 
 	return (

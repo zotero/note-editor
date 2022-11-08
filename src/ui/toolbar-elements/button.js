@@ -1,11 +1,12 @@
 'use strict';
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 import cx from 'classnames';
 
-export function Button({ icon, title, active, className, triggerOnMouseDown, onClick }) {
+export const Button = forwardRef(({ icon, title, active, className, triggerOnMouseDown, onClick, ...rest }, ref) => {
 	return (
 		<button
+			{ ...rest }
 			className={cx('toolbar-button', { active: !!active }, className)}
 			title={title}
 			onClick={(event) => {
@@ -24,11 +25,12 @@ export function Button({ icon, title, active, className, triggerOnMouseDown, onC
 				}
 				onClick();
 			}}
+			ref={ref}
 		>
 			{icon}
 		</button>
 	);
-}
+});
 
 export function StateButton({ icon, title, state }) {
 	return (

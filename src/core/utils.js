@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 
 // Work around firefox bug that stops up/down navigation in contenteditable to work
 export function refocusEditor(callback) {
@@ -412,4 +413,12 @@ export function removeDiacritics(str) {
 
 export function mod(n, m) {
 	return ((n % m) + m) % m;
+}
+
+export function usePrevious(value) {
+	const ref = useRef();
+	useEffect(() => {
+		ref.current = value;
+	});
+	return ref.current;
 }

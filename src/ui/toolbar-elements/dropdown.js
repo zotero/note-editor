@@ -110,8 +110,10 @@ export default function Dropdown({ className, icon, title, children }) {
 				triggerOnMouseDown={true}
 				onClick={handleButtonDown}
 				onKeyDown={handleButtonKeyDown}
+				aria-haspopup="true"
+				aria-expanded={show ? 'true' : 'false'}
 			/>
-			{show && <div ref={childWrapRef} className="popup" onClick={handlePopupClick}>
+			{show && <div ref={childWrapRef} role="menu" className="popup" onClick={handlePopupClick}>
 				{children}
 			</div>}
 		</div>

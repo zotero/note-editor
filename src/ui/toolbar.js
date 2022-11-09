@@ -75,6 +75,8 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 			onBlur={handleBlur}
 			onKeyDown={handleKeyDown}
 			ref={toolbarRef}
+			role="toolbar"
+			aria-orientation="horizontal"
 		>
 			<div className="start">
 				{enableReturnButton &&

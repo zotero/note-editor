@@ -16,18 +16,21 @@ export default function InsertDropdown({ onInsertTable, onInsertMath, onInsertIm
 			title={intl.formatMessage({id: 'general.insert'})}
 		>
 			<button
+				role="menuitem"
 				className="toolbar-button"
 				title={intl.formatMessage({ id: 'noteEditor.insertImage' })}
 				onClick={onInsertImage}
 				onMouseDown={(event) => event.preventDefault()}
 			><IconImage /></button>
 			<button
+				role="menuitem"
 				className="toolbar-button"
 				title={intl.formatMessage({ id: 'noteEditor.insertTable' })}
 				onClick={onInsertTable }
 				onMouseDown={(event) => event.preventDefault()}
 			><IconTable /></button>
 			<button
+				role="menuitem"
 				className="toolbar-button"
 				title={intl.formatMessage({ id: 'noteEditor.insertMath' })}
 				onClick={onInsertMath}

@@ -32,8 +32,14 @@ export const Button = forwardRef(({ icon, title, active, className, triggerOnMou
 	);
 });
 
-export function StateButton({ icon, title, state }) {
+export function StateButton({ icon, title, state, ...rest }) {
 	return (
-		<Button icon={icon} title={title} active={state.isActive} onClick={() => state.run()}/>
+		<Button
+			{ ...rest }
+			icon={icon}
+			title={title}
+			active={state.isActive}
+			onClick={() => state.run()}
+		/>
 	);
 }

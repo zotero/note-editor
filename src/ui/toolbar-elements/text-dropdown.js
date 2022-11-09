@@ -40,21 +40,25 @@ export default function TextDropdown({ menuState }) {
 			<div className="inline-options">
 				<div className="line">
 					<StateButton
+						role="menuitem"
 						icon={<IconBold/>}
 						title={intl.formatMessage({ id: 'noteEditor.bold' })}
 						state={menuState.strong}
 					/>
 					<StateButton
+						role="menuitem"
 						icon={<IconItalic/>}
 						title={intl.formatMessage({ id: 'noteEditor.italic' })}
 						state={menuState.em}
 					/>
 					<StateButton
+						role="menuitem"
 						icon={<IconUnderline/>}
 						title={intl.formatMessage({ id: 'noteEditor.underline' })}
 						state={menuState.underline}
 					/>
 					<StateButton
+						role="menuitem"
 						icon={<IconStrike/>}
 						title={intl.formatMessage({ id: 'noteEditor.strikethrough' })}
 						state={menuState.strike}
@@ -62,16 +66,19 @@ export default function TextDropdown({ menuState }) {
 				</div>
 				<div className="line">
 					<StateButton
+						role="menuitem"
 						icon={<IconSubscript/>}
 						title={intl.formatMessage({ id: 'noteEditor.subscript' })}
 						state={menuState.subscript}
 					/>
 					<StateButton
+						role="menuitem"
 						icon={<IconSuperscript/>}
 						title={intl.formatMessage({ id: 'noteEditor.superscript' })}
 						state={menuState.superscript}
 					/>
 					<StateButton
+						role="menuitem"
 						icon={<IconCode/>}
 						title={intl.formatMessage({ id: 'noteEditor.monospaced' })}
 						state={menuState.code}
@@ -81,6 +88,7 @@ export default function TextDropdown({ menuState }) {
 			<div className="block-options">
 				{blockTypes.map(([type, element], index) => (
 					<button
+						role="menuitem"
 						key={index}
 						className={cx('option', { active: menuState[type].isActive })}
 						onClick={() => handleItemPick(type)}

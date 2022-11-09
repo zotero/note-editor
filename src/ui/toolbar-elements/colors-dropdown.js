@@ -32,6 +32,7 @@ export default function ColorsDropdown({ colorState }) {
 		>
 			<div className="grid">
 				{clear && <button
+					role="menuitem"
 					className="color-button"
 					title={intl.formatMessage({ id: 'noteEditor.removeColor' })}
 					onClick={handleColorClear}
@@ -40,15 +41,17 @@ export default function ColorsDropdown({ colorState }) {
 				</button>}
 				{
 					colorState.state.availableColors.map(([name, code], i) => {
+						const isActive = colorState.state.activeColors.includes(code);
 						return (
 							<button
+								role="menuitem"
 								key={i}
 								className="color-button"
 								title={name ? intl.formatMessage({ id: 'general.' + name }) : code}
 								onClick={() => handleColorPick(code)}
 								onMouseDown={(event) => event.preventDefault()}
 							>
-								<IconColor color={code[0] === '#' ? code.slice(0, 7) : code} active={colorState.state.activeColors.includes(code)}/>
+								<IconColor color={code[0] === '#' ? code.slice(0, 7) : code} active={isActive}/>
 							</button>
 						)
 					})

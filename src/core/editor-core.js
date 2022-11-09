@@ -93,6 +93,7 @@ class EditorCore {
 		this.options = options;
 		this.reloaded = options.reloaded;
 		this.readOnly = options.readOnly;
+		this.disableDrag = options.disableDrag;
 		this.isAttachmentNote = options.isAttachmentNote;
 		this.unsaved = options.unsaved;
 		this.docChanged = false;
@@ -220,7 +221,7 @@ class EditorCore {
 					placeholder({
 						text: options.placeholder
 					}),
-					...(this.readOnly ? [] : [drag()]),
+					...((this.readOnly || this.disableDrag) ? [] : [drag()]),
 					tableEditing(),
 					history(),
 					markdownSerializer(),

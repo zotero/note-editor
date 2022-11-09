@@ -29,14 +29,17 @@ function Editor(props) {
 	}, []);
 
 	const handleInsertTable = useCallback(() => {
+		props.editorCore.view.dom.focus();
 		props.editorCore.pluginState.table.insertTable(2, 2);
 	}, [props.editorCore]);
 
 	const handleInsertMath = useCallback(() => {
+		props.editorCore.view.dom.focus();
 		props.editorCore.insertMath()
 	}, [props.editorCore]);
 
 	const handleInsertImage = useCallback(() => {
+		props.editorCore.view.dom.focus();
 		props.editorCore.pluginState.image.openFilePicker();
 	}, [props.editorCore]);
 

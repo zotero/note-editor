@@ -16,6 +16,7 @@ class EditorInstance {
 		window._currentEditorInstance = this;
 		this.instanceID = options.instanceID;
 		this._readOnly = options.readOnly;
+		this._disableDrag = options.disableDrag;
 		this._localizedStrings = options.localizedStrings;
 		this._editorCore = null;
 
@@ -39,6 +40,7 @@ class EditorInstance {
 		this._editorCore = new EditorCore({
 			value,
 			readOnly: this._readOnly,
+			disableDrag: this._disableDrag,
 			unsaved: false,
 			placeholder: '',
 			isAttachmentNote: false,

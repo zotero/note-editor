@@ -30,9 +30,6 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 	);
 
 	const handleFocus = useCallback((ev) => {
-		if (viewMode !== 'web') {
-			return;
-		}
 		const candidateNodes = getCandidateNodes();
 		if(!candidateNodes.includes(ev.target)) {
 			return;
@@ -42,9 +39,6 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 	}, [viewMode, getCandidateNodes]);
 
 	const handleBlur = useCallback((ev) => {
-		if (viewMode !== 'web') {
-			return;
-		}
 		const candidateNodes = getCandidateNodes();
 		if (ev.relatedTarget?.closest('.toolbar') === toolbarRef.current) {
 			return;
@@ -53,9 +47,6 @@ function Toolbar({ viewMode, enableReturnButton, colorState, menuState, linkStat
 	}, [viewMode]);
 
 	const handleKeyDown = useCallback((ev) => {
-		if (viewMode !== 'web') {
-			return;
-		}
 		const candidateNodes = getCandidateNodes();
 		if (ev.key === 'ArrowLeft') {
 			lastFocusedIndex.current = mod((lastFocusedIndex.current - 1), candidateNodes.length);

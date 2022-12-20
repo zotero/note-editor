@@ -135,7 +135,9 @@ export function dropPaste(options) {
 				}
 				// This was tested and works on macOS and Firefox 72
 				else if (event.clipboardData.files.length) {
-					insertImages(view, null, event.clipboardData.files);
+					if (!options.ignoreImages) {
+						insertImages(view, null, event.clipboardData.files);
+					}
 					return true;
 				}
 				let text = event.clipboardData.getData('text/plain');
@@ -173,8 +175,10 @@ export function dropPaste(options) {
 				let html = event.dataTransfer.getData('text/html') || window.droppedData && window.droppedData['text/html'];
 				let pos = view.posAtCoords({ left: event.clientX, top: event.clientY });
 				let data;
-				if (event.dataTransfer.files.length && !options.ignoreImages) {
-					insertImages(view, pos.pos, event.dataTransfer.files);
+				if (event.dataTransfer.files.length) {
+					if (!options.ignoreImages) {
+						insertImages(view, pos.pos, event.dataTransfer.files);
+					}
 					return true;
 				}
 				else if (data = event.dataTransfer.getData('zotero/annotation')) {

@@ -69,7 +69,6 @@
 	.popup {
 		font-size: 14px;
 		width: 150px;
-		left: -60px;
 
 		.inline-options {
 			.line {
@@ -112,20 +111,20 @@
 }
 
 
-.colors-dropdown {
+.highlight-color-dropdown {
 	.popup {
 		font-size: 14px;
-		width: 136px;
-		left: -53px;
+		width: 112px;
 		display: flex;
 		justify-content: center;
+		flex-direction: column;
+		padding: 7px;
 
 		.grid {
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: flex-end;
-			padding: 7px;
-			border-bottom: 1px solid #d9d9d9;
+			//border-bottom: 1px solid #d9d9d9;
 
 			.color-button {
 				width: 24px;
@@ -156,25 +155,25 @@
 	}
 
 	&.clear .popup {
-		width: 160px;
-		left: -65px;
+		width: 136px;
 	}
 }
 
-.font-colors-dropdown {
+.text-color-dropdown {
 	.popup {
 		font-size: 14px;
-		width: 208px;
-		left: -88px;
+		width: 112px;
 		display: flex;
 		justify-content: center;
+		flex-direction: column;
+		padding: 7px;
 
 		.grid {
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: flex-end;
-			padding: 7px;
-			border-bottom: 1px solid #d9d9d9;
+
+			//border-bottom: 1px solid #d9d9d9;
 
 			.color-button {
 				width: 24px;
@@ -205,8 +204,7 @@
 	}
 
 	&.clear .popup {
-		width: 160px;
-		left: -65px;
+		width: 136px;
 	}
 }
 
@@ -215,13 +213,11 @@
 	.popup {
 		display: flex;
 		padding: 3px;
-		left: -34px
 	}
 }
 
 .more-dropdown {
 	.popup {
-		right: 0;
 		padding: 5px 0;
 
 		hr {

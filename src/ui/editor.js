@@ -48,7 +48,8 @@ function Editor(props) {
 			{!props.disableUI && <Toolbar
 				viewMode={props.viewMode}
 				enableReturnButton={props.enableReturnButton}
-				colorState={editorState.color}
+				textColorState={editorState.textColor}
+				highlightColorState={editorState.highlightColor}
 				menuState={editorState.menu}
 				linkState={editorState.link}
 				citationState={editorState.citation}

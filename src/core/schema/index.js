@@ -2,7 +2,7 @@ import { Schema } from 'prosemirror-model';
 import nodes from './nodes';
 import marks from './marks';
 import { buildToHTML, buildFromHTML, buildClipboardSerializer } from './utils';
-import { HIGHLIGHT_COLORS } from './colors';
+import { TEXT_COLORS, HIGHLIGHT_COLORS } from './colors';
 
 const schema = new Schema({ nodes, marks });
 // Update in Zotero 'editorInstance.js' as well!
@@ -22,5 +22,6 @@ export {
 	fromHTML,
 	buildClipboardSerializer,
 	QUOTATION_MARKS,
+	TEXT_COLORS,
 	HIGHLIGHT_COLORS
 };

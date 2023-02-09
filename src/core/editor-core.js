@@ -36,7 +36,6 @@ import {
 import Provider from './provider';
 
 import { menu, menuKey } from './plugins/menu';
-import { color, colorKey } from './plugins/color';
 import { link, linkKey } from './plugins/link';
 import { search, searchKey } from './plugins/search';
 import { image, imageKey } from './plugins/image';
@@ -53,6 +52,8 @@ import { trailingParagraph } from './plugins/trailing-paragraph';
 import { table, tableKey } from './plugins/table';
 import { markdownSerializer } from './plugins/markdown-serializer';
 import { math } from './plugins/math';
+import { textColor, textColorKey } from './plugins/text-color';
+import { highlightColor, highlightColorKey } from './plugins/highlight-color';
 
 // TODO: Avoid resetting cursor and losing the recently typed and unsaved
 //  text when a newly synced note is set
@@ -184,7 +185,8 @@ class EditorCore {
 					keymap(baseKeymap),
 					dropCursor(),
 					gapCursor(),
-					color(),
+					textColor(),
+					highlightColor(),
 					menu(),
 					search(),
 					link({
@@ -374,7 +376,8 @@ class EditorCore {
 	updatePluginState(state) {
 		this.pluginState = {
 			core: { unsaved: this.unsaved },
-			color: colorKey.getState(state),
+			textColor: textColorKey.getState(state),
+			highlightColor: highlightColorKey.getState(state),
 			menu: menuKey.getState(state),
 			link: linkKey.getState(state),
 			search: searchKey.getState(state),

@@ -6,7 +6,7 @@ import { getMarkRange } from '../helpers';
 
 const MAX_AVAILABLE_COLORS = 30;
 
-class Color {
+class HighlightColor {
 	constructor(state, options) {
 		this.state = {
 			availableColors: HIGHLIGHT_COLORS,
@@ -148,21 +148,21 @@ class Color {
 	}
 }
 
-export let colorKey = new PluginKey('color');
+export let highlightColorKey = new PluginKey('highlight-color');
 
-export function color(options) {
+export function highlightColor(options) {
 	return new Plugin({
-		key: colorKey,
+		key: highlightColorKey,
 		state: {
 			init(config, state) {
-				return new Color(state, options);
+				return new HighlightColor(state, options);
 			},
 			apply(tr, pluginState, oldState, newState) {
 				return pluginState;
 			}
 		},
 		view: (view) => {
-			let pluginState = colorKey.getState(view.state);
+			let pluginState = highlightColorKey.getState(view.state);
 			pluginState.view = view;
 			pluginState.update(view.state);
 			return {

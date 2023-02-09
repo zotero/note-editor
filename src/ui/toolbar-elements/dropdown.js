@@ -1,7 +1,7 @@
 'use strict';
 
 import cx from 'classnames';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from './button';
 import { mod, usePrevious } from '../../core/utils';
 
@@ -9,7 +9,7 @@ export default function Dropdown({ className, icon, title, children }) {
 	const [show, setShow] = useState(false);
 	const prevShow = usePrevious(show);
 	const rootRef = useRef();
-	const childWrapRef = useRef(null);
+	const popupRef = useRef(null);
 	const buttonRef = useRef(null);
 	const lastFocusedIndex = useRef(0);
 
@@ -26,15 +26,15 @@ export default function Dropdown({ className, icon, title, children }) {
 	}, [handleMouseDownCallback]);
 
 	const getCandidateNodes = useCallback(() =>
-		Array.from(childWrapRef.current?.querySelectorAll('button:not([disabled])') ?? []),
+		Array.from(popupRef.current?.querySelectorAll('button:not([disabled])') ?? []),
 	[]);
 
 	useEffect(() => {
 		if (show && !prevShow) {
 			const candidates = getCandidateNodes();
 			candidates.forEach(n => node => node.tabIndex = "-1");
-			const nextNode = childWrapRef.current.querySelector('button.active:not([disabled])')
-				?? childWrapRef.current.querySelector('button:not([disabled])');
+			const nextNode = popupRef.current.querySelector('button.active:not([disabled])')
+				?? popupRef.current.querySelector('button:not([disabled])');
 
 			if(nextNode) {
 				lastFocusedIndex.current = candidates.indexOf(nextNode);
@@ -42,6 +42,31 @@ export default function Dropdown({ className, icon, title, children }) {
 			}
 		}
 	}, [show, prevShow]);
+
+	useLayoutEffect(() => {
+		if (show) {
+			positionPopup();
+		}
+	});
+
+	function positionPopup() {
+		let PADDING = 5;
+		let editorWidth = document.getElementById('editor-container').offsetWidth;
+		let buttonRect = buttonRef.current.getBoundingClientRect();
+		let buttonLeft = buttonRect.left;
+		let buttonWidth = buttonRect.width;
+		let popupWidth = popupRef.current.offsetWidth;
+		let delta = -(popupWidth / 2 - buttonWidth / 2);
+		let absoluteLeft = buttonLeft + delta;
+		let absoluteRight = absoluteLeft + popupWidth;
+		if (absoluteLeft < PADDING) {
+			delta += PADDING - absoluteLeft;
+		}
+		else if (absoluteRight > editorWidth - PADDING) {
+			delta += editorWidth - PADDING - absoluteRight;
+		}
+		popupRef.current.style.left = delta + 'px';
+	}
 
 	function handleGlobalMouseDown(event) {
 		let parent = event.target;
@@ -113,7 +138,7 @@ export default function Dropdown({ className, icon, title, children }) {
 				aria-haspopup="true"
 				aria-expanded={show ? 'true' : 'false'}
 			/>
-			{show && <div ref={childWrapRef} role="menu" className="popup" onClick={handlePopupClick}>
+			{show && <div ref={popupRef} role="menu" className="popup" onClick={handlePopupClick}>
 				{children}
 			</div>}
 		</div>

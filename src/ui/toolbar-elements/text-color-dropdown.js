@@ -27,7 +27,7 @@ export default function TextColorDropdown({ textColorState }) {
 	return (
 		<Dropdown
 			className={cx('text-color-dropdown', {clear})}
-			icon={<IconTextColor color={activeColor || '#000000'}/>}
+			icon={<IconTextColor color={activeColor || 'currentColor'}/>}
 			title={intl.formatMessage({ id: 'noteEditor.textColor' })}
 		>
 			<div className="grid">

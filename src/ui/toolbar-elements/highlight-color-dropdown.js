@@ -27,7 +27,7 @@ export default function HighlightColorDropdown({ highlightColorState }) {
 	return (
 		<Dropdown
 			className={cx('highlight-color-dropdown', {clear})}
-			icon={<IconHighlighter color={activeColor && (activeColor[0] === '#' ? activeColor.slice(0, 7) : activeColor) || '#000000'}/>}
+			icon={<IconHighlighter color={activeColor && (activeColor[0] === '#' ? activeColor.slice(0, 7) : activeColor) || 'currentColor'}/>}
 			title={intl.formatMessage({ id: 'noteEditor.highlightText' })}
 		>
 			<div className="grid">

@@ -148,8 +148,7 @@ export function updateMarkRangeAtCursor(type, attrs) {
 					to = range.to;
 				}
 			}
-
-			tr.ensureMarks([]);
+			tr.removeStoredMark(type)
 			if (to > from) {
 				tr.removeMark(from, to, type);
 			}

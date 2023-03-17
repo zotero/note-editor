@@ -18,6 +18,7 @@ class EditorInstance {
 		this._readOnly = options.readOnly;
 		this._disableDrag = options.disableDrag;
 		this._localizedStrings = options.localizedStrings;
+		this._isAttachmentNote = options.isAttachmentNote || false;
 		this._editorCore = null;
 
 		this._init(options.value);
@@ -43,7 +44,7 @@ class EditorInstance {
 			disableDrag: this._disableDrag,
 			unsaved: false,
 			placeholder: '',
-			isAttachmentNote: false,
+			isAttachmentNote: this._isAttachmentNote,
 			onSubscribe: (subscription) => {
 				let { id, type, data } = subscription;
 				subscription = { id, type, data };

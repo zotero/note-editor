@@ -20,7 +20,7 @@ import TextColorDropdown from './toolbar-elements/text-color-dropdown';
 import InsertDropdown from './toolbar-elements/insert-dropdown';
 import { mod } from '../core/utils';
 
-function Toolbar({ viewMode, enableReturnButton, textColorState, highlightColorState, menuState, linkState, citationState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow, onInsertTable, onInsertMath, onInsertImage }) {
+function Toolbar({ viewMode, enableReturnButton, textColorState, highlightColorState, menuState, isAttachmentNote, linkState, citationState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow, onInsertTable, onInsertMath, onInsertImage }) {
 	const intl = useIntl();
 	const toolbarRef = useRef(null);
 	const lastFocusedIndex = useRef(0);
@@ -104,6 +104,7 @@ function Toolbar({ viewMode, enableReturnButton, textColorState, highlightColorS
 					title={intl.formatMessage({ id: 'noteEditor.findAndReplace' })}
 				/>
 				{viewMode === 'web' && <InsertDropdown
+					isAttachmentNote={isAttachmentNote}
 					onInsertTable={ onInsertTable }
 					onInsertMath={ onInsertMath }
 					onInsertImage={ onInsertImage }

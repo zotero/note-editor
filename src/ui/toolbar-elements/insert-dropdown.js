@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl';
 import { IconInsert, IconImage, IconMath, IconTable } from '../icons';
 import Dropdown from './dropdown';
 
-export default function InsertDropdown({ onInsertTable, onInsertMath, onInsertImage }) {
+export default function InsertDropdown({ isAttachmentNote, onInsertTable, onInsertMath, onInsertImage }) {
 	const intl = useIntl();
 
 	return (
@@ -15,13 +15,13 @@ export default function InsertDropdown({ onInsertTable, onInsertMath, onInsertIm
 			icon={<IconInsert />}
 			title={intl.formatMessage({id: 'general.insert'})}
 		>
-			<button
+			{ !isAttachmentNote && <button
 				role="menuitem"
 				className="toolbar-button"
 				title={intl.formatMessage({ id: 'noteEditor.insertImage' })}
 				onClick={onInsertImage}
 				onMouseDown={(event) => event.preventDefault()}
-			><IconImage /></button>
+			><IconImage /></button> }
 			<button
 				role="menuitem"
 				className="toolbar-button"

@@ -51,6 +51,7 @@ function Editor(props) {
 				textColorState={editorState.textColor}
 				highlightColorState={editorState.highlightColor}
 				menuState={editorState.menu}
+				isAttachmentNote={props.editorCore.isAttachmentNote}
 				linkState={editorState.link}
 				citationState={editorState.citation}
 				unsaved={editorState.core.unsaved}

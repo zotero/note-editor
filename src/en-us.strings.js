@@ -120,6 +120,7 @@ export default {
 	'noteEditor.align': 'Align',
 	'noteEditor.showOnPage': 'Show on Page',
 	'noteEditor.addCitation': 'Add Citation',
+	'noteEditor.removeCitation': 'Hide Citation',
 	'noteEditor.alignRight': 'Align Right',
 	'noteEditor.replace': 'Replace',
 	'noteEditor.annotationsWithDate': 'Annotations (%S)',

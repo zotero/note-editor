@@ -346,4 +346,84 @@ const configIOS = {
 	],
 };
 
-module.exports = [configDev, configWeb, configZotero, configIOS];
+const configAndroid = {
+	name: 'android',
+	mode: 'production',
+	devtool: false,
+	entry: {
+		editor: ['./src/index.android.js', './src/stylesheets/main.scss'],
+	},
+	optimization: {
+		minimize: true,
+		minimizer: [new TerserPlugin({ extractComments: false }), new CssMinimizerPlugin()],
+	},
+	output: {
+		path: path.resolve(__dirname, './build/android'),
+		filename: '[name].js',
+		publicPath: '',
+		library: {
+			name: 'zotero-editor',
+			type: 'umd',
+			umdNamedDefine: true,
+		},
+	},
+	module: {
+		rules: [
+			{
+				test: /\.(js|jsx)$/,
+				exclude: /node_modules/,
+				use: {
+					loader: 'babel-loader',
+				},
+			},
+			{
+				test: /\.s?css$/,
+				use: [
+					MiniCssExtractPlugin.loader,
+					{
+						loader: 'css-loader',
+					},
+					{
+						loader: 'postcss-loader',
+					},
+					{
+						loader: 'sass-loader',
+					},
+				],
+			},
+			{
+				test: /\.svg$/,
+				type: 'asset/resource',
+				generator: {
+					filename: 'assets/icons/[name].[hash:8][ext]',
+				},
+			},
+			{
+				test: /\.woff2$/,
+				type: 'asset/resource',
+				generator: {
+					filename: 'assets/fonts/[name].[hash:8][ext]',
+				},
+			},
+			{
+				test: /\.(ttf|woff)$/,
+				type: 'asset/resource',
+				generator: {
+					emit: false,
+				},
+			},
+		],
+	},
+	plugins: [
+		new CleanWebpackPlugin(),
+		new MiniCssExtractPlugin({
+			filename: '[name].css',
+		}),
+		new HtmlWebpackPlugin({
+			template: './html/editor.android.html',
+			filename: './[name].html',
+		}),
+	],
+};
+
+module.exports = [configDev, configWeb, configZotero, configIOS, configAndroid];

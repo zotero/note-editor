@@ -7,22 +7,34 @@ import cx from 'classnames';
 import { IconClose, IconColor, IconHighlighter } from '../icons';
 import Dropdown from './dropdown';
 
-export default function HighlightColorDropdown({ highlightColorState }) {
+export default function HighlightColorDropdown({ highlightColorState, underlineColorState }) {
 	const intl = useIntl();
 
 	function handleColorPick(color) {
-		highlightColorState.state.setColor(color)
+		if (underlineColorState.state.isCursorInUnderline) {
+			underlineColorState.state.setColor(color);
+		}
+		else {
+			highlightColorState.state.setColor(color);
+		}
 	}
 
 	function handleColorClear() {
-		highlightColorState.state.removeColor();
+		if (underlineColorState.state.isCursorInUnderline) {
+			underlineColorState.state.removeColor();
+		}
+		else {
+			highlightColorState.state.removeColor();
+		}
 	}
 
-	let activeColor = highlightColorState.state.activeColors.length === 1
-		? highlightColorState.state.activeColors[0]
+	let colorState = underlineColorState.state.isCursorInUnderline ? underlineColorState : highlightColorState;
+
+	let activeColor = colorState.state.activeColors.length === 1
+		? colorState.state.activeColors[0]
 		: null;
 
-	let clear = !!highlightColorState.state.activeColors.length;
+	let clear = !!colorState.state.activeColors.length;
 
 	return (
 		<Dropdown
@@ -40,7 +52,7 @@ export default function HighlightColorDropdown({ highlightColorState }) {
 					<IconClose/>
 				</button>}
 				{
-					highlightColorState.state.availableColors.slice(0, 8).map(([name, code], i) => {
+					colorState.state.availableColors.slice(0, 8).map(([name, code], i) => {
 						return (
 							<button
 								key={i}
@@ -57,8 +69,8 @@ export default function HighlightColorDropdown({ highlightColorState }) {
 			</div>
 			<div className="grid">
 				{
-					highlightColorState.state.availableColors.slice(8).map(([name, code], i) => {
-						const isActive = highlightColorState.state.activeColors.includes(code);
+					colorState.state.availableColors.slice(8).map(([name, code], i) => {
+						const isActive = colorState.state.activeColors.includes(code);
 						return (
 							<button
 								role="menuitem"

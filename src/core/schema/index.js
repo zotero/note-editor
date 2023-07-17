@@ -6,7 +6,7 @@ import { TEXT_COLORS, HIGHLIGHT_COLORS } from './colors';
 
 const schema = new Schema({ nodes, marks });
 // Update in Zotero 'editorInstance.js' as well!
-schema.version = 9;
+schema.version = 10;
 
 const toHTML = buildToHTML(schema);
 const fromHTML = buildFromHTML(schema);

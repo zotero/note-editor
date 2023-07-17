@@ -54,6 +54,7 @@ import { markdownSerializer } from './plugins/markdown-serializer';
 import { math } from './plugins/math';
 import { textColor, textColorKey } from './plugins/text-color';
 import { highlightColor, highlightColorKey } from './plugins/highlight-color';
+import { underlineColor, underlineColorKey } from './plugins/underline-color';
 
 // TODO: Avoid resetting cursor and losing the recently typed and unsaved
 //  text when a newly synced note is set
@@ -187,6 +188,7 @@ class EditorCore {
 					gapCursor(),
 					textColor(),
 					highlightColor(),
+					underlineColor(),
 					menu(),
 					search(),
 					link({
@@ -378,6 +380,7 @@ class EditorCore {
 			core: { unsaved: this.unsaved },
 			textColor: textColorKey.getState(state),
 			highlightColor: highlightColorKey.getState(state),
+			underlineColor: underlineColorKey.getState(state),
 			menu: menuKey.getState(state),
 			link: linkKey.getState(state),
 			search: searchKey.getState(state),

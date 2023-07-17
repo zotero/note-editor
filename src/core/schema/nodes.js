@@ -98,7 +98,7 @@ export default {
 	// Block nodes
 	paragraph: {
 		group: 'block',
-		content: '(text | hardBreak | image | citation | highlight | math_inline)*',
+		content: '(text | hardBreak | image | citation | highlight | underline_annotation | math_inline)*',
 		attrs: {
 			indent: { default: null },
 			align: { default: null },
@@ -124,7 +124,7 @@ export default {
 
 
 	heading: {
-		content: '(text | hardBreak | citation | highlight)*',
+		content: '(text | hardBreak | citation | highlight | underline_annotation)*',
 		group: 'block',
 		defining: true,
 		attrs: {
@@ -426,6 +426,31 @@ export default {
 		}],
 		toDOM: node => ['span', {
 			class: 'highlight',
+			'data-annotation': encodeObject(node.attrs.annotation)
+		}, 0]
+	},
+
+
+	underline_annotation: {
+		inline: true,
+		group: 'inline',
+		content: '(text | hardBreak)*',
+		defining: true,
+		attrs: {
+			annotation: { default: null }
+		},
+		parseDOM: [{
+			tag: 'span.underline',
+			getAttrs: dom => {
+				let annotation = decodeObject(dom.getAttribute('data-annotation'));
+				if (annotation) {
+					return { annotation };
+				}
+				return false;
+			}
+		}],
+		toDOM: node => ['span', {
+			class: 'underline',
 			'data-annotation': encodeObject(node.attrs.annotation)
 		}, 0]
 	},

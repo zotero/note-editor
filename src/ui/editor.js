@@ -50,6 +50,7 @@ function Editor(props) {
 				enableReturnButton={props.enableReturnButton}
 				textColorState={editorState.textColor}
 				highlightColorState={editorState.highlightColor}
+				underlineColorState={editorState.underlineColor}
 				menuState={editorState.menu}
 				isAttachmentNote={props.editorCore.isAttachmentNote}
 				linkState={editorState.link}

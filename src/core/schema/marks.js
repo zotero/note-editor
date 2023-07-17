@@ -39,12 +39,27 @@ export default {
 
 	underline: {
 		inclusive: true,
+		attrs: {
+			color: {default: ''}
+		},
 		parseDOM: [
-			{ tag: 'u' },
+			{
+				tag: 'u',
+				getAttrs: (node) => {
+					let color = node.style['text-decoration-color'] || '';
+					return {color};
+				}
+			},
 			{ style: 'text-decoration=underline' },
 			{ style: 'text-decoration-line=underline' }
 		],
-		toDOM: () => ['u', 0]
+		toDOM: (mark) => {
+			let style;
+			if (mark.attrs.color) {
+				style = `text-decoration-color: ${mark.attrs.color};`;
+			}
+			return ['u', {style}, 0];
+		},
 	},
 
 

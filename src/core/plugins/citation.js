@@ -60,7 +60,7 @@ class Citation {
 					let pos2;
 					for (let i = pos; i >= 0; i--) {
 						let node = doc.nodeAt(i);
-						if (node && ['highlight', 'image'].includes(node.type.name)) {
+						if (node && ['highlight', 'underline', 'image'].includes(node.type.name)) {
 							pos2 = i + node.nodeSize;
 							break;
 						}
@@ -96,7 +96,7 @@ class Citation {
 		let { selection } = state;
 		let { from, $from } = selection;
 
-		if ($from.parent.type === schema.nodes.highlight) {
+		if ([schema.nodes.highlight, schema.nodes.underline_annotation].includes($from.parent.type)) {
 			this.addCitationAfter();
 			return;
 		}
@@ -137,6 +137,7 @@ class Citation {
 		let { doc, tr } = state;
 
 		let nodeData = getSingleSelectedNode(state, schema.nodes.highlight, true)
+			|| getSingleSelectedNode(state, schema.nodes.underline_annotation)
 			|| getSingleSelectedNode(state, schema.nodes.image);
 
 		if (nodeData && nodeData.node.attrs.annotation) {
@@ -271,7 +272,7 @@ class Citation {
 			let annotation = node.attrs.annotation;
 			if (annotation && annotation.citationItem) {
 				let textContent = node.textContent;
-				if (annotation.type === 'highlight'
+				if (['highlight', 'underline'].includes(annotation.type)
 					&& (!QUOTATION_MARKS.includes(textContent[0])
 						|| !QUOTATION_MARKS.includes(textContent[textContent.length - 1]))) {
 					return;
@@ -309,7 +310,7 @@ class Citation {
 			let annotation = node.attrs.annotation;
 			if (annotation && annotation.citationItem) {
 				let textContent = node.textContent;
-				if (annotation.type === 'highlight'
+				if (['highlight', 'underline'].includes(annotation.type)
 					&& (!QUOTATION_MARKS.includes(textContent[0])
 						|| !QUOTATION_MARKS.includes(textContent[textContent.length - 1]))) {
 					return;

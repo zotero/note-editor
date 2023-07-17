@@ -61,6 +61,12 @@ export function buildToHTML(schema) {
 			container.setAttribute('data-schema-version', 8);
 		}
 
+		// Decrease schema version number if not using underline annotations
+		if (schema.version === 10
+			&& !tmp.querySelector('span.underline')) {
+			container.setAttribute('data-schema-version', 9);
+		}
+
 		return tmp.innerHTML.trim();
 	};
 }

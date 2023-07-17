@@ -20,7 +20,7 @@ import TextColorDropdown from './toolbar-elements/text-color-dropdown';
 import InsertDropdown from './toolbar-elements/insert-dropdown';
 import { mod } from '../core/utils';
 
-function Toolbar({ viewMode, enableReturnButton, textColorState, highlightColorState, menuState, isAttachmentNote, linkState, citationState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow, onInsertTable, onInsertMath, onInsertImage }) {
+function Toolbar({ viewMode, enableReturnButton, textColorState, highlightColorState, underlineColorState, menuState, isAttachmentNote, linkState, citationState, unsaved, searchState, onClickReturn, onShowNote, onOpenWindow, onInsertTable, onInsertMath, onInsertImage }) {
 	const intl = useIntl();
 	const toolbarRef = useRef(null);
 	const lastFocusedIndex = useRef(0);
@@ -81,7 +81,7 @@ function Toolbar({ viewMode, enableReturnButton, textColorState, highlightColorS
 			<div className="middle">
 				<TextDropdown menuState={menuState}/>
 				<TextColorDropdown textColorState={textColorState}/>
-				<HighlightColorDropdown highlightColorState={highlightColorState}/>
+				<HighlightColorDropdown highlightColorState={highlightColorState} underlineColorState={underlineColorState}/>
 				<StateButton
 					state={menuState.clearFormatting}
 					icon={<IconRemoveFormatting/>}
@@ -123,10 +123,16 @@ function Toolbar({ viewMode, enableReturnButton, textColorState, highlightColorS
 						<FormattedMessage id="noteEditor.editInWindow"/>
 					</button>}
 					{(!unsaved && viewMode !== 'library' || viewMode !== 'window' && viewMode !== 'ios') && <hr/>}
-					{highlightColorState.state.canApplyAnnotationColors && <button className="option" onClick={() => highlightColorState.state.applyAnnotationColors()}>
+					{(highlightColorState.state.canApplyAnnotationColors || underlineColorState.state.canApplyAnnotationColors) && <button className="option" onClick={() => {
+						highlightColorState.state.applyAnnotationColors();
+						underlineColorState.state.applyAnnotationColors()
+					}}>
 						<FormattedMessage id="noteEditor.applyAnnotationColors"/>
 					</button>}
-					{highlightColorState.state.canRemoveAnnotationColors && <button className="option" onClick={() => highlightColorState.state.removeAnnotationColors()}>
+					{(highlightColorState.state.canRemoveAnnotationColors || underlineColorState.state.canRemoveAnnotationColors ) && <button className="option" onClick={() => {
+						highlightColorState.state.removeAnnotationColors();
+						underlineColorState.state.removeAnnotationColors();
+					}}>
 						<FormattedMessage id="noteEditor.removeAnnotationColors"/>
 					</button>}
 					{citationState.state.canAddCitations && <button className="option" onClick={() => citationState.state.addCitations()}>

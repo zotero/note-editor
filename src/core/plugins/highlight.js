@@ -15,7 +15,8 @@ class Highlight {
 			return;
 		}
 
-		let nodeData = getSingleSelectedNode(state, schema.nodes.highlight, true);
+		let nodeData = getSingleSelectedNode(state, schema.nodes.highlight, true)
+			|| getSingleSelectedNode(state, schema.nodes.underline_annotation, true);
 		if (nodeData) {
 			let { pos } = nodeData;
 			let dom = this.view.nodeDOM(pos);
@@ -61,7 +62,7 @@ function unlinkHighlights(tr) {
 			if (updatedInLastIteration) {
 				return false;
 			}
-			if (node.type.name === 'highlight') {
+			if (['highlight', 'underline'].includes(node.type.name)) {
 				if (node.content instanceof Fragment && node.content.content.length) {
 					let $pos = tr.doc.resolve(pos);
 					if ($pos.node(1).type !== schema.nodes.blockquote) {
@@ -93,7 +94,7 @@ function unlinkHighlights(tr) {
 function handleEnter(state, dispatch) {
 	let { tr } = state;
 	let { $from, $to } = state.selection;
-	if ($from.pos === $to.pos && $from.parent.type === schema.nodes.highlight) {
+	if ($from.pos === $to.pos && [schema.nodes.highlight, schema.nodes.underline_annotation].includes($from.parent.type)) {
 		let blockParent = $from.node(1);
 		// https://discuss.prosemirror.net/t/the-weird-backspacing-functionality-with-inline-nodes/2128/8
 		let block = blockParent.copy();
@@ -107,7 +108,7 @@ function handleBackspace(state, dispatch) {
 	let { tr } = state;
 	let { $from, $to } = state.selection;
 	if ($from.pos === $to.pos) {
-		if ($from.nodeBefore && $from.nodeBefore.type === schema.nodes.highlight) {
+		if ($from.nodeBefore && [schema.nodes.highlight, schema.nodes.underline_annotation].includes($from.nodeBefore.type)) {
 			dispatch(tr.setSelection(TextSelection.create(tr.doc, $from.pos - 1)));
 		}
 	}
@@ -159,7 +160,7 @@ export function highlight(options) {
 									return;
 								}
 								let $pos = oldState.doc.resolve(oldStart);
-								if ($pos.parent.type.name === 'highlight') {
+								if (['highlight', 'underline'].includes($pos.parent.type.name)) {
 									if ($pos.parentOffset === 0) {
 										tr.delete(newStart, newEnd);
 										tr.replace(newStart - 1, newStart - 1, step.slice);

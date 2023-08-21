@@ -1,5 +1,4 @@
-
-@import "~@benrbray/prosemirror-math/style/math.css";
+@import "./prosemirror-math";
 @import "~katex/dist/katex.min.css";
 
 .math-node.empty-math .math-render::before {

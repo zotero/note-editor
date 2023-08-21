@@ -26,6 +26,10 @@ function getMarkdownSerializer() {
 		state.renderInline(node)
 	};
 
+	serializer.nodes['underline_annotation'] = (state, node) => {
+		state.renderInline(node)
+	};
+
 	serializer.nodes['citation'] = (state, node) => {
 		state.write(serializeCitationInnerText(node));
 	};

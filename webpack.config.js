@@ -46,6 +46,9 @@ const configDev = {
 					},
 					{
 						loader: 'sass-loader',
+						options: {
+							additionalData: `$platform: 'dev';`
+						}
 					},
 				],
 			},
@@ -137,6 +140,9 @@ const configWeb = {
 					},
 					{
 						loader: 'sass-loader',
+						options: {
+							additionalData: `$platform: 'web';`
+						}
 					},
 				],
 			},
@@ -222,6 +228,9 @@ const configZotero = {
 					},
 					{
 						loader: 'sass-loader',
+						options: {
+							additionalData: `$platform: 'zotero';`
+						}
 					},
 				],
 			},
@@ -308,6 +317,9 @@ const configIOS = {
 					},
 					{
 						loader: 'sass-loader',
+						options: {
+							additionalData: `$platform: 'ios';`
+						}
 					},
 				],
 			},
@@ -388,6 +400,9 @@ const configAndroid = {
 					},
 					{
 						loader: 'sass-loader',
+						options: {
+							additionalData: `$platform: 'android';`
+						}
 					},
 				],
 			},

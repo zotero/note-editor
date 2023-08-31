@@ -216,7 +216,7 @@ function main(html) {
 				disableUI={false}
 				showUpdateNotice={false}
 				enableReturnButton={true}
-				viewMode={'pdf'}
+				viewMode="dev"
 				editorCore={editorCore}
 				onClickReturn={() => {
 					console.log('Clicked return');

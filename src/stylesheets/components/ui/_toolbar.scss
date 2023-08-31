@@ -36,8 +36,11 @@
 	align-items: center;
 	justify-content: space-around;
 
-	&:hover {
-		background-color: #F0F0F0;
+	@if not $mobile {
+		// hover effect only makes sense on non-touch device
+		&:hover {
+			background-color: #F0F0F0;
+		}
 	}
 
 	&:active,

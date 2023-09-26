@@ -134,6 +134,11 @@ class EditorInstance {
 				this._editorCore.provider.notify(id, data);
 				return;
 			}
+			case 'forceSave': {
+				let data = this._editorCore.getData(true);
+				this._postMessage({ action: 'update', value: data ? data.html : null });
+				return;
+			}
 			// case 'setCitation': {
 			// 	let { nodeID, citation, formattedCitation } = message;
 			// 	this._editorCore.setCitation(nodeID, citation, formattedCitation);

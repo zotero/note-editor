@@ -208,7 +208,7 @@ export function formatCitationItem(citationItem) {
 
 	// Title
 	if (!str && itemData.title) {
-		str = `“${itemData.title}”`;
+		str += `“${itemData.title}”`;
 	}
 
 	// Date
@@ -223,15 +223,16 @@ export function formatCitationItem(citationItem) {
 
 	// Locator
 	if (citationItem.locator) {
+		let label = '';
 		if (citationItem.label) {
 			// TODO: Localize and use short forms
-			var label = citationItem.label;
+			label = citationItem.label;
 		}
 		else if (/[\-–,]/.test(citationItem.locator)) {
-			var label = 'pp.';
+			label = 'pp.';
 		}
 		else {
-			var label = 'p.';
+			label = 'p.';
 		}
 
 		str += ', ' + label + ' ' + citationItem.locator;

@@ -83,7 +83,13 @@ class ImageView {
 			divRight.className = 'link';
 
 			let img = document.createElement('img');
-			img.src = node.attrs.src;
+			// Disable remote image loading
+			if (node.attrs.src.startsWith('data:')) {
+				img.src = node.attrs.src;
+			}
+			else {
+				img.alt = node.attrs.src;
+			}
 			divLeft.appendChild(img);
 
 			if (node.attrs.src) {

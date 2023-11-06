@@ -194,7 +194,7 @@ export function dropPaste(options) {
 					let { tr } = state;
 					// This was adapted from deleteTable that is in prosemirror-tables
 					var $pos = state.selection.$anchor;
-					for (var d = $pos.depth; d > 0; d--) {
+					for (var d = $pos.depth; d > 0 && d <= 3; d--) {
 						var node = $pos.node(d);
 						if (node.type.spec.tableRole == 'table') {
 							tr.delete($pos.before(d), $pos.after(d)).scrollIntoView();

@@ -4,13 +4,17 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import cx from 'classnames';
 
-import {
-	IconBold, IconCase,IconCode, IconItalic, IconStrike,
-	IconSubscript, IconSuperscript, IconUnderline
-} from '../icons';
-
 import Dropdown from './dropdown';
 import { StateButton } from './button';
+
+import IconFormatText from '../../../res/icons/20/format-text.svg';
+import IconBold from '../../../res/icons/20/bold.svg';
+import IconItalic from '../../../res/icons/20/italic.svg';
+import IconUnderline from '../../../res/icons/20/underline.svg';
+import IconStrike from '../../../res/icons/20/strikethrough.svg';
+import IconSubscript from '../../../res/icons/20/subscript.svg';
+import IconSuperscript from '../../../res/icons/20/superscript.svg';
+import IconCode from '../../../res/icons/20/monospaced-1.25.svg';
 
 const blockTypes = [
 	['heading1', <h1><FormattedMessage id="noteEditor.heading1"/></h1>],
@@ -34,7 +38,7 @@ export default function TextDropdown({ menuState }) {
 	return (
 		<Dropdown
 			className="text-dropdown"
-			icon={<IconCase/>}
+			icon={<IconFormatText/>}
 			title={intl.formatMessage({ id: 'noteEditor.formatText' })}
 		>
 			<div className="inline-options">

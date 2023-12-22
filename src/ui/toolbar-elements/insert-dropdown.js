@@ -3,8 +3,12 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import { IconInsert, IconImage, IconMath, IconTable } from '../icons';
 import Dropdown from './dropdown';
+
+import IconInsert from '../../../res/icons/24/insert.svg';
+import IconImage from '../../../res/icons/24/image.svg';
+import IconMath from '../../../res/icons/24/math.svg';
+import IconTable from '../../../res/icons/24/table.svg';
 
 export default function InsertDropdown({ isAttachmentNote, onInsertTable, onInsertMath, onInsertImage }) {
 	const intl = useIntl();

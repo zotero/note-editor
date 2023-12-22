@@ -3,13 +3,20 @@
 	user-select: none;
 	color: #404040;
 	font-size: 12px;
-	border-bottom: 1px solid #d9d9d9;
 	cursor: default;
 	display: flex;
 	justify-content: space-between;
-	padding: 3px 5px;
+	height: 41px !important;
+	min-height: 41px;
+	margin: 0;
+	padding: 0px 8px;
+	min-width: 1px;
+	background: var(--material-toolbar);
+	border-bottom: var(--material-panedivider);
 
 	.start {
+		display: flex;
+		align-items: center;
 		width: 30px;
 	}
 
@@ -24,29 +31,32 @@
 	}
 
 	.end {
+		display: flex;
+		align-items: center;
 		width: 30px;
 	}
 }
 
 .toolbar-button {
-	color: #404040;
-	width: 30px;
-	height: 30px;
+	color: var(--fill-secondary);
+	width: 28px;
+	height: 28px;
 	display: flex;
 	align-items: center;
 	justify-content: space-around;
+	border-radius: 5px;
+	margin: 0 4px;
 
 	@if not $mobile {
 		// hover effect only makes sense on non-touch device
 		&:hover {
-			background-color: #F0F0F0;
+			background-color: var(--fill-quinary);
 		}
 	}
 
 	&:active,
 	&.active {
-		background-color: #404040;
-		color: #ffffff;
+		background-color: var(--fill-quarternary);
 	}
 }
 
@@ -60,11 +70,12 @@
 	.popup {
 		top: 30px;
 		position: absolute;
-		background-color: white;
 		z-index: 200;
-		border: 1px solid #d9d9d9;
 		box-shadow: 0 0 24px 0 rgba(0,0,0,0.12);
 		border-radius: 4px;
+		background: var(--material-toolbar);
+		border: var(--material-panedivider);
+		color: var(--fill-primary)
 	}
 }
 
@@ -85,7 +96,7 @@
 				}
 			}
 
-			border-bottom: 1px solid #d9d9d9;
+			border-bottom: var(--material-panedivider);
 		}
 
 		.block-options {
@@ -101,11 +112,11 @@
 				padding: 5px 0 5px 20px;
 
 				&:hover {
-					background-color: #F0F0F0;
+					background-color: var(--fill-quinary);
 				}
 
 				&.active {
-					background-color: #404040;
+					background-color: var(--fill-quarternary);
 					color: white;
 				}
 			}
@@ -137,7 +148,7 @@
 				justify-content: space-around;
 
 				&:hover {
-					background-color: #F0F0F0;
+					background-color: var(--fill-quinary);
 				}
 			}
 
@@ -186,7 +197,7 @@
 				justify-content: space-around;
 
 				&:hover {
-					background-color: #F0F0F0;
+					background-color: var(--fill-quinary);
 				}
 			}
 
@@ -226,7 +237,7 @@
 		hr {
 			margin: 5px 0;
 			border: 0;
-			border-bottom: 1px solid #d9d9d9;
+			border-bottom: var(--material-panedivider);
 
 			&:last-child {
 				display: none;
@@ -239,13 +250,12 @@
 			width: 100%;
 
 			&:hover {
-				background-color: #F0F0F0;
+				background-color: var(--fill-quinary);
 			}
 
 		}
 	}
 }
-
 
 .citation-icon {
 	width: 16px;

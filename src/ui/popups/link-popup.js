@@ -3,8 +3,12 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, Fragment } from 'react';
 import { useIntl } from 'react-intl';
 import cx from 'classnames';
-import { IconCheckmark, IconEdit, IconUnlink } from '../icons';
+
 import Popup from './popup';
+
+import IconCheckmark from '../../../res/icons/16/checkmark.svg';
+import IconEdit from '../../../res/icons/16/edit.svg';
+import IconUnlink from '../../../res/icons/16/unlink.svg';
 
 function LinkPopup({ parentRef, pluginState }) {
 	const intl = useIntl();

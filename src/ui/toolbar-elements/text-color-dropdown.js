@@ -4,8 +4,10 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import cx from 'classnames';
 
-import { IconClose, IconColor, IconHighlighter, IconTextColor } from '../icons';
 import Dropdown from './dropdown';
+
+import { IconColor, IconTextColor } from '../custom-icons';
+import IconRemoveColor from '../../../res/icons/24/remove-color.svg';
 
 export default function TextColorDropdown({ textColorState }) {
 	const intl = useIntl();
@@ -27,7 +29,7 @@ export default function TextColorDropdown({ textColorState }) {
 	return (
 		<Dropdown
 			className={cx('text-color-dropdown', {clear})}
-			icon={<IconTextColor color={activeColor || 'currentColor'}/>}
+			icon={<IconTextColor color={activeColor || 'transparent'}/>}
 			title={intl.formatMessage({ id: 'noteEditor.textColor' })}
 		>
 			<div className="grid">
@@ -36,7 +38,7 @@ export default function TextColorDropdown({ textColorState }) {
 					title={intl.formatMessage({ id: 'noteEditor.removeColor' })}
 					onClick={handleColorClear}
 				>
-					<IconClose/>
+					<IconRemoveColor/>
 				</button>}
 				{
 					textColorState.state.availableColors.slice(0, 8).map(([name, code], i) => {

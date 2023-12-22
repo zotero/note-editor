@@ -2,8 +2,13 @@
 
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { IconBlockquote, IconCloseSmall, IconDocument, IconUndo } from '../icons';
+
 import Popup from './popup';
+
+import IconBlockquote from '../../../res/icons/16/cite.svg';
+import IconCloseSmall from '../../../res/icons/16/x-8.svg';
+import IconDocument from '../../../res/icons/16/show-item.svg';
+import IconUndo from '../../../res/icons/16/show-item.svg';
 
 function CitationPopup({ parentRef, citationState, viewMode }) {
 	function handleOpen() {

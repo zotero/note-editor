@@ -4,14 +4,14 @@ import React, { useCallback, useRef} from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Button, StateButton } from './toolbar-elements/button';
-import {
-	IconChevronLeft,
-	IconCitation, IconColors,
-	IconLink,
-	IconMore,
-	IconRemoveFormatting,
-	IconSearch
-} from './icons';
+
+import IconChevronLeft from '../../res/icons/20/chevron-left.svg';
+import IconCitation from '../../res/icons/20/cite.svg';
+import IconLink from '../../res/icons/20/link.svg';
+import IconMore from '../../res/icons/20/options.svg';
+import IconRemoveFormatting from '../../res/icons/20/clear-format.svg';
+import IconSearch from '../../res/icons/20/magnifier.svg';
+
 import AlignDropdown from './toolbar-elements/align-dropdown';
 import Dropdown from './toolbar-elements/dropdown';
 import TextDropdown from './toolbar-elements/text-dropdown';

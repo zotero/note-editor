@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { IconChevronDown, IconChevronUp } from './icons';
+
+import IconChevronDown from '../../res/icons/10/chevron-down.svg';
+import IconChevronUp from '../../res/icons/10/chevron-up.svg';
 
 function Findbar({ searchState, active }) {
 	const intl = useIntl();

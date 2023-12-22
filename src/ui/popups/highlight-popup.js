@@ -2,8 +2,12 @@
 
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { IconBlockquote, IconDocument, IconUnlink } from '../icons';
+
 import Popup from './popup';
+
+import IconBlockquote from '../../../res/icons/16/cite.svg';
+import IconDocument from '../../../res/icons/16/page.svg';
+import IconUnlink from '../../../res/icons/16/unlink.svg';
 
 function HighlightPopup({ parentRef, highlightState, citationState }) {
 	function handleOpen() {

@@ -31,19 +31,19 @@ function CitationPopup({ parentRef, citationState, viewMode }) {
 		<Popup className="citation-popup" parentRef={parentRef} pluginState={citationState.popup}>
 			{citationState.popup.canOpen && <button onClick={handleOpen}>
 				<div className="icon"><IconDocument/></div>
-				<FormattedMessage id="noteEditor.goToPage"/>
+				<div className="title"><FormattedMessage id="noteEditor.goToPage"/></div>
 			</button>}
 			<button onClick={handleShowItem}>
 				<div className="icon"><IconUndo/></div>
-				<FormattedMessage id="noteEditor.showItem"/>
+				<div className="title"><FormattedMessage id="noteEditor.showItem"/></div>
 			</button>
 			{!['ios', 'web'].includes(viewMode) && <button onClick={handleEdit}>
 				<div className="icon"><IconBlockquote/></div>
-				<FormattedMessage id="noteEditor.editCitation"/>
+				<div className="title"><FormattedMessage id="noteEditor.editCitation"/></div>
 			</button>}
 			{citationState.popup.canRemove && <button onClick={handleRemove}>
 				<div className="icon"><IconCloseSmall/></div>
-				<FormattedMessage id="noteEditor.removeCitation"/>
+				<div className="title"><FormattedMessage id="noteEditor.removeCitation"/></div>
 			</button>}
 		</Popup>
 	)

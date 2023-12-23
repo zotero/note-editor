@@ -1,7 +1,3 @@
-//
-// Popup
-//
-
 .popup-container .popup {
 	position: absolute;
 	display: flex;
@@ -38,9 +34,12 @@
 			justify-content: space-around;
 			margin-inline-end: 7px;
 		}
+
+		.title {
+			color: var(--fill-primary);
+		}
 	}
 }
-
 
 .link-popup {
 	.link {

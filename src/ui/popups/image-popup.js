@@ -26,15 +26,15 @@ function ImagePopup({ parentRef, imageState, citationState }) {
 		<Popup className="image-popup" parentRef={parentRef} pluginState={imageState.popup}>
 			<button onClick={handleOpen}>
 				<div className="icon"><IconDocument/></div>
-				<FormattedMessage id="noteEditor.showOnPage"/>
+				<div className="title"><FormattedMessage id="noteEditor.showOnPage"/></div>
 			</button>
 			<button onClick={handleUnlink}>
 				<div className="icon"><IconUnlink/></div>
-				<FormattedMessage id="noteEditor.unlink"/>
+				<div className="title"><FormattedMessage id="noteEditor.unlink"/></div>
 			</button>
 			{citationState.canAddCitationAfter() && <button onClick={handleAdd}>
 				<div className="icon"><IconBlockquote/></div>
-				<FormattedMessage id="noteEditor.addCitation"/>
+				<div className="title"><FormattedMessage id="noteEditor.addCitation"/></div>
 			</button>}
 		</Popup>
 	);

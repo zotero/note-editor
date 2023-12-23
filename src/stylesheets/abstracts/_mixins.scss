@@ -1,9 +1,73 @@
-//
-// Mixins
-//
+@use "sass:math";
 
-@import "mixins/media-queries";
-@import "mixins/icon";
-@import "mixins/selectors";
-@import "mixins/popover-pointer";
+@mixin popover-pointer($width, $height, $offset: 50%, $position: null) {
+	$border-x: math.div($width, 2);
+	$border-y: $height;
 
+	&::before,
+	&::after {
+		content: "";
+		position: absolute;
+		left: $offset;
+		border: solid transparent;
+		border-width: $border-y $border-x;
+		transform: translateX(-$border-x);
+	}
+
+	#{if($position == "bottom", "&", "&[class*='bottom']")} {
+		&::before,
+		&::after {
+			border-top-width: 0;
+		}
+
+		&::before {
+			top: (-$border-y - 1px);
+			border-bottom-color: var(--color-panedivider); // Updated color
+		}
+
+		&::after {
+			top: -$border-y;
+			border-bottom-color: var(--color-toolbar);
+		}
+	}
+
+	#{if($position == "top", "&", "&[class*='top']")} {
+		&::before,
+		&::after {
+			border-bottom-width: 0;
+		}
+
+		&::before {
+			bottom: (-$border-y - 1px);
+			border-top-color: var(--color-panedivider); // Updated color
+		}
+
+		&::after {
+			bottom: -$border-y;
+			border-top-color: var(--color-toolbar);
+		}
+	}
+}
+
+// An implementation of Firefox light-dark() CSS mixin, which is not supported in 102
+@mixin light-dark($prop, $light-color, $dark-color) {
+	@media (prefers-color-scheme: light) {
+		#{$prop}: $light-color;
+	}
+	@media (prefers-color-scheme: dark) {
+		#{$prop}: $dark-color;
+	}
+}
+
+@mixin macOS-inactive-opacity {
+	$selector: &;
+	@at-root {
+		@media (-moz-platform: macos) {
+			#{$selector} {
+				&:-moz-window-inactive {
+					opacity: 0.6;
+				}
+			}
+		}
+	}
+}

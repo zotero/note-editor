@@ -5,10 +5,10 @@ $mobile: false;
 }
 
 //
-// Functions
+// Abstracts
 //
 
-@import "abstracts/functions";
+@import "abstracts/mixins";
 
 //
 // Themes
@@ -16,12 +16,6 @@ $mobile: false;
 
 @import "themes/light";
 @import "themes/dark";
-
-//
-// Abstracts
-//
-
-@import "abstracts/mixins";
 
 //
 // Base

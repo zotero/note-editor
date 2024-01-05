@@ -10,11 +10,12 @@
 	font-family: var(--font-family);
 	font-size: var(--font-size);
 	font-style: normal;
-	@media (-moz-platform: windows) {
+	//@media (-moz-platform: windows) {
+	// Windows, web or other platform
 		--color-accent: var(--accent-blue);
 		@include light-dark(--color-focus-border, #000, #fff);
 		--width-focus-border: 2px;
-	}
+	//}
 	@media (-moz-platform: macos) {
 		--color-accent: SelectedItem;
 		--color-focus-border: color-mix(in srgb, var(--color-accent) 70%, transparent);

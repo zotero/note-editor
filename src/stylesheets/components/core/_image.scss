@@ -11,10 +11,10 @@
 		margin-right: auto;
 
 		.image {
-			outline: 1px solid #d9d9d9;
+			outline: 1px solid var(--fill-quarternary);
 
 			&.annotation:hover {
-				border-color: gray;
+				border-color: var(--fill-tertiary);
 			}
 		}
 	}
@@ -56,6 +56,6 @@
 		max-width: 100%;
 		width: 200px;
 		height: 200px;
-		background-color: lightgray;
+		background-color: var(--fill-quarternary);
 	}
 }

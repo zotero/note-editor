@@ -58,7 +58,7 @@ math-inline .math-src .ProseMirror {
 
 math-inline .math-src::after, math-inline .math-src::before {
 	content: "$";
-	color: #b0b0b0;
+	color: var(--fill-tertiary);
 }
 
 /* -- Block Math ---------------------------------------- */
@@ -67,7 +67,7 @@ math-display { display: block; }
 
 math-display .math-render { display: block; }
 
-math-display.ProseMirror-selectednode { background-color: #eee; }
+math-display.ProseMirror-selectednode { background-color: var(--fill-quinary); }
 
 math-display .math-src .ProseMirror {
 	width: 100%;
@@ -77,7 +77,7 @@ math-display .math-src .ProseMirror {
 math-display .math-src::after, math-display .math-src::before {
 	content: "$$";
 	text-align: left;
-	color: #b0b0b0;
+	color: var(--fill-tertiary);
 }
 
 math-display .katex-display { margin: 0; }
@@ -88,7 +88,7 @@ math-display .katex-display { margin: 0; }
 .katex-html *::selection { background-color: none !important; }
 
 .math-node.math-select .math-render {
-	background-color: #c0c0c0ff;
+	background-color: var(--fill-tertiary);
 }
 math-inline.math-select .math-render {
 	padding-top: 2px;

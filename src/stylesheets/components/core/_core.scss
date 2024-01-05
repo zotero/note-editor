@@ -73,11 +73,11 @@ img.ProseMirror-separator {
 }
 
 .citation.selected, .citation:hover {
-	background-color: #E1EFFF;;
+	background-color: var(--accent-blue10);
 }
 
 .citation.ProseMirror-selectednode {
-	background-color: #f4f4f4;
+	background-color: var(--fill-quinary);
 }
 
 .highlight:hover {
@@ -134,7 +134,7 @@ $indent-width: 30;
 }
 
 .find-selected {
-	background-color: #adf;
+	background-color: var(--accent-blue50);
 }
 
 .primary-editor.column-resize-handle {
@@ -144,7 +144,7 @@ $indent-width: 30;
 	bottom: 0;
 	width: 4px;
 	z-index: 20;
-	background-color: #adf;
+	background-color: var(--accent-blue50);
 	pointer-events: none;
 }
 
@@ -162,7 +162,7 @@ $indent-width: 30;
 	right: 0;
 	top: 0;
 	bottom: 0;
-	background: rgba(200, 200, 255, 0.4);
+	background: var(--accent-blue10);
 	pointer-events: none;
 }
 
@@ -257,7 +257,7 @@ $indent-width: 30;
 	pre {
 		padding: 0.7rem 1rem;
 		border-radius: 5px;
-		background: #f1f1f1;
+		background: var(--fill-quinary);
 		//color: $color-white;
 
 		font-size: 0.9em;
@@ -267,7 +267,7 @@ $indent-width: 30;
 		padding: 0.2rem 0.4rem;
 		border-radius: 5px;
 		font-size: 0.9em;
-		background: #f1f1f1;
+		background: var(--fill-quarternary);
 	}
 
 	ul,
@@ -336,7 +336,7 @@ $indent-width: 30;
 			bottom: 0;
 			width: 4px;
 			z-index: 20;
-			background-color: #adf;
+			background-color: var(--accent-blue50);
 			pointer-events: none;
 		}
 	}
@@ -355,7 +355,7 @@ $indent-width: 30;
 
 .ProseMirror .empty-node::before {
 	position: absolute;
-	color: #aaa;
+	color: var(--fill-tertiary);
 	cursor: text;
 }
 
@@ -410,17 +410,17 @@ $indent-width: 30;
 /* rtl:end:ignore */
 
 .ProseMirror-selectednode {
-	background-color: #f4f4f4;
+	background-color: var(--fill-quinary);
 	border-radius: 4px;
 }
 
 .primary-editor hr {
 	border: 0;
-	background-color: #cccccc;
+	background-color: var(--fill-quarternary);
 	height: 2px;
 
 	&.ProseMirror-selectednode {
-		background-color: #adf;
+		background-color: var(--accent-blue30);
 	}
 }
 

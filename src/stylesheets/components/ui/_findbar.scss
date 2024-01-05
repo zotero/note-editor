@@ -1,84 +1,66 @@
 .findbar {
-	font-size: 14px;
-	color: #595959;
-	border-bottom: 1px solid #d9d9d9;
-	padding: 6px 10px;
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	row-gap: 6px;
+	column-gap: 8px;
+	padding: 6px 8px;
+	background: var(--material-toolbar);
+	border-bottom: var(--material-panedivider);
+	font-size: 12px;
 
-	.line {
+	input[type=text] {
+		padding: 0 7px;
+		background: var(--material-background);
+		border-radius: 5px;
+		border: var(--material-border-quinary);
+		width: 100%;
+		outline: none;
+		height: 28px;
+
+		&:focus {
+			outline: none;
+			border-color: rgba(0, 0, 0, 0);
+			box-shadow: 0 0 0 var(--width-focus-border) var(--color-focus-search);
+		}
+	}
+
+	.buttons {
 		display: flex;
+		gap: 8px;
+		align-self: center;
 
-		&:nth-child(2) {
-			margin-top: 4px;
-		}
-
-		.input-box {
-			flex-grow: 1;
+		.group {
 			display: flex;
-			height: 32px;
-			border: 1px solid #d9d9d9;
-			border-radius: 4px;
-			padding: 0 4px 0 7px;
-
-			.input {
-				flex-grow: 1;
-				display: flex;
-
-				input {
-					width: 100%;
-					border: none;
-					outline: none;
-					color: inherit;
-				}
-			}
-
-			.buttons {
-				display: flex;
-				align-items: center;
-
-				.button {
-					color: #404040;
-					width: 22px;
-					height: 22px;
-					display: flex;
-					align-items: center;
-					justify-content: space-around;
-					border-radius: 4px;
-
-					&:hover {
-						background-color: #F0F0F0;
-					}
-
-					&:active,
-					&.active {
-						background-color: #404040;
-						color: #ffffff;
-					}
-				}
-
-				.text-button {
-					cursor: default;
-					white-space: nowrap;
-					width: unset;
-					margin-left: 4px;
-					border: 1px solid lightgray;
-					padding: 0 7px;
-				}
-
-			}
+			gap: 4px;
 		}
+	}
 
-		.check-button {
-			height: 32px;
-			display: flex;
-			align-items: center;
-			cursor: default;
-			white-space: nowrap;
-			margin-left: 4px;
-			padding: 0 7px;
+	.check-button {
+		display: flex;
+		align-items: center;
+		cursor: default;
+		white-space: nowrap;
 
-			label {
-				padding-left: 5px;
-			}
+		label {
+			padding-inline-start: 6px;
+		}
+	}
+
+	.text-button {
+		display: flex;
+		padding: 4px;
+		align-items: center;
+		gap: 4px;
+		height: 24px;
+		border-radius: 5px;
+		background: var(--material-button);
+		color: var(--fill-primary);
+		box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.05), 0px 0.5px 2.5px 0px rgba(0, 0, 0, 0.30);
+		cursor: default;
+
+		&:active {
+			background-color: var(--fill-senary);
 		}
 	}
 }

@@ -86,7 +86,7 @@ function LinkPopup({ parentRef, pluginState }) {
 							onClick={handleSet}
 							title={intl.formatMessage({ id: 'noteEditor.set' })}
 						>
-							<div className="icon"><IconCheckmark/></div>
+							<IconCheckmark/>
 						</button>
 					</Fragment>
 				)
@@ -97,13 +97,13 @@ function LinkPopup({ parentRef, pluginState }) {
 							onClick={handleEdit}
 							title={intl.formatMessage({ id: 'noteEditor.edit' })}
 						>
-							<div className="icon"><IconEdit/></div>
+							<IconEdit/>
 						</button>
 						<button
 							onClick={handleUnset}
 							title={intl.formatMessage({ id: 'noteEditor.unlink' })}
 						>
-							<div className="icon"><IconUnlink/></div>
+							<IconUnlink/>
 						</button>
 					</Fragment>
 				)}

@@ -5,15 +5,15 @@
 	font-size: 12px;
 	background: var(--material-toolbar);
 	border: var(--material-panedivider);
-	padding: 5px 5px;
-	border-radius: 4px;
+	padding: 5px;
+	border-radius: 5px;
 	box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.12);
 	@include popover-pointer($width: 10px, $height: 5px);
 
 	button {
 		user-select: none;
 		padding: 4px;
-		border-radius: 4px;
+		border-radius: 5px;
 		cursor: default;
 		display: flex;
 		align-items: center;

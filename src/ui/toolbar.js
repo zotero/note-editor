@@ -122,7 +122,7 @@ function Toolbar({ viewMode, enableReturnButton, textColorState, highlightColorS
 					{viewMode !== 'window' && viewMode !== 'ios' && <button className="option" onClick={onOpenWindow}>
 						<FormattedMessage id="noteEditor.editInWindow"/>
 					</button>}
-					{(!unsaved && viewMode !== 'library' || viewMode !== 'window' && viewMode !== 'ios') && <hr/>}
+					{(!unsaved && viewMode !== 'library' || viewMode !== 'window' && viewMode !== 'ios') && <div className="separator"/>}
 					{(highlightColorState.state.canApplyAnnotationColors || underlineColorState.state.canApplyAnnotationColors) && <button className="option" onClick={() => {
 						highlightColorState.state.applyAnnotationColors();
 						underlineColorState.state.applyAnnotationColors()

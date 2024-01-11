@@ -6,9 +6,9 @@ import { useIntl } from 'react-intl';
 import Dropdown from './dropdown';
 import { StateButton } from './button';
 
-import IconAlignLeft from '../../../res/icons/24/align-left.svg';
-import IconAlignCenter from '../../../res/icons/24/align-center.svg';
-import IconAlignRight from '../../../res/icons/24/align-right.svg';
+import IconAlignLeft from '../../../res/icons/20/align-left.svg';
+import IconAlignCenter from '../../../res/icons/20/align-center.svg';
+import IconAlignRight from '../../../res/icons/20/align-right.svg';
 
 export default function AlignDropdown({ menuState }) {
 	const intl = useIntl();

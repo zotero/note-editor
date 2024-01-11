@@ -7,7 +7,7 @@ import cx from 'classnames';
 import Dropdown from './dropdown';
 
 import { IconColor, IconHighlighter } from '../custom-icons';
-import IconRemoveColor from '../../../res/icons/24/remove-color.svg';
+import IconRemoveColor from '../../../res/icons/16/remove-color.svg';
 
 export default function HighlightColorDropdown({ highlightColorState, underlineColorState }) {
 	const intl = useIntl();
@@ -40,54 +40,54 @@ export default function HighlightColorDropdown({ highlightColorState, underlineC
 
 	return (
 		<Dropdown
-			className={cx('highlight-color-dropdown', {clear})}
+			className="color-dropdown"
 			icon={<IconHighlighter color={activeColor && (activeColor[0] === '#' ? activeColor.slice(0, 7) : activeColor)}/>}
 			title={intl.formatMessage({ id: 'noteEditor.highlightText' })}
 		>
-			<div className="grid">
-				{clear && <button
-					role="menuitem"
-					className="color-button"
-					title={intl.formatMessage({ id: 'noteEditor.removeColor' })}
-					onClick={handleColorClear}
-				>
-					<IconRemoveColor/>
-				</button>}
-				{
-					colorState.state.availableColors.slice(0, 8).map(([name, code], i) => {
-						return (
-							<button
-								key={i}
-								className="color-button"
-								title={name ? intl.formatMessage({ id: 'general.' + name }) : code}
-								onClick={() => handleColorPick(code)}
-								onMouseDown={(event) => event.preventDefault()}
-							>
-								<IconColor color={code[0] === '#' ? code.slice(0, 7) : code} active={highlightColorState.state.activeColors.includes(code)}/>
-							</button>
-						)
-					})
-				}
-			</div>
-			<div className="grid">
-				{
-					colorState.state.availableColors.slice(8).map(([name, code], i) => {
-						const isActive = colorState.state.activeColors.includes(code);
-						return (
-							<button
-								role="menuitem"
-								key={i}
-								className="color-button"
-								title={name ? intl.formatMessage({ id: 'general.' + name }) : code}
-								onClick={() => handleColorPick(code)}
-								onMouseDown={(event) => event.preventDefault()}
-							>
-								<IconColor color={code} active={isActive}/>
-							</button>
-						)
-					})
-				}
-			</div>
+			{clear &&
+				<button role="menuitem" className="option" onClick={handleColorClear}>
+					<div className="icon"><IconRemoveColor/></div>
+					<div className="name"><FormattedMessage id="noteEditor.removeColor"/></div>
+				</button>
+			}
+			{clear && <div className="separator"/>}
+			{
+				colorState.state.availableColors.slice(0, 8).map(([name, code], i) => {
+					let active = colorState.state.activeColors.includes(code);
+					return (
+						<button
+							key={i}
+							role="menuitem"
+							className={cx('option', { active })}
+							onClick={() => handleColorPick(code)}
+							onMouseDown={(event) => event.preventDefault()}
+						>
+							<div className="icon">
+								<IconColor color={code[0] === '#' ? code.slice(0, 7) : code}/>
+							</div>
+							<div className="name">{name ? <FormattedMessage id={'general.' + name}/> : code}</div>
+						</button>
+					)
+				})
+			}
+			{colorState.state.availableColors.length >= 8 && <div className="separator"/>}
+			{
+				colorState.state.availableColors.slice(8).map(([name, code], i) => {
+					let active = colorState.state.activeColors.includes(code);
+					return (
+						<button
+							role="menuitem"
+							key={i}
+							className={cx('option', { active })}
+							onClick={() => handleColorPick(code)}
+							onMouseDown={(event) => event.preventDefault()}
+						>
+							<div className="icon"><IconColor color={code}/></div>
+							<div className="name">{code}</div>
+						</button>
+					)
+				})
+			}
 		</Dropdown>
 	);
 }

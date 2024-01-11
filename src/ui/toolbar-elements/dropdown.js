@@ -15,13 +15,16 @@ export default function Dropdown({ className, icon, title, children }) {
 
 	const handleMouseDownCallback = useCallback(handleGlobalMouseDown, []);
 	const handleKeyDownCallback = useCallback(handleGlobalKeyDown, []);
+	const handleBlurCallback = useCallback(handleBlur, []);
 
 	useEffect(() => {
 		window.addEventListener('mousedown', handleMouseDownCallback);
 		window.addEventListener('keydown', handleKeyDownCallback);
+		window.addEventListener('blur', handleBlurCallback);
 		return () => {
 			window.removeEventListener('mousedown', handleMouseDownCallback);
 			window.removeEventListener('keydown', handleKeyDownCallback);
+			window.removeEventListener('blur', handleBlurCallback);
 		};
 	}, [handleMouseDownCallback]);
 
@@ -85,6 +88,10 @@ export default function Dropdown({ className, icon, title, children }) {
 			setShow(false);
 			buttonRef.current.focus();
 		}
+	}
+
+	function handleBlur(event) {
+		setShow(false);
 	}
 
 	function handleButtonDown(event) {

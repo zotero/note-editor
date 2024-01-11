@@ -5,10 +5,10 @@ import { useIntl } from 'react-intl';
 
 import Dropdown from './dropdown';
 
-import IconInsert from '../../../res/icons/24/insert.svg';
-import IconImage from '../../../res/icons/24/image.svg';
-import IconMath from '../../../res/icons/24/math.svg';
-import IconTable from '../../../res/icons/24/table.svg';
+import IconInsert from '../../../res/icons/20/plus.svg';
+import IconImage from '../../../res/icons/20/image.svg';
+import IconMath from '../../../res/icons/20/math.svg';
+import IconTable from '../../../res/icons/20/table.svg';
 
 export default function InsertDropdown({ isAttachmentNote, onInsertTable, onInsertMath, onInsertImage }) {
 	const intl = useIntl();
@@ -16,7 +16,7 @@ export default function InsertDropdown({ isAttachmentNote, onInsertTable, onInse
 	return (
 		<Dropdown
 			className="insert-dropdown"
-			icon={<IconInsert />}
+			icon={<IconInsert/>}
 			title={intl.formatMessage({id: 'general.insert'})}
 		>
 			{ !isAttachmentNote && <button

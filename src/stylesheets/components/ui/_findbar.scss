@@ -63,4 +63,6 @@
 			background-color: var(--fill-senary);
 		}
 	}
+
+	@include macOS-inactive-opacity;
 }

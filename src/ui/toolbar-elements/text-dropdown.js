@@ -22,10 +22,10 @@ const blockTypes = [
 	['heading3', <h3><FormattedMessage id="noteEditor.heading3"/></h3>],
 	['paragraph', <span><FormattedMessage id="noteEditor.paragraph"/></span>],
 	['codeBlock', <code><FormattedMessage id="noteEditor.monospaced"/></code>],
-	['bulletList', <code><FormattedMessage id="noteEditor.bulletList"/></code>],
-	['orderedList', <span><FormattedMessage id="noteEditor.orderedList"/></span>],
-	['blockquote', <span><FormattedMessage id="noteEditor.blockquote"/></span>],
-	['math_display', <span><FormattedMessage id="noteEditor.mathBlock"/></span>]
+	['bulletList', <span>• <FormattedMessage id="noteEditor.bulletList"/></span>],
+	['orderedList', <span>1. <FormattedMessage id="noteEditor.orderedList"/></span>],
+	['blockquote', <span>│ <FormattedMessage id="noteEditor.blockquote"/></span>],
+	['math_display', <span>𝑓 <FormattedMessage id="noteEditor.mathBlock"/></span>]
 ];
 
 export default function TextDropdown({ menuState }) {
@@ -89,6 +89,7 @@ export default function TextDropdown({ menuState }) {
 					/>
 				</div>
 			</div>
+			<div className="separator"/>
 			<div className="block-options">
 				{blockTypes.map(([type, element], index) => (
 					<button

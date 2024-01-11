@@ -6,19 +6,11 @@ import { gapCursor } from 'prosemirror-gapcursor';
 import { keymap } from 'prosemirror-keymap';
 import { history } from 'prosemirror-history';
 import { baseKeymap } from 'prosemirror-commands';
-
+import { tableEditing, fixTables } from "prosemirror-tables";
 import { mathPlugin, mathKeymap } from './math';
-
-import {
-	tableEditing,
-	columnResizing,
-	fixTables
-} from "prosemirror-tables";
-
 import { schema, toHTML, buildClipboardSerializer } from './schema';
 import Metadata from './schema/metadata';
 import { schemaTransform, preprocessHTML } from './schema/transformer';
-
 import nodeViews from './node-views';
 import { debounce } from './utils';
 import { buildKeymap } from './keymap';

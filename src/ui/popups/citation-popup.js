@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import Popup from './popup';
 
 import IconBlockquote from '../../../res/icons/16/cite.svg';
-import IconCloseSmall from '../../../res/icons/16/x-8.svg';
+import IconHide from '../../../res/icons/16/hide.svg';
 import IconDocument from '../../../res/icons/16/page.svg';
 import IconUndo from '../../../res/icons/16/show-item.svg';
 
@@ -42,7 +42,7 @@ function CitationPopup({ parentRef, citationState, viewMode }) {
 				<div className="title"><FormattedMessage id="noteEditor.editCitation"/></div>
 			</button>}
 			{citationState.popup.canRemove && <button onClick={handleRemove}>
-				<div className="icon"><IconCloseSmall/></div>
+				<div className="icon"><IconHide/></div>
 				<div className="title"><FormattedMessage id="noteEditor.removeCitation"/></div>
 			</button>}
 		</Popup>

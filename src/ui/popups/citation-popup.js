@@ -7,7 +7,7 @@ import Popup from './popup';
 
 import IconBlockquote from '../../../res/icons/16/cite.svg';
 import IconCloseSmall from '../../../res/icons/16/x-8.svg';
-import IconDocument from '../../../res/icons/16/show-item.svg';
+import IconDocument from '../../../res/icons/16/page.svg';
 import IconUndo from '../../../res/icons/16/show-item.svg';
 
 function CitationPopup({ parentRef, citationState, viewMode }) {

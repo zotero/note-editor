@@ -32,7 +32,7 @@ export default function TextColorDropdown({ textColorState }) {
 		<Dropdown
 			className="color-dropdown"
 			icon={<IconTextColor color={activeColor && (activeColor[0] === '#' ? activeColor.slice(0, 7) : activeColor)}/>}
-			title={intl.formatMessage({ id: 'noteEditor.highlightText' })}
+			title={intl.formatMessage({ id: 'noteEditor.textColor' })}
 		>
 			{clear &&
 				<button role="menuitem" className="option" onClick={handleColorClear}>

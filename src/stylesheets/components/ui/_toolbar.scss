@@ -50,6 +50,19 @@
 	}
 }
 
+// Allow a bit more narrow note editor width without resulting in toolbar button wrapping
+@media (max-width: 310px) {
+	.toolbar .middle {
+		gap: 2px;
+	}
+}
+
+@media (max-width: 298px) {
+	.toolbar .middle {
+		gap: 0;
+	}
+}
+
 .toolbar-button {
 	color: var(--fill-secondary);
 	width: 28px;

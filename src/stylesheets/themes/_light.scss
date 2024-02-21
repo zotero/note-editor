@@ -40,7 +40,7 @@ $-colors: (
     color-scrollbar-background: transparent,
 );
 
-@mixin -ligh-rules() {
+@mixin -light-rules() {
     @each $name, $color in $-colors {
             --#{$name}: #{$color};
         }
@@ -80,12 +80,12 @@ $-colors: (
 // Temporarily, force light theme in web build
 @if $platform == 'web' {
     :root {
-        @include -ligh-rules();
+        @include -light-rules();
     }
 } @else {
     @media (prefers-color-scheme: light) {
         :root {
-            @include -ligh-rules();
+            @include -light-rules();
         }
     }
 }

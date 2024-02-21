@@ -9,6 +9,7 @@ import LinkPopup from './popups/link-popup';
 import HighlightPopup from './popups/highlight-popup';
 import CitationPopup from './popups/citation-popup';
 import ImagePopup from './popups/image-popup';
+import TablePopup from './popups/table-popup';
 import Noticebar from './noticebar';
 
 function Editor(props) {
@@ -75,6 +76,7 @@ function Editor(props) {
 			<div className="editor-core" ref={editorRef}>
 				<div className="relative-container">
 					{refReady && !props.disableUI && <Fragment>
+						{['web'].includes(props.viewMode) && !editorState.link?.popup.active && editorState.table.isTableSelected() && <TablePopup parentRef={editorRef} tableState={editorState.table} /> }
 						{editorState.link && <LinkPopup parentRef={editorRef} pluginState={editorState.link.popup}/>}
 						{!['web'].includes(props.viewMode) && editorState.highlight && <HighlightPopup parentRef={editorRef} highlightState={editorState.highlight} citationState={editorState.citation}/>}
 						{!['web'].includes(props.viewMode) && editorState.image && <ImagePopup parentRef={editorRef} imageState={editorState.image} citationState={editorState.citation}/>}

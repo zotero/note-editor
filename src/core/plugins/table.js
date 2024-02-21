@@ -27,6 +27,7 @@ import { Fragment } from 'prosemirror-model';
 
 class Table {
 	constructor(state, options) {
+		this.popup = { active: false };
 		this.state = { };
 		this.options = options;
 	}
@@ -39,9 +40,17 @@ class Table {
 		let { $from } = this.view.state.selection;
 		for (let i = $from.depth; i >= 0; i--) {
 			let node = $from.node(i);
-			if(node.type === this.view.state.schema.nodes.table) {
+			if (node.type === this.view.state.schema.nodes.table) {
 				this.node = node;
 			}
+		}
+
+		if (this.node) {
+			let dom = this.view.nodeDOM(this.tablePos());
+			this.popup = {
+				active: true,
+				node: dom,
+			};
 		}
 
 		if (oldState && oldState.doc.eq(state.doc) && oldState.selection.eq(state.selection)) {
@@ -204,7 +213,7 @@ class Table {
 	};
 
 	destroy() {
-
+		this.popup = { active: false };
 	}
 }
 

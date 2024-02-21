@@ -40,9 +40,8 @@ $-colors: (
     color-scrollbar-background: transparent,
 );
 
-@media (prefers-color-scheme: light) {
-    :root {
-        @each $name, $color in $-colors {
+@mixin -ligh-rules() {
+    @each $name, $color in $-colors {
             --#{$name}: #{$color};
         }
         
@@ -77,5 +76,16 @@ $-colors: (
         --material-panedivider: 1px solid var(--color-panedivider);
         --material-border-quinary: 1px solid var(--fill-quinary);
         --material-border-quarternary: 1px solid var(--fill-quarternary);
+}
+// Temporarily, force light theme in web build
+@if $platform == 'web' {
+    :root {
+        @include -ligh-rules();
+    }
+} @else {
+    @media (prefers-color-scheme: light) {
+        :root {
+            @include -ligh-rules();
+        }
     }
 }

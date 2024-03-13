@@ -26,8 +26,7 @@ class EditorInstance {
 	}
 
 	_postMessage(message) {
-		// window.parent.postMessage({ instanceID: this.instanceID, message }, '*');
-		window.webkit.messageHandlers.textHandler.postMessage({ instanceID: this.instanceID, message });
+		window.webkit.messageHandlers.messageHandler.postMessage(message);
 	}
 
 	_init(value) {
@@ -114,48 +113,12 @@ class EditorInstance {
 			</IntlProvider>,
 			document.getElementById('editor-container')
 		);
-		window.addEventListener('message', this._messageHandler);
-		this._postMessage({ action: 'initialized' });
+		this._postMessage({ action: 'readerInitialized' });
 	}
 
 	uninit() {
 		window.removeEventListener('message', this._messageHandler);
 		ReactDOM.unmountComponentAtNode(document.getElementById('editor-container'));
-	}
-
-	_messageHandler = (event) => {
-		if (event.data.instanceID !== this.instanceID) {
-			return;
-		}
-
-		let message = event.data.message;
-		switch (message.action) {
-			case 'notifySubscription': {
-				let { id, data } = message;
-				this._editorCore.provider.notify(id, data);
-				return;
-			}
-			// case 'setCitation': {
-			// 	let { nodeID, citation, formattedCitation } = message;
-			// 	this._editorCore.setCitation(nodeID, citation, formattedCitation);
-			// 	return;
-			// }
-			// case 'updateCitationItems': {
-			// 	let { citationItems } = message;
-			// 	this._editorCore.updateCitationItems(citationItems);
-			// 	return;
-			// }
-			// case 'attachImportedImage': {
-			// 	let { nodeID, attachmentKey } = message;
-			// 	this._editorCore.attachImportedImage(nodeID, attachmentKey);
-			// 	return;
-			// }
-			// case 'insertHTML': {
-			// 	let { pos, html } = message;
-			// 	this._editorCore.insertHTML(pos, html);
-			// 	return;
-			// }
-		}
 	}
 }
 
@@ -192,20 +155,68 @@ document.addEventListener('click', () => {
 	}
 });
 
-window.addEventListener('message', function (e) {
-	console.log('message', e.data)
-	let message = e.data.message;
-	let instanceID = e.data.instanceID;
+// _messageHandler = (event) => {
+// 		if (event.data.instanceID !== this.instanceID) {
+// 			return;
+// 		}
+// 		let message = event.data.message;
+// 		switch (message.action) {
+// 			case 'notifySubscription': {
+// 				let { id, data } = message;
+// 				this._editorCore.provider.notify(id, data);
+// 				return;
+// 			}
+// 			// case 'setCitation': {
+// 			// 	let { nodeID, citation, formattedCitation } = message;
+// 			// 	this._editorCore.setCitation(nodeID, citation, formattedCitation);
+// 			// 	return;
+// 			// }
+// 			// case 'updateCitationItems': {
+// 			// 	let { citationItems } = message;
+// 			// 	this._editorCore.updateCitationItems(citationItems);
+// 			// 	return;
+// 			// }
+// 			// case 'attachImportedImage': {
+// 			// 	let { nodeID, attachmentKey } = message;
+// 			// 	this._editorCore.attachImportedImage(nodeID, attachmentKey);
+// 			// 	return;
+// 			// }
+// 			// case 'insertHTML': {
+// 			// 	let { pos, html } = message;
+// 			// 	this._editorCore.insertHTML(pos, html);
+// 			// 	return;
+// 			// }
+// 		}
+// 	}
 
-	if (message.action === 'init') {
-		// console.log('Initializing a new instance', message);
-		if (currentInstance) {
-			currentInstance.uninit();
-		}
+window.notifySubscription = encodedMessage => {
+	let message = JSON.parse(decodeBase64(encodedMessage));
+	let { id, data } = message;
+	currentInstance._editorCore.provider.notify(id, data);
+}
 
-		currentInstance = new EditorInstance({ instanceID, ...message });
+window.start = encodedMessage => {
+	let message = JSON.parse(decodeBase64(encodedMessage));
+	if (currentInstance) {
+		currentInstance.uninit();
 	}
-});
+	currentInstance = new EditorInstance({ instanceID: 1, ...message });
+}
+
+function decodeBase64(base64) {
+     const text = atob(base64);
+     const length = text.length;
+     const bytes = new Uint8Array(length);
+     for (let i = 0; i < length; i++) {
+         bytes[i] = text.charCodeAt(i);
+     }
+     const decoder = new TextDecoder();
+     return decoder.decode(bytes);
+ }
+
+ function log(message) {
+	window.webkit.messageHandlers.logHandler.postMessage(message); 	
+ }
 
 
-window.webkit.messageHandlers.textHandler.postMessage({ action: 'initialized' }, '*');
+window.webkit.messageHandlers.messageHandler.postMessage({ action: 'initialized' });

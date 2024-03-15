@@ -33,6 +33,7 @@ class EditorInstance {
 	_init(value) {
 		this._editorCore = new EditorCore({
 			value,
+			mode: 'ios',
 			readOnly: this._readOnly,
 			unsaved: false,
 			placeholder: '',
@@ -157,6 +158,11 @@ class EditorInstance {
 		}
 	}
 }
+
+// Prevent zoom on double-tap
+document.addEventListener('dblclick', function(event) {
+	event.preventDefault();
+}, { passive: false });
 
 window.addEventListener('message', function (e) {
 	console.log('message', e.data)

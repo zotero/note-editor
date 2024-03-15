@@ -217,7 +217,7 @@ class EditorCore {
 					placeholder({
 						text: options.placeholder
 					}),
-					...((this.readOnly || this.disableDrag) ? [] : [drag()]),
+					...((this.readOnly || this.disableDrag || options.mode === 'ios') ? [] : [drag()]),
 					tableEditing(),
 					history(),
 					markdownSerializer(),

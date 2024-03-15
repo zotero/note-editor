@@ -72,14 +72,16 @@ export default function Dropdown({ className, icon, title, children }) {
 	}
 
 	function handleGlobalMouseDown(event) {
-		let parent = event.target;
-		while (parent && parent !== rootRef.current) parent = parent.parentNode;
-		if (!parent) {
-			// put focus back on the dropdown button, then move focus again as expected. This now
-			// triggers blur-related cleanup in toolbar prior to the destruction of a popup
-			buttonRef.current.focus();
-			event.target.focus();
-			setShow(false);
+		if (popupRef.current) {
+			let parent = event.target;
+			while (parent && parent !== rootRef.current) parent = parent.parentNode;
+			if (!parent) {
+				// put focus back on the dropdown button, then move focus again as expected. This now
+				// triggers blur-related cleanup in toolbar prior to the destruction of a popup
+				buttonRef.current.focus();
+				event.target.focus();
+				setShow(false);
+			}
 		}
 	}
 

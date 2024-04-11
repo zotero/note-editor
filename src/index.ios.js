@@ -164,6 +164,34 @@ document.addEventListener('dblclick', function(event) {
 	event.preventDefault();
 }, { passive: false });
 
+document.addEventListener('selectionchange', () => {
+	const selection = window.getSelection();
+	if (selection.rangeCount > 0) {
+		const range = selection.getRangeAt(0);
+		// Get the parent element of the cursor's position
+		const parentElement = range.commonAncestorContainer.nodeType === 3
+			? range.commonAncestorContainer.parentNode
+			: range.commonAncestorContainer;
+		setTimeout(() => {
+			parentElement.scrollIntoView();
+		}, 50);
+	}
+});
+
+document.addEventListener('click', () => {
+	const selection = window.getSelection();
+	if (selection.rangeCount > 0) {
+		const range = selection.getRangeAt(0);
+		// Get the parent element of the cursor's position
+		const parentElement = range.commonAncestorContainer.nodeType === 3
+			? range.commonAncestorContainer.parentNode
+			: range.commonAncestorContainer;
+		setTimeout(() => {
+			parentElement.scrollIntoView();
+		}, 1000);
+	}
+});
+
 window.addEventListener('message', function (e) {
 	console.log('message', e.data)
 	let message = e.data.message;

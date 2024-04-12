@@ -151,7 +151,7 @@ document.addEventListener('click', () => {
 			: range.commonAncestorContainer;
 		setTimeout(() => {
 			parentElement.scrollIntoView();
-		}, 1000);
+		}, 300);
 	}
 });
 

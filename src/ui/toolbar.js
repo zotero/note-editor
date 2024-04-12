@@ -103,7 +103,7 @@ function Toolbar({ viewMode, enableReturnButton, textColorState, highlightColorS
 					icon={<IconSearch/>}
 					title={intl.formatMessage({ id: 'noteEditor.findAndReplace' })}
 				/>
-				{viewMode === 'web' && <InsertDropdown
+				{['ios', 'web'].includes(viewMode) && <InsertDropdown
 					isAttachmentNote={isAttachmentNote}
 					onInsertTable={ onInsertTable }
 					onInsertMath={ onInsertMath }
@@ -111,7 +111,7 @@ function Toolbar({ viewMode, enableReturnButton, textColorState, highlightColorS
 				/>}
 			</div>
 			<div className="end">
-				{!['web'].includes(viewMode) && <Dropdown
+				{!['ios', 'web'].includes(viewMode) && <Dropdown
 					className="more-dropdown"
 					icon={<IconMore/>}
 					title={intl.formatMessage({ id: 'noteEditor.more' })}

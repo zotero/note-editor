@@ -127,32 +127,63 @@ document.addEventListener('dblclick', function(event) {
 	event.preventDefault();
 }, { passive: false });
 
-document.addEventListener('selectionchange', () => {
-	const selection = window.getSelection();
-	if (selection.rangeCount > 0) {
-		const range = selection.getRangeAt(0);
-		// Get the parent element of the cursor's position
-		const parentElement = range.commonAncestorContainer.nodeType === 3
-			? range.commonAncestorContainer.parentNode
-			: range.commonAncestorContainer;
-		setTimeout(() => {
-			parentElement.scrollIntoView();
-		}, 50);
+function scrollCaretIntoView(container) {
+	function adjustScroll(rect, containerRect, container) {
+		if (rect.bottom > containerRect.bottom) {
+			container.scrollTop += (rect.bottom - containerRect.bottom);
+		} else if (rect.top < containerRect.top) {
+			container.scrollTop -= (containerRect.top - rect.top);
+		}
+
+		if (rect.right > containerRect.right) {
+			container.scrollLeft += (rect.right - containerRect.right);
+		} else if (rect.left < containerRect.left) {
+			container.scrollLeft -= (containerRect.left - rect.left);
+		}
 	}
-});
+
+	let selection = window.getSelection();
+	if (!selection.rangeCount) return; // No selection
+
+	let range = selection.getRangeAt(0);
+	let isCollapsed = selection.isCollapsed;
+
+	if (isCollapsed) {
+		// Use a temporary span to measure the position of the caret
+		let span = document.createElement('span');
+		// This span is used as a caret position marker
+		span.style.display = 'inline-block';
+		span.style.width = '0';
+		span.style.height = '0';
+
+		// Insert the span at the caret's position
+		range.insertNode(span);
+		span.parentNode.insertBefore(span, span.nextSibling);
+
+		// Measure the span's position relative to the container
+		let rect = span.getBoundingClientRect();
+		let containerRect = container.getBoundingClientRect();
+
+		// Cleanup: remove the span and restore the selection
+		span.parentNode.removeChild(span);
+		// The range can get messed up after DOM manipulation, so it needs to be reset
+		selection.removeAllRanges();
+		selection.addRange(range);
+
+		// Scroll if necessary
+		adjustScroll(rect, containerRect, container);
+	} else {
+		// For normal range selection, measure the bounding rectangle
+		let rect = range.getBoundingClientRect();
+		let containerRect = container.getBoundingClientRect();
+		adjustScroll(rect, containerRect, container);
+	}
+}
 
 document.addEventListener('click', () => {
-	const selection = window.getSelection();
-	if (selection.rangeCount > 0) {
-		const range = selection.getRangeAt(0);
-		// Get the parent element of the cursor's position
-		const parentElement = range.commonAncestorContainer.nodeType === 3
-			? range.commonAncestorContainer.parentNode
-			: range.commonAncestorContainer;
-		setTimeout(() => {
-			parentElement.scrollIntoView();
-		}, 300);
-	}
+	setTimeout(() => {
+		scrollCaretIntoView(document.querySelector('.editor-core'));
+	}, 300);
 });
 
 // _messageHandler = (event) => {
@@ -215,7 +246,7 @@ function decodeBase64(base64) {
  }
 
  function log(message) {
-	window.webkit.messageHandlers.logHandler.postMessage(message); 	
+	window.webkit.messageHandlers.logHandler.postMessage(message);
  }
 
 

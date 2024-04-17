@@ -76,7 +76,7 @@ function Editor(props) {
 			<div className="editor-core" ref={editorRef}>
 				<div className="relative-container">
 					{refReady && !props.disableUI && <Fragment>
-						{['web'].includes(props.viewMode) && !editorState.link?.popup.active && editorState.table.isTableSelected() && <TablePopup parentRef={editorRef} tableState={editorState.table} /> }
+						{['ios', 'web'].includes(props.viewMode) && !editorState.link?.popup.active && editorState.table.isTableSelected() && <TablePopup parentRef={editorRef} tableState={editorState.table} /> }
 						{editorState.link && <LinkPopup parentRef={editorRef} pluginState={editorState.link.popup}/>}
 						{!['web'].includes(props.viewMode) && editorState.highlight && <HighlightPopup parentRef={editorRef} highlightState={editorState.highlight} citationState={editorState.citation}/>}
 						{!['web'].includes(props.viewMode) && editorState.image && <ImagePopup parentRef={editorRef} imageState={editorState.image} citationState={editorState.citation}/>}

@@ -21,7 +21,18 @@ class EditorInstance {
 		this._isAttachmentNote = options.isAttachmentNote || false;
 		this._editorCore = null;
 
+		this._setColorScheme(options.colorScheme);
+
 		this._init(options.value);
+	}
+
+	_setColorScheme(colorScheme) {
+		if (colorScheme) {
+			document.documentElement.dataset.colorScheme = colorScheme;
+		}
+		else {
+			delete document.documentElement.dataset.colorScheme;
+		}
 	}
 
 	getDataSync(onlyChanged) {
@@ -151,6 +162,11 @@ class EditorInstance {
 			}
 			case 'focus': {
 				this._editorCore.focus();
+				return;
+			}
+			case 'setColorScheme': {
+				let { colorScheme } = message;
+				this._setColorScheme(colorScheme);
 			}
 		}
 	};

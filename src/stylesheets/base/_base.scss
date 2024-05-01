@@ -30,7 +30,6 @@
 			--width-focus-border: 2px;
 		}
 	} @else if $platform == 'web' {
-		color-scheme: light;
 		--color-accent: SelectedItem;
 		--color-focus-border: color-mix(in srgb, var(--color-accent) 70%, transparent);
 		--width-focus-border: 3px;

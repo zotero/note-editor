@@ -47,7 +47,7 @@ class EditorInstance {
 				this._postMessage({ action: 'unsubscribe', id, type });
 			},
 			onImportImages: (images) => {
-				// this._postMessage({ action: 'importImages', images });
+				this._postMessage({ action: 'importImages', images });
 			},
 			onUpdate: () => {
 				let data = this._editorCore.getData();
@@ -207,11 +207,6 @@ document.addEventListener('click', () => {
 // 			// 	this._editorCore.updateCitationItems(citationItems);
 // 			// 	return;
 // 			// }
-// 			// case 'attachImportedImage': {
-// 			// 	let { nodeID, attachmentKey } = message;
-// 			// 	this._editorCore.attachImportedImage(nodeID, attachmentKey);
-// 			// 	return;
-// 			// }
 // 			// case 'insertHTML': {
 // 			// 	let { pos, html } = message;
 // 			// 	this._editorCore.insertHTML(pos, html);
@@ -220,9 +215,17 @@ document.addEventListener('click', () => {
 // 		}
 // 	}
 
+window.attachImportedImage = encodedMessage => {
+	let message = JSON.parse(decodeBase64(encodedMessage));
+	let { nodeID, attachmentKey } = message;
+	log("Attach imported node: " + nodeID + "; key: " + attachmentKey);
+	currentInstance._editorCore.attachImportedImage(nodeID, attachmentKey);
+}
+
 window.notifySubscription = encodedMessage => {
 	let message = JSON.parse(decodeBase64(encodedMessage));
 	let { id, data } = message;
+	log("Notify subscription: " + id);
 	currentInstance._editorCore.provider.notify(id, data);
 }
 

@@ -88,7 +88,7 @@ $-colors: (
                 @include -light-rules();
             }
         }
- } else {
+ } @else {
     @media (prefers-color-scheme: light) {
         :root {
             @include -light-rules();

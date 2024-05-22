@@ -79,21 +79,19 @@ $-colors: (
 }
 
  @if $platform == 'web' {
-     :root[data-color-scheme=dark] {
-         @include -dark-rules();
-     }
+    :root[data-color-scheme=dark] {
+        @include -dark-rules();
+    }
 
-     @media (prefers-color-scheme: dark) {
-         :root:not([data-color-scheme]) {
-             @include -dark-rules();
-         }
-     }
- }
-
- else {
-     @media (prefers-color-scheme: dark) {
-         :root {
-             @include -dark-rules();
-         }
-     }
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-color-scheme]) {
+            @include -dark-rules();
+        }
+    }
+ } @else {
+    @media (prefers-color-scheme: dark) {
+        :root {
+            @include -dark-rules();
+        }
+    }
  }

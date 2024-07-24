@@ -42,6 +42,15 @@ export function buildKeymap(options) {
 	bind('Mod-k', options.toggleLink);
 	bind('Mod-K', options.toggleLink);
 
+	if (mac) {
+		bind('Cmd-Ctrl-c', options.insertCitation);
+		bind('Cmd-Ctrl-C', options.insertCitation);
+	}
+	else {
+		bind('Ctrl-Alt-c', options.insertCitation);
+		bind('Ctrl-Alt-C', options.insertCitation);
+	}
+
 	bind('Shift-Ctrl-8', wrapInList(schema.nodes.bulletList));
 	bind('Shift-Ctrl-9', wrapInList(schema.nodes.orderedList));
 	bind('Ctrl->', wrapIn(schema.nodes.blockquote));

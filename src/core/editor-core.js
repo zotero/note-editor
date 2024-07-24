@@ -164,6 +164,10 @@ class EditorCore {
 					}),
 					keymap(mathKeymap),
 					keymap(buildKeymap({
+						insertCitation: () => {
+							this.pluginState.citation.insertCitation();
+							return true;
+						},
 						toggleLink: () => {
 							this.pluginState.link.toggle();
 							return true;
@@ -288,7 +292,7 @@ class EditorCore {
 							node = $from.parent;
 						}
 						options.onOpenContextMenu($from.pos, node, event.screenX, event.screenY);
-					}, 0);	
+					}, 0);
 				},
 				click: (view, event) => {
 					if (event.target.closest('a')) {

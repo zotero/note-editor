@@ -16,7 +16,7 @@ function LinkPopup({ parentRef, pluginState }) {
 	const inputRef = useRef();
 
 	useEffect(() => {
-		setEditing(!pluginState.href);
+		setEditing(!pluginState.href || pluginState.edit);
 	}, [pluginState]);
 
 	useLayoutEffect(() => {

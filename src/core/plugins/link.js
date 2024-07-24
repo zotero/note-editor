@@ -54,22 +54,25 @@ class Link {
 
 	toggle() {
 		let { state, dispatch } = this.view;
-		let range = getMarkRangeAtCursor(state, schema.marks.link);
-		if (range) {
-			removeMarkRangeAtCursor(schema.marks.link)(state, dispatch);
-		}
-		else if (!state.selection.empty) {
-			let selection = window.getSelection();
-			let range = selection.getRangeAt(0);
-			let rect = range.getBoundingClientRect();
+		let href = this.getHref(state);
+		let node = this.getLinkNode(state.selection.from);
+		if (node || !state.selection.empty) {
 			this.popup = {
 				active: true,
-				rect,
-				href: '',
+				href: href,
 				setURL: this.setURL.bind(this),
 				removeURL: this.removeURL.bind(this),
-				open: this.open.bind(this)
+				open: this.open.bind(this),
+				edit: true
 			};
+			if (node) {
+				this.popup.node = node;
+			}
+			else {
+				let selection = window.getSelection();
+				let range = selection.getRangeAt(0);
+				this.popup.rect = range.getBoundingClientRect();
+			}
 			dispatch(state.tr);
 		}
 		this.view.focus();

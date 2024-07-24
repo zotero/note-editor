@@ -59,7 +59,7 @@ function LinkPopup({ parentRef, pluginState }) {
 			event.preventDefault();
 		}
 		else if (event.key === 'Escape') {
-			setEditing(false);
+			pluginState.cancel();
 			event.preventDefault();
 		}
 	}

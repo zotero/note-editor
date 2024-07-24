@@ -30,7 +30,8 @@ class Link {
 					href,
 					setURL: this.setURL.bind(this),
 					removeURL: this.removeURL.bind(this),
-					open: this.open.bind(this)
+					open: this.open.bind(this),
+					cancel: this.cancel.bind(this)
 				};
 				return;
 			}
@@ -63,6 +64,7 @@ class Link {
 				setURL: this.setURL.bind(this),
 				removeURL: this.removeURL.bind(this),
 				open: this.open.bind(this),
+				cancel: this.cancel.bind(this),
 				edit: true
 			};
 			if (node) {
@@ -117,6 +119,12 @@ class Link {
 		refocusEditor(() => {
 			this.view.dispatch(this.view.state.tr.setSelection(TextSelection.create(this.view.state.tr.doc, from, to)));
 		});
+	}
+
+	cancel() {
+		this.popup = { active: false };
+		let { state, dispatch } = this.view;
+		dispatch(state.tr);
 	}
 
 	getHref(state) {

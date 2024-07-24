@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
 
 import { randomString } from './core/utils';
@@ -57,6 +57,7 @@ class EditorInstance {
 		this._localizedStrings = options.localizedStrings;
 		this._smartQuotes = options.smartQuotes;
 		this._editorCore = null;
+		this._reactRoot = null;
 
 		// TODO: Don't use global var
 		window.localizedStrings = options.localizedStrings;
@@ -157,7 +158,8 @@ class EditorInstance {
 			this._readOnly = true;
 		}
 
-		ReactDOM.render(
+		this._reactRoot = createRoot(document.getElementById('editor-container'));
+		this._reactRoot.render(
 			<IntlProvider
 				locale={window.navigator.language}
 				messages={this._localizedStrings}
@@ -180,8 +182,7 @@ class EditorInstance {
 						this._postMessage({ action: 'openWindow' });
 					}}
 				/>
-			</IntlProvider>,
-			document.getElementById('editor-container')
+			</IntlProvider>
 		);
 		window.addEventListener('message', this._messageHandler);
 		this._postMessage({ action: 'initialized' });
@@ -189,7 +190,7 @@ class EditorInstance {
 
 	uninit() {
 		window.removeEventListener('message', this._messageHandler);
-		ReactDOM.unmountComponentAtNode(document.getElementById('editor-container'));
+		this._reactRoot.unmount();
 	}
 
 	_messageHandler = (event) => {

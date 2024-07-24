@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
 
 import Editor from './ui/editor';
@@ -20,6 +20,7 @@ class EditorInstance {
 		this._localizedStrings = options.localizedStrings;
 		this._isAttachmentNote = options.isAttachmentNote || false;
 		this._editorCore = null;
+		this._reactRoot = null;
 
 		this._setColorScheme(options.colorScheme);
 
@@ -111,7 +112,8 @@ class EditorInstance {
 			this._readOnly = true;
 		}
 
-		ReactDOM.render(
+		this._reactRoot = createRoot(document.getElementById('editor-container'));
+		this._reactRoot.render(
 			<IntlProvider
 				locale={window.navigator.language}
 				messages={strings}
@@ -132,8 +134,7 @@ class EditorInstance {
 
 					}}
 				/>
-			</IntlProvider>,
-			document.getElementById('editor-container')
+			</IntlProvider>
 		);
 		window.addEventListener('message', this._messageHandler);
 		this._postMessage({ action: 'initialized' });
@@ -141,7 +142,7 @@ class EditorInstance {
 
 	uninit() {
 		window.removeEventListener('message', this._messageHandler);
-		ReactDOM.unmountComponentAtNode(document.getElementById('editor-container'));
+		this._reactRoot.unmount();
 	}
 
 	_messageHandler = (event) => {

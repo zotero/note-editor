@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
 
 import Editor from './ui/editor';
@@ -15,6 +15,7 @@ class EditorInstance {
 		this._readOnly = options.readOnly;
 		this._localizedStrings = options.localizedStrings;
 		this._editorCore = null;
+		this._reactRoot = null;
 		window.localizedStrings = options.localizedStrings;
 
 		this._init(options.value);
@@ -89,7 +90,8 @@ class EditorInstance {
 			this._readOnly = true;
 		}
 
-		ReactDOM.render(
+		this._reactRoot = createRoot(document.getElementById('editor-container'));
+		this._reactRoot.render(
 			<IntlProvider
 				locale={window.navigator.language}
 				messages={strings}
@@ -110,15 +112,14 @@ class EditorInstance {
 
 					}}
 				/>
-			</IntlProvider>,
-			document.getElementById('editor-container')
+			</IntlProvider>
 		);
 		this._postMessage({ action: 'readerInitialized' });
 	}
 
 	uninit() {
 		window.removeEventListener('message', this._messageHandler);
-		ReactDOM.unmountComponentAtNode(document.getElementById('editor-container'));
+		this._reactRoot.unmount();
 	}
 }
 

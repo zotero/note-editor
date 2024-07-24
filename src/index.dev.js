@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
 
 import Editor from './ui/editor';
@@ -13,6 +13,8 @@ import strings from './en-us.strings';
 let beautify = require('js-beautify').html;
 
 let deletedImages = {};
+
+let reactRoot = null;
 
 // Zotero item key
 export function generateObjectKey() {
@@ -82,8 +84,7 @@ function main(html) {
 		resizing = false;
 	});
 
-	ReactDOM.unmountComponentAtNode(document.getElementById('editor-container'));
-
+	reactRoot?.unmount();
 
 	let editorCore = new EditorCore({
 		container: null,
@@ -130,8 +131,12 @@ function main(html) {
 		async onImportImages(images) {
 			console.log('onImportImages', images);
 			for (let image of images) {
-				let attachmentKey = await importImage(image.src);
-				editorCore.attachImportedImage(image.nodeID, attachmentKey);
+				try {
+					let attachmentKey = await importImage(image.src);
+					editorCore.attachImportedImage(image.nodeID, attachmentKey);
+				} catch (e) {
+					console.log(e);
+				}
 			}
 		},
 		onOpenURL(url) {
@@ -206,7 +211,8 @@ function main(html) {
 	let dir = 'ltr';
 	document.getElementsByTagName("html")[0].dir = dir;
 
-	ReactDOM.render(
+	reactRoot = createRoot(document.getElementById('editor-container'));
+	reactRoot.render(
 		<IntlProvider
 			locale={window.navigator.language}
 			messages={strings}
@@ -228,8 +234,7 @@ function main(html) {
 					console.log('Open Window');
 				}}
 			/>
-		</IntlProvider>,
-		document.getElementById('editor-container')
+		</IntlProvider>
 	);
 
 	window.editorCore = editorCore;

@@ -151,6 +151,7 @@ export default {
 	'noteEditor.image': 'Image',
 	'noteEditor.math': 'Math',
 	'noteEditor.table': 'Table',
+	'noteEditor.citation': 'Citation',
 	'noteEditor.insertRowBefore': 'Insert Row Above',
 	'noteEditor.insertRowAfter': 'Insert Row Below',
 	'noteEditor.insertColumnBefore': 'Insert Column Left',

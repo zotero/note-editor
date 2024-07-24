@@ -285,20 +285,6 @@ class EditorInstance {
 				zoteroExecCommand(document, 'paste', false, null);
 				return;
 			}
-			// case 'insertCitation': {
-			// 	let citation = {
-			// 		citationItems: [],
-			// 		properties: {}
-			// 	};
-			//
-			// 	let nodeID = randomString();
-			// 	let citationNode = schema.nodes.citation.create({ nodeID, citation });
-			// 	let { state, dispatch } = this._editorCore.view;
-			// 	// TODO: Automatically add white spaces before/after citation when necessary
-			// 	dispatch(state.tr.insert(pos, citationNode));
-			// 	this._postMessage({ action: 'openCitationPopup', nodeID, citation });
-			// 	return;
-			// }
 			case 'rtl': {
 				this._editorCore.pluginState.menu.rtl.run();
 				return;
@@ -327,6 +313,10 @@ class EditorInstance {
 			// case 'insertImage': {
 			// 	return;
 			// }
+			case 'insertCitation': {
+				this._editorCore.pluginState.citation.insertCitation();
+				return;
+			}
 			case 'insertTable': {
 				this._editorCore.pluginState.table.insertTable(2, 2);
 				return;
@@ -452,6 +442,11 @@ class EditorInstance {
 					enabled: !this._readOnly,
 					groups: [
 						[
+							{
+								name: 'insertCitation',
+								label: this._getLocalizedString('noteEditor.citation'),
+								enabled: !this._readOnly && !this._isAttachmentNote
+							},
 							{
 								name: 'insertImage',
 								label: this._getLocalizedString('noteEditor.image'),

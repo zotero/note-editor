@@ -109,7 +109,7 @@ class Citation {
 		let nodeID = randomString();
 		let citationNode = schema.nodes.citation.create({ nodeID, citation });
 
-		dispatch(state.tr.insert(from, citationNode));
+		dispatch(state.tr.replaceSelectionWith(citationNode));
 		// TODO: Fix the temporary work-around
 		window._currentEditorInstance._postMessage({ action: 'openCitationPopup', nodeID, citation });
 	}

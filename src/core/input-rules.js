@@ -16,18 +16,27 @@ import { makeBlockMathInputRule, makeInlineMathInputRule } from './math';
 
 function markInputRule(regexp, markType, size) {
   return new InputRule(regexp, (state, match, start, end) => {
-    let to = end;
-    let from = match[1] ? to - match[1].length + 1 : start;
+	  let to = end;
+	  let from = match[1] ? to - match[1].length + 1 : start;
 	  if (schema.marks.code
 		  && schema.marks.code.isInSet(state.doc.resolve(from + 1).marks())) {
 		  return;
 	  }
 
-    let tr = state.tr.addMark(from, to, markType.create());
-    if (size > 1) {
-      tr = tr.delete(to - (size - 1), to);
-    }
-    return tr.delete(from, from + size).removeStoredMark(markType);
+	  // Skip input rule if matched range includes inline math node
+	  let nodesInRange = [];
+	  state.doc.nodesBetween(from, to, (node, pos) => {
+		  nodesInRange.push({ node, pos });
+	  });
+	  if (nodesInRange.find(x => x.node.type.name === 'math_inline')) {
+		  return;
+	  }
+
+	  let tr = state.tr.addMark(from, to, markType.create());
+	  if (size > 1) {
+		  tr = tr.delete(to - (size - 1), to);
+	  }
+	  return tr.delete(from, from + size).removeStoredMark(markType);
   });
 }
 

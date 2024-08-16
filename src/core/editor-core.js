@@ -274,7 +274,13 @@ class EditorCore {
 						that.update(true);
 					}
 					else {
-						that.debouncedUpdate();
+						if (that.options.mode === 'ios') {
+							// Don't use debounce as the iOS app does it by itself
+							that.update();
+						}
+						else {
+							that.debouncedUpdate();
+						}
 					}
 				}
 

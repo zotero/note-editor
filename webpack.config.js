@@ -5,6 +5,23 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
+const babelConfigs = new Map([
+	['zotero', {
+		presets: [
+			['@babel/preset-env', { useBuiltIns: false }],
+		],
+	}],
+	['web', {
+		presets: [
+			["@babel/preset-env", {
+				targets: 'firefox >= 68, chrome >= 67, edge >= 79, safari >= 11, last 2 versions, not dead, not ie 11, not ie 10',
+				corejs: { version: 3.37 },
+				useBuiltIns: "usage",
+			}]
+		]
+	}],
+]);
+
 function generateEditorConfig(build) {
 	let config = {
 		name: build,
@@ -34,14 +51,18 @@ function generateEditorConfig(build) {
 			rules: [
 				{
 					test: /\.(js|jsx)$/,
-					exclude: /node_modules/,
+					exclude: {
+						and: [/node_modules/],
+						not: build === 'web'
+						// some dependencies need to be transpiled for web, see zotero/web-library#556
+							? [
+								/@benrbray[\\/]prosemirror-math/,
+							]
+							: []
+					},
 					use: {
 						loader: 'babel-loader',
-						options: build === 'zotero' ? {
-							presets: [
-								['@babel/preset-env', { useBuiltIns: false }],
-							],
-						} : {},
+						options: babelConfigs.get(build) ?? {},
 					},
 				},
 				{

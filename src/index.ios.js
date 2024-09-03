@@ -13,10 +13,10 @@ class EditorInstance {
 		window._currentEditorInstance = this;
 		this.instanceID = options.instanceID;
 		this._readOnly = options.readOnly;
-		this._localizedStrings = options.localizedStrings;
+		this._localizedStrings = strings;
 		this._editorCore = null;
 		this._reactRoot = null;
-		window.localizedStrings = options.localizedStrings;
+		window.localizedStrings = strings;
 
 		this._init(options.value);
 	}

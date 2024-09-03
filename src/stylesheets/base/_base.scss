@@ -66,5 +66,6 @@ button {
 	// Avoid focus ring on touch devices
 	button:focus {
 		outline: none;
+		box-shadow: none;
 	}
 }

@@ -98,17 +98,17 @@ function Toolbar({ viewMode, enableReturnButton, textColorState, highlightColorS
 					title={intl.formatMessage({ id: 'noteEditor.insertCitation' })}
 					onClick={() => citationState.insertCitation()}
 				/>}
+				{['ios', 'web'].includes(viewMode) && <InsertDropdown
+					isAttachmentNote={isAttachmentNote}
+					onInsertTable={onInsertTable}
+					onInsertMath={onInsertMath}
+					onInsertImage={onInsertImage}
+				/>}
 				<StateButton
 					state={{ isActive: searchState.active, run: () => searchState.setActive(!searchState.active) }}
 					icon={<IconSearch/>}
 					title={intl.formatMessage({ id: 'noteEditor.findAndReplace' })}
 				/>
-				{['ios', 'web'].includes(viewMode) && <InsertDropdown
-					isAttachmentNote={isAttachmentNote}
-					onInsertTable={ onInsertTable }
-					onInsertMath={ onInsertMath }
-					onInsertImage={ onInsertImage }
-				/>}
 			</div>
 			<div className="end">
 				{!['ios', 'web'].includes(viewMode) && <Dropdown

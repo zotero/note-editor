@@ -79,6 +79,11 @@ $-colors: (
 }
 
  @if $platform == 'web' {
+    :root {
+        // fallback for browsers that do not support color-schemes (e.g., Safari 11)
+        @include -light-rules();
+    }
+        
     :root[data-color-scheme=light] {
             @include -light-rules();
         }

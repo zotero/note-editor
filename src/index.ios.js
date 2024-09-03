@@ -181,10 +181,12 @@ function scrollCaretIntoView(container) {
 	}
 }
 
-document.addEventListener('click', () => {
-	setTimeout(() => {
-		scrollCaretIntoView(document.querySelector('.editor-core'));
-	}, 300);
+document.addEventListener('click', (event) => {
+	if (event.target.closest('.primary-editor')) {
+		setTimeout(() => {
+			scrollCaretIntoView(document.querySelector('.editor-core'));
+		}, 300);
+	}
 });
 
 // _messageHandler = (event) => {

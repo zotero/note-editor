@@ -25,10 +25,13 @@ function Findbar({ searchState, active }) {
 
 	function handleKeydown(event) {
 		if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
-			searchState.setActive(true);
-			searchInputRef.current.focus();
-			searchInputRef.current.select();
 			event.preventDefault();
+			event.stopPropagation();
+			searchState.setActive(true);
+			setTimeout(() => {
+				searchInputRef.current?.focus();
+				searchInputRef.current?.select();
+			});
 		}
 	}
 

@@ -78,7 +78,7 @@ function Editor(props) {
 					{refReady && !props.disableUI && <Fragment>
 						{['ios', 'web'].includes(props.viewMode) && !editorState.link?.popup.active && editorState.table.isTableSelected() && <TablePopup parentRef={editorRef} tableState={editorState.table} /> }
 						{editorState.link && <LinkPopup parentRef={editorRef} pluginState={editorState.link.popup}/>}
-						{!['web'].includes(props.viewMode) && editorState.highlight && <HighlightPopup parentRef={editorRef} highlightState={editorState.highlight} citationState={editorState.citation}/>}
+						{editorState.highlight && <HighlightPopup parentRef={editorRef} highlightState={editorState.highlight} citationState={editorState.citation} viewMode={props.viewMode} />}
 						{!['web'].includes(props.viewMode) && editorState.image && <ImagePopup parentRef={editorRef} imageState={editorState.image} citationState={editorState.citation}/>}
 						{editorState.citation && <CitationPopup
 							parentRef={editorRef}

@@ -67,7 +67,11 @@ export function buildToHTML(schema) {
 			container.setAttribute('data-schema-version', 9);
 		}
 
-		return tmp.innerHTML.trim();
+		let html = tmp.innerHTML.trim();
+		// Normalize text by precomposing characters and accents into single composed characters
+		// to prevent indexing issues
+		html = html.normalize('NFC');
+		return html;
 	};
 }
 

@@ -88,7 +88,7 @@ function Editor(props) {
 					</Fragment>}
 				</div>
 			</div>
-			<div id='a11y-alert' aria-live='polite'>
+			<div id="a11y-alert" aria-live="polite">
 				{editorState.link.popup.active ? intl.formatMessage({ id: 'noteEditor.a11yLinkPopupAppearedAlert' }) : ""}
 			</div>
 		</div>

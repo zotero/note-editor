@@ -172,6 +172,10 @@ class EditorCore {
 							this.pluginState.link.toggle();
 							return true;
 						},
+						openLink: () => {
+							this.pluginState.link.open();
+							return true;
+						},
 						goToPreviousCell: () => {
 							return this.pluginState.table.goToNextCell(-1);
 						},

@@ -31,7 +31,8 @@ class Link {
 					setURL: this.setURL.bind(this),
 					removeURL: this.removeURL.bind(this),
 					open: this.open.bind(this),
-					cancel: this.cancel.bind(this)
+					cancel: this.cancel.bind(this),
+					refocusView: this.refocusView.bind(this),
 				};
 				return;
 			}
@@ -65,6 +66,7 @@ class Link {
 				removeURL: this.removeURL.bind(this),
 				open: this.open.bind(this),
 				cancel: this.cancel.bind(this),
+				refocusView: this.refocusView.bind(this),
 				edit: true
 			};
 			if (node) {
@@ -125,6 +127,10 @@ class Link {
 		this.popup = { active: false };
 		let { state, dispatch } = this.view;
 		dispatch(state.tr);
+	}
+
+	refocusView() {
+		this.view.focus();
 	}
 
 	getHref(state) {

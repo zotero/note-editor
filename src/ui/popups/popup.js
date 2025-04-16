@@ -45,11 +45,22 @@ function Popup({ parentRef, pluginState, className, children }) {
 		popupRef.current.style.left = Math.round(left) + 'px';
 	}, [pluginState]);
 
+	function handleKeydown(event) {
+		if (event.key === 'Escape') {
+			if (pluginState.refocusView) {
+				pluginState.refocusView();
+				event.preventDefault();
+				event.stopPropagation();
+			}
+
+		}
+	}
+
 
 	if (!pluginState.active) return null;
 
 	return (
-		<div ref={containerRef} className="popup-container">
+		<div ref={containerRef} className="popup-container" onKeyDown={handleKeydown}>
 			<div ref={popupRef} className={cx('popup popup-top', className)}>
 				{children}
 			</div>

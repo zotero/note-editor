@@ -49,12 +49,12 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          mkdir build/build-zip
-          cd build/zotero
+          mkdir build-zip
+          cd build
           zip -r ../build-zip/$GITHUB_SHA.zip *
           cd ..
           gem install --no-document dpl -v '>= 2.0'
-          dpl s3 --bucket zotero-download --local_dir build-zip --upload_dir ci/client-note-editor --acl public_read
+          dpl s3 --bucket zotero-download --local_dir build-zip --upload_dir ci/note-editor --acl public_read
 
       - name: Run tests
         run: npm run test

@@ -57,6 +57,11 @@ export function buildKeymap(options) {
 
 	// Hard break
 	let cmd = chainCommands(exitCode, (state, dispatch) => {
+		// except if the cursor is on a link - then just open it
+		if (options.openLink) {
+			options.openLink();
+			return true;
+		}
 		dispatch(state.tr.replaceSelectionWith(schema.nodes.hardBreak.create()).scrollIntoView());
 		return true;
 	});

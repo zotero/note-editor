@@ -162,4 +162,6 @@ export default {
 	'noteEditor.insertImage': 'Insert Image',
 	'noteEditor.insertTable': 'Insert Table',
 	'noteEditor.insertMath': 'Insert Math Block',
+	'noteEditor.linkPopupAppeared': 'Link popup appeared. Use Shift-Tab to navigate it.',
+	'noteEditor.citationPopupAppeared': 'Citation popup appeared. Use Shift-Tab to navigate it.'
 };

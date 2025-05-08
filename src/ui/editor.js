@@ -11,6 +11,7 @@ import CitationPopup from './popups/citation-popup';
 import ImagePopup from './popups/image-popup';
 import TablePopup from './popups/table-popup';
 import Noticebar from './noticebar';
+import A11yAlert from './a11yAlert';
 
 function Editor(props) {
 	const intl = useIntl();
@@ -88,6 +89,10 @@ function Editor(props) {
 					</Fragment>}
 				</div>
 			</div>
+			{ refReady && !props.disableUI && <A11yAlert 
+				linkPopupActive={editorState.link?.popup.active} 
+				citationPopupActive={editorState.citation?.popup.active} 
+			/> }
 		</div>
 	);
 }

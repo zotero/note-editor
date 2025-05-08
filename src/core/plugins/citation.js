@@ -68,6 +68,9 @@ class Citation {
 
 					tr.delete(pos2, pos + node.nodeSize);
 					dispatch(tr);
+				},
+				refocusView: () => {
+					this.view.focus();
 				}
 			};
 		}

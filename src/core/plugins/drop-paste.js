@@ -129,7 +129,7 @@ export function dropPaste(options) {
 			handlePaste(view, event, slice) {
 				let { state, dispatch } = view;
 				let data;
-				if (data = event.clipboardData.getData('zotero/annotation')) {
+				if (data = event.clipboardData.getData('zotero/annotation') || window.clipboardData?.['zotero/annotation']) {
 					options.onInsertObject('zotero/annotation', data);
 					return true;
 				}

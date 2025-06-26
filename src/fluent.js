@@ -16,10 +16,6 @@ if (__BUILD__ !== 'zotero') {
 	bundle.addResource(new FluentResource('-app-name = Zotero'));
 }
 
-export function addFTL(ftl) {
-	bundle.addResource(new FluentResource(ftl));
-}
-
 export function getLocalizedString(key, args = {}) {
 	const message = bundle.getMessage(key);
 	if (message && message.value) {
@@ -28,4 +24,8 @@ export function getLocalizedString(key, args = {}) {
 		console.warn(`Localization key '${key}' not found`);
 		return key;
 	}
+}
+
+export function addFTL(ftl) {
+	bundle.addResource(new FluentResource(ftl), { allowOverrides: true });
 }

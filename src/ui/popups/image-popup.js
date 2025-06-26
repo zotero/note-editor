@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { useLocalization } from '@fluent/react';
 
 import Popup from './popup';
 
@@ -10,6 +10,8 @@ import IconDocument from '../../../res/icons/16/page.svg';
 import IconUnlink from '../../../res/icons/16/unlink.svg';
 
 function ImagePopup({ parentRef, imageState, citationState }) {
+	const { l10n } = useLocalization();
+
 	function handleOpen() {
 		imageState.popup.open();
 	}
@@ -26,15 +28,15 @@ function ImagePopup({ parentRef, imageState, citationState }) {
 		<Popup className="image-popup" parentRef={parentRef} pluginState={imageState.popup}>
 			<button onClick={handleOpen}>
 				<div className="icon"><IconDocument/></div>
-				<div className="title"><FormattedMessage id="noteEditor.showOnPage"/></div>
+				<div className="title">{l10n.getString('note-editor-go-to-page')}</div>
 			</button>
 			<button onClick={handleUnlink}>
 				<div className="icon"><IconUnlink/></div>
-				<div className="title"><FormattedMessage id="noteEditor.unlink"/></div>
+				<div className="title">{l10n.getString('note-editor-unlink')}</div>
 			</button>
 			{citationState.canAddCitationAfter() && <button onClick={handleAdd}>
 				<div className="icon"><IconBlockquote/></div>
-				<div className="title"><FormattedMessage id="noteEditor.addCitation"/></div>
+				<div className="title">{l10n.getString('note-editor-add-citation')}</div>
 			</button>}
 		</Popup>
 	);

@@ -1,13 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { IntlProvider } from 'react-intl';
 
+import './fluent';
 import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
-import strings from './en-us.strings';
-
-window.localizedStrings = strings;
-
 
 let currentInstance = null;
 
@@ -17,7 +13,6 @@ class EditorInstance {
 		this.instanceID = options.instanceID;
 		this._readOnly = options.readOnly;
 		this._disableDrag = options.disableDrag;
-		this._localizedStrings = options.localizedStrings;
 		this._isAttachmentNote = options.isAttachmentNote || false;
 		this._editorCore = null;
 		this._reactRoot = null;
@@ -38,11 +33,6 @@ class EditorInstance {
 
 	getDataSync(onlyChanged) {
 		return this._editorCore.getData(onlyChanged);
-	}
-
-	_getLocalizedString(key) {
-		let string = this._localizedStrings[key];
-		return string || key;
 	}
 
 	_postMessage(message) {
@@ -114,27 +104,22 @@ class EditorInstance {
 
 		this._reactRoot = createRoot(document.getElementById('editor-container'));
 		this._reactRoot.render(
-			<IntlProvider
-				locale={window.navigator.language}
-				messages={strings}
-			>
-				<Editor
-					readOnly={this._readOnly}
-					disableUI={false}
-					enableReturnButton={false}
-					viewMode="web"
-					showUpdateNotice={this._editorCore.unsupportedSchema}
-					editorCore={this._editorCore}
-					onClickReturn={() => {
-					}}
-					onShowNote={() => {
-						this._postMessage({ action: 'showNote' });
-					}}
-					onOpenWindow={() => {
+			<Editor
+				readOnly={this._readOnly}
+				disableUI={false}
+				enableReturnButton={false}
+				viewMode="web"
+				showUpdateNotice={this._editorCore.unsupportedSchema}
+				editorCore={this._editorCore}
+				onClickReturn={() => {
+				}}
+				onShowNote={() => {
+					this._postMessage({ action: 'showNote' });
+				}}
+				onOpenWindow={() => {
 
-					}}
-				/>
-			</IntlProvider>
+				}}
+			/>
 		);
 		window.addEventListener('message', this._messageHandler);
 		this._postMessage({ action: 'initialized' });

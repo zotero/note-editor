@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { IntlProvider } from 'react-intl';
 
+import { addFTL, getLocalizedString } from './fluent';
 import { randomString } from './core/utils';
 import { schema } from './core/schema';
 import Editor from './ui/editor';
@@ -54,13 +54,15 @@ class EditorInstance {
 		this._dir = window.dir = options.dir;
 		this._enableReturnButton = options.enableReturnButton;
 		this._isAttachmentNote = options.isAttachmentNote;
-		this._localizedStrings = options.localizedStrings;
 		this._smartQuotes = options.smartQuotes;
 		this._editorCore = null;
 		this._reactRoot = null;
 
-		// TODO: Don't use global var
-		window.localizedStrings = options.localizedStrings;
+		if (Array.isArray(options.ftl)) {
+			for (let ftl of options.ftl) {
+				addFTL(ftl);
+			}
+		}
 
 		this._setFont(options.font);
 		if (options.style) {
@@ -71,11 +73,6 @@ class EditorInstance {
 
 	getDataSync(onlyChanged) {
 		return this._editorCore.getData(onlyChanged);
-	}
-
-	_getLocalizedString(key) {
-		let string = this._localizedStrings[key];
-		return string || key;
 	}
 
 	_setFont(font) {
@@ -160,29 +157,24 @@ class EditorInstance {
 
 		this._reactRoot = createRoot(document.getElementById('editor-container'));
 		this._reactRoot.render(
-			<IntlProvider
-				locale={window.navigator.language}
-				messages={this._localizedStrings}
-			>
-				<Editor
-					readOnly={this._readOnly}
-					disableUI={this._disableUI}
-					// TODO: Rename this to something like 'inContextPane`
-					enableReturnButton={this._enableReturnButton}
-					viewMode={this._viewMode}
-					showUpdateNotice={this._editorCore.unsupportedSchema}
-					editorCore={this._editorCore}
-					onClickReturn={() => {
-						this._postMessage({ action: 'return' });
-					}}
-					onShowNote={() => {
-						this._postMessage({ action: 'showNote' });
-					}}
-					onOpenWindow={() => {
-						this._postMessage({ action: 'openWindow' });
-					}}
-				/>
-			</IntlProvider>
+			<Editor
+				readOnly={this._readOnly}
+				disableUI={this._disableUI}
+				// TODO: Rename this to something like 'inContextPane`
+				enableReturnButton={this._enableReturnButton}
+				viewMode={this._viewMode}
+				showUpdateNotice={this._editorCore.unsupportedSchema}
+				editorCore={this._editorCore}
+				onClickReturn={() => {
+					this._postMessage({ action: 'return' });
+				}}
+				onShowNote={() => {
+					this._postMessage({ action: 'showNote' });
+				}}
+				onOpenWindow={() => {
+					this._postMessage({ action: 'openWindow' });
+				}}
+			/>
 		);
 		window.addEventListener('message', this._messageHandler);
 		this._postMessage({ action: 'initialized' });
@@ -372,19 +364,19 @@ class EditorInstance {
 			[
 				{
 					name: 'cut',
-					label: this._getLocalizedString('noteEditor.cut'),
+					label: getLocalizedString('general-cut'),
 					enabled: !this._readOnly && this._editorCore.hasSelection(),
 					persistent: true
 				},
 				{
 					name: 'copy',
-					label: this._getLocalizedString('noteEditor.copy'),
+					label: getLocalizedString('general-copy'),
 					enabled: this._editorCore.hasSelection(),
 					persistent: true
 				},
 				{
 					name: 'paste',
-					label: this._getLocalizedString('noteEditor.paste'),
+					label: getLocalizedString('general-paste'),
 					enabled: !this._readOnly,
 					persistent: true
 				}
@@ -392,44 +384,44 @@ class EditorInstance {
 			// [
 			// 	{
 			// 		name: 'insertCitation',
-			// 		label: this._getLocalizedString('noteEditor.insertCitation'),
+			// 		label: getLocalizedString('note-editor-insert-citation'),
 			// 		enabled: !this._readOnly && !this._editorCore.hasSelection()
 			// 	}
 			// ],
 			[
 				{
 					name: 'rtl',
-					label: this._getLocalizedString('noteEditor.rightToLeft'),
+					label: getLocalizedString('note-editor-right-to-left'),
 					enabled: !this._readOnly && (this._dir === 'ltr' && !this._editorCore.pluginState.menu.rtl.isActive
 						|| this._dir === 'rtl' && this._editorCore.pluginState.menu.ltr.isActive)
 				},
 				{
 					name: 'ltr',
-					label: this._getLocalizedString('noteEditor.leftToRight'),
+					label: getLocalizedString('note-editor-left-to-right'),
 					enabled: !this._readOnly && (this._dir === 'ltr' && this._editorCore.pluginState.menu.rtl.isActive
 						|| this._dir === 'rtl' && !this._editorCore.pluginState.menu.ltr.isActive)
 				},
 				{
 					name: 'align',
-					label: this._getLocalizedString('noteEditor.align'),
+					label: getLocalizedString('note-editor-align'),
 					enabled: !this._readOnly,
 					groups: [
 						[
 							{
 								name: 'alignLeft',
-								label: this._getLocalizedString('noteEditor.alignLeft'),
+								label: getLocalizedString('note-editor-align-left'),
 								checked: this._editorCore.pluginState.menu.alignLeft.isActive,
 								enabled: !this._readOnly
 							},
 							{
 								name: 'alignCenter',
-								label: this._getLocalizedString('noteEditor.alignCenter'),
+								label: getLocalizedString('note-editor-align-center'),
 								checked: this._editorCore.pluginState.menu.alignCenter.isActive,
 								enabled: !this._readOnly
 							},
 							{
 								name: 'alignRight',
-								label: this._getLocalizedString('noteEditor.alignRight'),
+								label: getLocalizedString('note-editor-align-right'),
 								checked: this._editorCore.pluginState.menu.alignRight.isActive,
 								enabled: !this._readOnly
 							}
@@ -439,28 +431,28 @@ class EditorInstance {
 			],
 			[
 				{
-					label: this._getLocalizedString('general.insert'),
+					label: getLocalizedString('general-insert'),
 					enabled: !this._readOnly,
 					groups: [
 						[
 							{
 								name: 'insertCitation',
-								label: this._getLocalizedString('noteEditor.citation'),
+								label: getLocalizedString('note-editor-citation'),
 								enabled: !this._readOnly && !this._isAttachmentNote
 							},
 							{
 								name: 'insertImage',
-								label: this._getLocalizedString('noteEditor.image'),
+								label: getLocalizedString('note-editor-image'),
 								enabled: !this._readOnly && !this._isAttachmentNote
 							},
 							{
 								name: 'insertTable',
-								label: this._getLocalizedString('noteEditor.table'),
+								label: getLocalizedString('note-editor-table'),
 								enabled: !this._readOnly && !this._editorCore.pluginState.table.isTableSelected()
 							},
 							{
 								name: 'insertMath',
-								label: this._getLocalizedString('noteEditor.math'),
+								label: getLocalizedString('note-editor-math'),
 								enabled: !this._readOnly
 							}
 						]
@@ -470,53 +462,53 @@ class EditorInstance {
 			[
 				{
 					name: 'insertRowBefore',
-					label: this._getLocalizedString('noteEditor.insertRowBefore'),
+					label: getLocalizedString('note-editor-insert-row-before'),
 					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
 				},
 				{
 					name: 'insertRowAfter',
-					label: this._getLocalizedString('noteEditor.insertRowAfter'),
+					label: getLocalizedString('note-editor-insert-row-after'),
 					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
 				}
 			],
 			[
 				{
 					name: 'insertColumnBefore',
-					label: this._getLocalizedString('noteEditor.insertColumnBefore'),
+					label: getLocalizedString('note-editor-insert-column-before'),
 					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
 				},
 				{
 					name: 'insertColumnAfter',
-					label: this._getLocalizedString('noteEditor.insertColumnAfter'),
+					label: getLocalizedString('note-editor-insert-column-after'),
 					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
 				}
 			],
 			[
 				{
 					name: 'deleteRow',
-					label: this._getLocalizedString('noteEditor.deleteRow'),
+					label: getLocalizedString('note-editor-delete-row'),
 					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
 				},
 				{
 					name: 'deleteColumn',
-					label: this._getLocalizedString('noteEditor.deleteColumn'),
+					label: getLocalizedString('note-editor-delete-column'),
 					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
 				},
 				{
 					name: 'deleteTable',
-					label: this._getLocalizedString('noteEditor.deleteTable'),
+					label: getLocalizedString('note-editor-delete-table'),
 					enabled: !this._readOnly && this._editorCore.pluginState.table.isTableSelected()
 				}
 			],
 			[
 				{
 					name: 'copyImage',
-					label: this._getLocalizedString('noteEditor.copyImage'),
+					label: getLocalizedString('note-editor-copy-image'),
 					enabled: !!this._editorCore.getSelectedImageDataURL()
 				},
 				{
 					name: 'saveImageAs',
-					label: this._getLocalizedString('noteEditor.saveImageAs'),
+					label: getLocalizedString('note-editor-save-image-as'),
 					enabled: !!this._editorCore.getSelectedImageDataURL()
 				},
 			]

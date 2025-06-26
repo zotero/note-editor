@@ -1,9 +1,11 @@
 const path = require('path');
+const webpack = require('webpack');               // ← 1) new import
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const ZoteroLocalePlugin = require('./webpack.zotero-locale-plugin');
 
 const babelConfigs = new Map([
 	['zotero', {
@@ -102,9 +104,18 @@ function generateEditorConfig(build) {
 						emit: false,
 					},
 				},
-			],
+				{
+					test: /\.ftl$/,
+					type: 'asset/source'
+				}
+			]
 		},
 		plugins: [
+			new ZoteroLocalePlugin({
+				files: ['zotero.ftl', 'note-editor.ftl'],
+				locales: ['en-US'],
+				commitHash: '80d01c9d02ae471516402d8fe22bee28ab47955f',
+			}),
 			new CleanWebpackPlugin(),
 			new MiniCssExtractPlugin({
 				filename: '[name].css',
@@ -113,6 +124,7 @@ function generateEditorConfig(build) {
 				template: `./html/editor.${build}.html`,
 				filename: './[name].html',
 			}),
+			new webpack.DefinePlugin({ __BUILD__: JSON.stringify(build) })
 		],
 	};
 
@@ -120,7 +132,6 @@ function generateEditorConfig(build) {
 		config.externals = {
 			react: 'React',
 			'react-dom': 'ReactDOM',
-			'react-intl': 'ReactIntl',
 			'prop-types': 'PropTypes',
 		};
 	}

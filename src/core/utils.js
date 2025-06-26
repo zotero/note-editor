@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { getLocalizedString } from '../fluent';
 
 // Work around firefox bug that stops up/down navigation in contenteditable to work
 export function refocusEditor(callback) {
@@ -199,10 +200,10 @@ export function formatCitationItem(citationItem) {
 			let a = authors[0].family || authors[0].literal;
 			let b = authors[1].family || authors[1].literal;
 			// TODO: Don't use global var
-			str = a + ' ' + (window.localizedStrings['general.and'] || 'and') + ' ' + b;
+			str = a + ' ' + (getLocalizedString('general-and') || 'and') + ' ' + b;
 		}
 		else if (authors.length >= 3) {
-			str = (authors[0].family || authors[0].literal) + ' ' + (window.localizedStrings['general.etAl'] || 'et al.');
+			str = (authors[0].family || authors[0].literal) + ' ' + (getLocalizedString('general-et-al') || 'et al.');
 		}
 	}
 

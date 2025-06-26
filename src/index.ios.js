@@ -1,10 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { IntlProvider } from 'react-intl';
 
+import './fluent';
 import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
-import strings from './en-us.strings';
 
 let currentInstance = null;
 
@@ -13,17 +12,10 @@ class EditorInstance {
 		window._currentEditorInstance = this;
 		this.instanceID = options.instanceID;
 		this._readOnly = options.readOnly;
-		this._localizedStrings = strings;
 		this._editorCore = null;
 		this._reactRoot = null;
-		window.localizedStrings = strings;
 
 		this._init(options.value);
-	}
-
-	_getLocalizedString(key) {
-		let string = this._localizedStrings[key];
-		return string || key;
 	}
 
 	_postMessage(message) {
@@ -92,27 +84,22 @@ class EditorInstance {
 
 		this._reactRoot = createRoot(document.getElementById('editor-container'));
 		this._reactRoot.render(
-			<IntlProvider
-				locale={window.navigator.language}
-				messages={strings}
-			>
-				<Editor
-					readOnly={this._readOnly}
-					disableUI={false}
-					enableReturnButton={false}
-					viewMode="ios"
-					showUpdateNotice={this._editorCore.unsupportedSchema}
-					editorCore={this._editorCore}
-					onClickReturn={() => {
-					}}
-					onShowNote={() => {
-						this._postMessage({ action: 'showNote' });
-					}}
-					onOpenWindow={() => {
+			<Editor
+				readOnly={this._readOnly}
+				disableUI={false}
+				enableReturnButton={false}
+				viewMode="ios"
+				showUpdateNotice={this._editorCore.unsupportedSchema}
+				editorCore={this._editorCore}
+				onClickReturn={() => {
+				}}
+				onShowNote={() => {
+					this._postMessage({ action: 'showNote' });
+				}}
+				onOpenWindow={() => {
 
-					}}
-				/>
-			</IntlProvider>
+				}}
+			/>
 		);
 		this._postMessage({ action: 'readerInitialized' });
 	}

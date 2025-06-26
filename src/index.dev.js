@@ -1,14 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { IntlProvider } from 'react-intl';
 
+import './fluent';
 import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
 
 import { imageStore, citationStore } from './index.dev.data';
 import { TextSelection } from 'prosemirror-state';
-import strings from './en-us.strings';
-
 
 let beautify = require('js-beautify').html;
 
@@ -213,28 +211,23 @@ function main(html) {
 
 	reactRoot = createRoot(document.getElementById('editor-container'));
 	reactRoot.render(
-		<IntlProvider
-			locale={window.navigator.language}
-			messages={strings}
-		>
-			<Editor
-				readOnly={false}
-				disableUI={false}
-				showUpdateNotice={false}
-				enableReturnButton={true}
-				viewMode="dev"
-				editorCore={editorCore}
-				onClickReturn={() => {
-					console.log('Clicked return');
-				}}
-				onShowNote={() => {
-					console.log('Show Note');
-				}}
-				onOpenWindow={() => {
-					console.log('Open Window');
-				}}
-			/>
-		</IntlProvider>
+		<Editor
+			readOnly={false}
+			disableUI={false}
+			showUpdateNotice={false}
+			enableReturnButton={true}
+			viewMode="dev"
+			editorCore={editorCore}
+			onClickReturn={() => {
+				console.log('Clicked return');
+			}}
+			onShowNote={() => {
+				console.log('Show Note');
+			}}
+			onOpenWindow={() => {
+				console.log('Open Window');
+			}}
+		/>
 	);
 
 	window.editorCore = editorCore;

@@ -1,8 +1,7 @@
 'use strict';
 
 import React, { useState, useEffect, useLayoutEffect, useRef, Fragment } from 'react';
-import { useIntl } from 'react-intl';
-import cx from 'classnames';
+import { useLocalization } from '@fluent/react';
 
 import Popup from './popup';
 
@@ -11,7 +10,7 @@ import IconEdit from '../../../res/icons/16/edit.svg';
 import IconUnlink from '../../../res/icons/16/unlink.svg';
 
 function LinkPopup({ parentRef, pluginState }) {
-	const intl = useIntl();
+	const { l10n } = useLocalization();
 	const [editing, setEditing] = useState(false);
 	const inputRef = useRef();
 
@@ -77,14 +76,14 @@ function LinkPopup({ parentRef, pluginState }) {
 							<input
 								ref={inputRef}
 								type="edit"
-								placeholder={intl.formatMessage({ id: 'noteEditor.enterLink' })}
+								placeholder={l10n.getString('note-editor-enter-link')}
 								onKeyDown={handleKeydown}
 								onInput={handleInput}
 							/>
 						</div>
 						<button
 							onClick={handleSet}
-							title={intl.formatMessage({ id: 'noteEditor.set' })}
+							title={l10n.getString('note-editor-set')}
 						>
 							<IconCheckmark/>
 						</button>
@@ -95,13 +94,13 @@ function LinkPopup({ parentRef, pluginState }) {
 						<div className="link"><a href={pluginState.href} onClick={handleOpen}>{pluginState.href}</a></div>
 						<button
 							onClick={handleEdit}
-							title={intl.formatMessage({ id: 'noteEditor.edit' })}
+							title={l10n.getString('general-edit')}
 						>
 							<IconEdit/>
 						</button>
 						<button
 							onClick={handleUnset}
-							title={intl.formatMessage({ id: 'noteEditor.unlink' })}
+							title={l10n.getString('note-editor-unlink')}
 						>
 							<IconUnlink/>
 						</button>

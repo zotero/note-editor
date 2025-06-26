@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { useCallback, useRef, useState, useLayoutEffect, useEffect, Fragment } from 'react';
-import { useIntl } from 'react-intl';
+import { LocalizationProvider, ReactLocalization, useLocalization } from '@fluent/react';
 
 import Toolbar from './toolbar';
 import Findbar from './findbar';
@@ -11,9 +11,11 @@ import CitationPopup from './popups/citation-popup';
 import ImagePopup from './popups/image-popup';
 import TablePopup from './popups/table-popup';
 import Noticebar from './noticebar';
+import { bundle } from '../fluent';
 
 function Editor(props) {
-	const intl = useIntl();
+	const { l10n } = useLocalization();
+
 	const editorRef = useRef(null);
 	const [editorState, setEditorState] = useState(props.editorCore.pluginState);
 
@@ -67,8 +69,7 @@ function Editor(props) {
 			/>}
 			<Findbar searchState={editorState.search} active={editorState.search.active}/>
 			{props.showUpdateNotice && <Noticebar>
-				{intl.formatMessage({ id: 'noteEditor.updateNotice' })
-				.replace(/%1\$S/g, intl.formatMessage({ id: 'zotero.appName' }))
+				{l10n.getString('note-editor-update-notice')
 				// Transform \n to <br>
 				.split(/\n/)
 				.reduce((result, word) => result.length ? [...result, <br/>, word] : [word], [])}
@@ -92,4 +93,12 @@ function Editor(props) {
 	);
 }
 
-export default Editor;
+function EditorWrapper(props) {
+	return (
+		<LocalizationProvider l10n={new ReactLocalization([bundle])}>
+			<Editor {...props} />
+		</LocalizationProvider>
+	)
+}
+
+export default EditorWrapper;

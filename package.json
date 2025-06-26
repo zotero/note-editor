@@ -17,9 +17,11 @@
 	],
 	"dependencies": {
 		"@benrbray/prosemirror-math": "github:zotero/prosemirror-math",
+		"@fluent/bundle": "^0.19.1",
+		"@fluent/react": "^0.15.2",
 		"classnames": "^2.3.1",
 		"core-js": "^3.37.1",
-		"katex": "^0.16.11",
+		"katex": "^0.16.22",
 		"prop-types": "^15.8.1",
 		"prosemirror-commands": "^1.5.2",
 		"prosemirror-dropcursor": "^1.8.1",
@@ -37,8 +39,7 @@
 		"prosemirror-utils": "^1.2.2",
 		"prosemirror-view": "^1.33.9",
 		"react": "^18.3.1",
-		"react-dom": "^18.3.1",
-		"react-intl": "^6.6.8"
+		"react-dom": "^18.3.1"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.18.9",

@@ -1,13 +1,13 @@
 'use strict';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { useLocalization } from '@fluent/react';
 
 import IconChevronDown from '../../res/icons/20/chevron-down.svg';
 import IconChevronUp from '../../res/icons/20/chevron-up.svg';
 
 function Findbar({ searchState, active }) {
-	const intl = useIntl();
+	const { l10n } = useLocalization();
 	const [showReplace, setShowReplace] = useState(false);
 	const [findValue, setFindValue] = useState('');
 	const [replaceValue, setReplaceValue] = useState('');
@@ -119,55 +119,59 @@ function Findbar({ searchState, active }) {
 
 	return active && (
 		<div className="findbar" onMouseDown={handleMouseDown}>
-
 			<input
 				ref={searchInputRef}
 				type="text"
-				placeholder={intl.formatMessage({ id: 'noteEditor.find' })}
+				placeholder={l10n.getString('general-find')}
 				value={searchState.searchTerm || ''}
 				onChange={handleFindInputChange} onKeyDown={handleFindInputKeyDown}
 			/>
-
 			<div className="buttons">
 				<div className="group">
 					<button
-						className="toolbar-button" onClick={handleFindPrev}
-						title={intl.formatMessage({ id: 'noteEditor.previous' })}
+						className="toolbar-button"
+						onClick={handleFindPrev}
+						title={l10n.getString('general-previous')}
 					>
-						<IconChevronUp/>
+						<IconChevronUp />
 					</button>
 					<button
-						className="toolbar-button" onClick={handleFindNext}
-						title={intl.formatMessage({ id: 'noteEditor.next' })}
+						className="toolbar-button"
+						onClick={handleFindNext}
+						title={l10n.getString('general-next')}
 					>
-						<IconChevronDown/>
+						<IconChevronDown />
 					</button>
 				</div>
 				<div className="check-button">
-					<input type="checkbox" id="replace-checkbox" checked={showReplace}
-						   onChange={handleReplaceCheckboxChange}/>
-					<label htmlFor="replace-checkbox"><FormattedMessage id="noteEditor.replace"/></label>
+					<input
+						type="checkbox"
+						id="replace-checkbox"
+						checked={showReplace}
+						onChange={handleReplaceCheckboxChange}
+					/>
+					<label htmlFor="replace-checkbox">
+						{l10n.getString('note-editor-replace')}
+					</label>
 				</div>
 			</div>
-
 			{showReplace && <React.Fragment>
-				<input
-					ref={replaceInputRef}
-					type="text"
-					placeholder={intl.formatMessage({ id: 'noteEditor.replace' })}
-					value={replaceValue}
-					onChange={handleReplaceInputChange}
-					onKeyDown={handleReplaceInputKeyDown}
-				/>
-				<div className="buttons">
-					<button className="text-button" onClick={handleReplace}>
-						<FormattedMessage id="noteEditor.replaceNext"/>
-					</button>
-					<button className="text-button" onClick={handleReplaceAll}>
-						<FormattedMessage id="noteEditor.replaceAll"/>
-					</button>
-				</div>
-
+					<input
+						ref={replaceInputRef}
+						type="text"
+						placeholder={l10n.getString('note-editor-replace')}
+						value={replaceValue}
+						onChange={handleReplaceInputChange}
+						onKeyDown={handleReplaceInputKeyDown}
+					/>
+					<div className="buttons">
+						<button className="text-button" onClick={handleReplace}>
+							{l10n.getString('note-editor-replace')}
+						</button>
+						<button className="text-button" onClick={handleReplaceAll}>
+							{l10n.getString('note-editor-replace-all')}
+						</button>
+					</div>
 			</React.Fragment>}
 		</div>
 	);

@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { useCallback } from 'react';
-import { useIntl } from 'react-intl';
+import { useLocalization } from '@fluent/react';
 
 import Popup from './popup';
 import IconInsertRowAbove from '../../../res/icons/16/insert-row-above.svg';
@@ -13,7 +13,7 @@ import IconDeleteColumn from '../../../res/icons/16/delete-column.svg';
 import IconDeleteTable from '../../../res/icons/16/delete-table.svg';
 
 function TablePopup({ parentRef, tableState }) {
-	const intl = useIntl();
+	const { l10n } = useLocalization();
 
 	const handleInsertRowBefore = useCallback(() => {
 		tableState.insertRowBefore();
@@ -45,43 +45,43 @@ function TablePopup({ parentRef, tableState }) {
 	return (
 		<Popup className="table-popup" parentRef={parentRef} pluginState={tableState.popup}>
 			<button
-				title={intl.formatMessage({ id: 'noteEditor.insertRowBefore' })}
+				title={l10n.getString('note-editor-insert-row-before')}
 				onClick={handleInsertRowBefore}
 			>
 				<div className="icon"><IconInsertRowAbove /></div>
 			</button>
 			<button
-				title={intl.formatMessage({ id: 'noteEditor.insertRowAfter' })}
+				title={l10n.getString('note-editor-insert-row-after')}
 				onClick={handleInsertRowAfter}
 			>
 				<div className="icon"><IconInsertRowBelow /></div>
 			</button>
 			<button
-				title={intl.formatMessage({ id: 'noteEditor.insertColumnBefore' })}
+				title={l10n.getString('note-editor-insert-column-before')}
 				onClick={handleColumnBefore}
 			>
 				<div className="icon"><IconInsertColumnLeft /></div>
 			</button>
 			<button
-				title={intl.formatMessage({ id: 'noteEditor.insertColumnAfter' })}
+				title={l10n.getString('note-editor-insert-column-after')}
 				onClick={handleColumnAfter}
 			>
 				<div className="icon"><IconInsertColumnRight /></div>
 			</button>
 			<button
-				title={intl.formatMessage({ id: 'noteEditor.deleteColumn' })}
+				title={l10n.getString('note-editor-delete-column')}
 				onClick={handleDeleteColumn}
 			>
 				<div className="icon"><IconDeleteColumn /></div>
 			</button>
 			<button
-				title={intl.formatMessage({ id: 'noteEditor.deleteRow' })}
+				title={l10n.getString('note-editor-delete-row')}
 				onClick={handleDeleteRow}
 			>
 				<div className="icon"><IconDeleteRow /></div>
 			</button>
 			<button
-				title={intl.formatMessage({ id: 'noteEditor.deleteTable' })}
+				title={l10n.getString('note-editor-delete-table')}
 				onClick={handleDeleteTable}
 			>
 				<div className="icon"><IconDeleteTable /></div>

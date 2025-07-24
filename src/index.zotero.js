@@ -41,6 +41,16 @@ Element.prototype.addEventListener = function (name, fn) {
 	return this.addEventListenerPrev(name, fn);
 };
 
+// Prevent context menu on UI elements that are not text inputs
+window.addEventListener('contextmenu', (e) => {
+	const target = e.target;
+	if (target?.closest?.('input, textarea, [contenteditable]')) {
+		return;
+	}
+	e.preventDefault();
+	e.stopPropagation();
+});
+
 class EditorInstance {
 	constructor(options) {
 		window._currentEditorInstance = this;

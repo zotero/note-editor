@@ -3,7 +3,7 @@
 import React, { forwardRef } from 'react';
 import cx from 'classnames';
 
-export const Button = forwardRef(({ icon, title, active, className, triggerOnMouseDown, onClick, ...rest }, ref) => {
+export const Button = forwardRef(({ icon, title, active, enableFocus, className, triggerOnMouseDown, onClick, ...rest }, ref) => {
 	return (
 		<button
 			{ ...rest }
@@ -17,9 +17,13 @@ export const Button = forwardRef(({ icon, title, active, className, triggerOnMou
 				onClick();
 			}}
 			onMouseDown={(event) => {
-				// preventDefault prevents :active activation on Firefox
-				// (see https://bugzilla.mozilla.org/show_bug.cgi?id=771241)
-				event.preventDefault();
+				if (!enableFocus) {
+					// Prevent default to maintain focus in contenteditable,
+					// except on find button—needed for focus to work in Zotero note-editor iframe.
+					// Note: As a side effect, preventDefault also blocks :active styling in Firefox
+					// (see https://bugzilla.mozilla.org/show_bug.cgi?id=771241)
+					event.preventDefault();
+				}
 				if (!triggerOnMouseDown || event.button !== 0) {
 					return;
 				}

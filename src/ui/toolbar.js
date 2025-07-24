@@ -126,6 +126,7 @@ function Toolbar({
 					state={{ isActive: searchState.active, run: () => searchState.setActive(!searchState.active) }}
 					icon={<IconSearch/>}
 					title={l10n.getString('note-editor-find-and-replace')}
+					enableFocus={true}
 				/>
 			</div>
 			<div className="end">

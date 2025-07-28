@@ -408,7 +408,41 @@ class EditorCore {
 	}
 
 	insertHTML(pos, html) {
+		// Check if there are other highlight/underline annotations with colors applied
+		let hasAnnotationsWithAppliedColors = false;
+		let state = highlightColorKey.getState(this.view.state).state;
+		if (!state.canApplyAnnotationColors && state.canRemoveAnnotationColors) {
+			hasAnnotationsWithAppliedColors = true;
+		}
+		state = underlineColorKey.getState(this.view.state).state;
+		if (!state.canApplyAnnotationColors && state.canRemoveAnnotationColors) {
+			hasAnnotationsWithAppliedColors = true;
+		}
+
+		// Check if there are other annotations with citations added
+		let hasCitationsRemoved = false;
+		state = citationKey.getState(this.view.state).state;
+		if (state.canAddCitations && !state.canRemoveCitations) {
+			hasCitationsRemoved = true;
+		}
+
 		insertHTML(pos, html)(this.view.state, this.view.dispatch);
+
+		// Apply colors if annotations were inserted and doing the same for existing annotations
+		state = highlightColorKey.getState(this.view.state).state;
+		if (hasAnnotationsWithAppliedColors && state.canApplyAnnotationColors) {
+			state.applyAnnotationColors();
+		}
+		state = underlineColorKey.getState(this.view.state).state;
+		if (hasAnnotationsWithAppliedColors && state.canApplyAnnotationColors) {
+			state.applyAnnotationColors();
+		}
+
+		// Remove citations if annotations were inserted and doing the same for existing annotations
+		state = citationKey.getState(this.view.state).state;
+		if (hasCitationsRemoved && state.canAddCitations) {
+			state.removeCitations();
+		}
 	}
 
 	insertMath() {

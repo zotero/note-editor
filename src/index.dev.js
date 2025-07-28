@@ -242,7 +242,8 @@ let html1 = `
 <h4>Heading 4</h4>
 <h5>Heading 5</h5>
 <h6>Heading 6</h6>
-
+<p><span class="math">$f(x)=1$</span> </p>
+<pre class="math">$$f(x)=1$$</pre>
 <p dir="rtl">rtl</p>
 <h1 dir="rtl">rtl</h1>
 

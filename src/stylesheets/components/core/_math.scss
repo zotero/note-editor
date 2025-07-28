@@ -28,8 +28,6 @@ math-display {
 }
 
 math-inline {
-	font-size: 1.1em !important;
-
 	.math-src {
 		div[contenteditable] {
 			white-space: normal;
@@ -39,11 +37,10 @@ math-inline {
 }
 
 math-display {
-	//font-size: 1em !important;
 	margin-block-start: 1em;
 	margin-block-end: 1em;
 }
 
 .math-src {
-	font-size: 0.9rem;
+	font-size: 0.90em;
 }

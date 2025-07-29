@@ -7,13 +7,15 @@ import { undo, redo } from 'prosemirror-history';
 import { undoInputRule } from 'prosemirror-inputrules';
 import { schema } from './schema';
 import { changeIndent, removeBlockIndent, customSplitBlock } from './commands';
-
-const mac = typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false;
+import { isMac } from './utils';
 
 export function buildKeymap(options) {
 	let keys = {};
 
 	function bind(key, cmd) {
+		if (key.includes('Mod-')) {
+			key = key.replace(/Mod-/g, isMac() ? 'Cmd-' : 'Ctrl-');
+		}
 		keys[key] = cmd;
 	}
 
@@ -21,7 +23,7 @@ export function buildKeymap(options) {
 	bind('Shift-Mod-z', redo);
 	bind('Backspace', undoInputRule);
 	bind('Backspace', removeBlockIndent());
-	if (!mac) bind('Mod-y', redo);
+	if (!isMac()) bind('Ctrl-y', redo);
 
 	bind('Alt-F10', focusToolbar);
 	bind('Alt-ArrowUp', joinUp);
@@ -42,7 +44,7 @@ export function buildKeymap(options) {
 	bind('Mod-k', options.toggleLink);
 	bind('Mod-K', options.toggleLink);
 
-	if (mac) {
+	if (isMac()) {
 		bind('Cmd-Ctrl-c', options.insertCitation);
 		bind('Cmd-Ctrl-C', options.insertCitation);
 	}
@@ -62,7 +64,7 @@ export function buildKeymap(options) {
 	});
 	bind('Mod-Enter', cmd);
 	bind('Shift-Enter', cmd);
-	if (mac) bind('Ctrl-Enter', cmd);
+	if (isMac()) bind('Ctrl-Enter', cmd);
 
 	bind('Shift-Tab', chainCommands(
 		options.goToPreviousCell,

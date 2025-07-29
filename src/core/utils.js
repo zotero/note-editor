@@ -423,3 +423,7 @@ export function usePrevious(value) {
 	});
 	return ref.current;
 }
+
+export function isMac() {
+	return !!navigator && /Mac/.test(navigator.platform);
+}

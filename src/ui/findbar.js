@@ -5,6 +5,7 @@ import { useLocalization } from '@fluent/react';
 
 import IconChevronDown from '../../res/icons/20/chevron-down.svg';
 import IconChevronUp from '../../res/icons/20/chevron-up.svg';
+import { isMac } from '../core/utils';
 
 function Findbar({ searchState, active }) {
 	const { l10n } = useLocalization();
@@ -24,7 +25,7 @@ function Findbar({ searchState, active }) {
 	}, [handleKeydownCallback]);
 
 	function handleKeydown(event) {
-		if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+		if ((!isMac() && event.ctrlKey || isMac() && event.metaKey) && event.key === 'f') {
 			event.preventDefault();
 			event.stopPropagation();
 			searchState.setActive(true);

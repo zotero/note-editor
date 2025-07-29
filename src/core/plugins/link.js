@@ -2,7 +2,7 @@ import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { schema } from '../schema';
 import { removeMarkRangeAtCursor, updateMarkRangeAtCursor } from '../commands';
 import { getMarkRangeAtCursor } from '../helpers';
-import { refocusEditor } from '../utils';
+import { isMac, refocusEditor } from '../utils';
 
 class Link {
 	constructor(state, options) {
@@ -162,7 +162,7 @@ export function link(options) {
 		key: linkKey,
 		props: {
 			handleClick: (view, pos, event) => {
-				if (event.button === 0 && (event.ctrlKey || event.metaKey)) {
+				if (event.button === 0 && (!isMac() && event.ctrlKey || isMac() && event.metaKey)) {
 					let href = getHrefAtPos(view.state.doc.resolve(pos));
 					if (href) {
 						if (href[0] === '#') {

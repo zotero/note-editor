@@ -2,8 +2,6 @@ import { NodeSelection, Plugin, TextSelection } from 'prosemirror-state';
 import { dropPoint } from 'prosemirror-transform';
 import { throttle } from '../utils';
 import { Slice, Fragment } from 'prosemirror-model';
-import { __serializeForClipboard } from 'prosemirror-view';
-
 
 class Drag {
 	constructor(view, options) {
@@ -58,7 +56,7 @@ class Drag {
 					// TODO: Consider using decorations to change background color when block drag handle is hovered
 
 					let slice = new Slice(new Fragment([node]), 0, 0);
-					let ref = __serializeForClipboard(this.view, slice);
+					let ref = this.view.serializeForClipboard(slice);
 					var dom = ref.dom;
 					var text = ref.text;
 					event.dataTransfer.setDragImage(new Image(), 0, 0);

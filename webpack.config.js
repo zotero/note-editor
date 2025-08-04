@@ -114,7 +114,7 @@ function generateEditorConfig(build) {
 			new ZoteroLocalePlugin({
 				files: ['zotero.ftl', 'note-editor.ftl'],
 				locales: ['en-US'],
-				commitHash: '80d01c9d02ae471516402d8fe22bee28ab47955f',
+				commitHash: 'e644df74feedd620d311da1ffca9f1aeb0c46626',
 			}),
 			new CleanWebpackPlugin(),
 			new MiniCssExtractPlugin({

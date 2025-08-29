@@ -25,6 +25,7 @@ function Findbar({ searchState, active }) {
 	}, [handleKeydownCallback]);
 
 	function handleKeydown(event) {
+		// Open findbar: Ctrl/Cmd+F
 		if ((!isMac() && event.ctrlKey || isMac() && event.metaKey) && event.key === 'f') {
 			event.preventDefault();
 			event.stopPropagation();
@@ -33,6 +34,23 @@ function Findbar({ searchState, active }) {
 				searchInputRef.current?.focus();
 				searchInputRef.current?.select();
 			});
+			return;
+		}
+
+		// Navigate results: Ctrl/Cmd+G (next), Shift+Ctrl/Cmd+G (previous)
+		if (
+			(!isMac() && event.ctrlKey || isMac() && event.metaKey)
+			&& event.key.toLowerCase() === 'g'
+			&& searchState.active
+		) {
+			event.preventDefault();
+			event.stopPropagation();
+			if (event.shiftKey) {
+				searchState.prev();
+			} else {
+				searchState.next();
+			}
+			return;
 		}
 	}
 

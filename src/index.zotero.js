@@ -63,6 +63,7 @@ class EditorInstance {
 		this._placeholder = options.placeholder;
 		this._dir = window.dir = options.dir;
 		this._enableReturnButton = options.enableReturnButton;
+		this._contextPaneButtonMode = options.contextPaneButtonMode;
 		this._isAttachmentNote = options.isAttachmentNote;
 		this._smartQuotes = options.smartQuotes;
 		this._editorCore = null;
@@ -98,6 +99,13 @@ class EditorInstance {
 			document.head.appendChild(node);
 		}
 		node.innerHTML = style;
+	}
+
+	_setToggleContextPaneButtonMode(mode) {
+		this._contextPaneButtonMode = mode;
+		if (this._editorCore && this._editorCore.setContextPaneButtonMode) {
+			this._editorCore.setContextPaneButtonMode(mode);
+		}
 	}
 
 	_postMessage(message) {
@@ -172,11 +180,15 @@ class EditorInstance {
 				disableUI={this._disableUI}
 				// TODO: Rename this to something like 'inContextPane`
 				enableReturnButton={this._enableReturnButton}
+				contextPaneButtonMode={this._contextPaneButtonMode}
 				viewMode={this._viewMode}
 				showUpdateNotice={this._editorCore.unsupportedSchema}
 				editorCore={this._editorCore}
 				onClickReturn={() => {
 					this._postMessage({ action: 'return' });
+				}}
+				onToggleContextPane={() => {
+					this._postMessage({ action: 'toggleContextPane' });
 				}}
 				onShowNote={() => {
 					this._postMessage({ action: 'showNote' });
@@ -239,10 +251,17 @@ class EditorInstance {
 			case 'setFont': {
 				let { font } = message;
 				this._setFont(font);
+				return;
 			}
 			case 'setStyle': {
 				let { style } = message;
 				this._setStyle(style);
+				return;
+			}
+			case 'setToggleContextPaneButtonMode': {
+				let { mode } = message;
+				this._setToggleContextPaneButtonMode(mode);
+				return;
 			}
 		}
 	}

@@ -13,6 +13,8 @@ import InsertDropdown from './toolbar-elements/insert-dropdown';
 import { mod } from '../core/utils';
 
 import IconChevronLeft from '../../res/icons/20/chevron-left.svg';
+import IconToggleContext from "../../res/icons/20/sidebar.svg";
+import IconToggleContextBottom from "../../res/icons/20/sidebar-bottom.svg";
 import IconCitation from '../../res/icons/20/cite.svg';
 import IconLink from '../../res/icons/20/link.svg';
 import IconMore from '../../res/icons/20/options.svg';
@@ -22,6 +24,7 @@ import IconSearch from '../../res/icons/20/magnifier.svg';
 function Toolbar({
 	viewMode,
 	enableReturnButton,
+	contextPaneButtonMode,
 	textColorState,
 	highlightColorState,
 	underlineColorState,
@@ -32,6 +35,7 @@ function Toolbar({
 	unsaved,
 	searchState,
 	onClickReturn,
+	onToggleContextPane,
 	onShowNote,
 	onOpenWindow,
 	onInsertTable,
@@ -191,6 +195,14 @@ function Toolbar({
 							</button>
 						)}
 					</Dropdown>
+				)}
+				{contextPaneButtonMode && (
+					<Button
+						className={`toolbar-button-toggleContextPane ${contextPaneButtonMode}`}
+						icon={contextPaneButtonMode === 'stacked' ? <IconToggleContextBottom /> : <IconToggleContext />}
+						title={l10n.getString('note-editor-toggle-context-pane')}
+						onClick={onToggleContextPane}
+					/>
 				)}
 			</div>
 		</div>

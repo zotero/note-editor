@@ -47,6 +47,7 @@ import { math } from './plugins/math';
 import { textColor, textColorKey } from './plugins/text-color';
 import { highlightColor, highlightColorKey } from './plugins/highlight-color';
 import { underlineColor, underlineColorKey } from './plugins/underline-color';
+import { markdownParser } from './plugins/markdown-parser';
 
 // TODO: Avoid resetting cursor and losing the recently typed and unsaved
 //  text when a newly synced note is set
@@ -153,6 +154,7 @@ class EditorCore {
 				plugins: [
 					mathPlugin,
 					readOnly({ enable: this.readOnly }),
+					markdownParser(),
 					dropPaste({
 						ignoreImages: this.isAttachmentNote,
 						onInsertObject: options.onInsertObject

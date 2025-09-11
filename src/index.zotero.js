@@ -101,6 +101,10 @@ class EditorInstance {
 		node.innerHTML = style;
 	}
 
+	_focusToolbar() {
+		document.querySelector('.toolbar button').focus();
+	}
+
 	_setToggleContextPaneButtonMode(mode) {
 		this._contextPaneButtonMode = mode;
 		if (this._editorCore && this._editorCore.setContextPaneButtonMode) {
@@ -246,6 +250,10 @@ class EditorInstance {
 			}
 			case 'focus': {
 				this._editorCore.focus();
+				return;
+			}
+			case 'focusToolbar': {
+				this._focusToolbar();
 				return;
 			}
 			case 'setFont': {

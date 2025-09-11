@@ -36,6 +36,8 @@ function Toolbar({
 	searchState,
 	onClickReturn,
 	onToggleContextPane,
+	onFocusBack,
+	onFocusForward,
 	onShowNote,
 	onOpenWindow,
 	onInsertTable,
@@ -68,6 +70,14 @@ function Toolbar({
 	}, [viewMode]);
 
 	const handleKeyDown = useCallback((ev) => {
+		// Shift+Tab: focus back to the element outside the editor
+		if (ev.key === 'Tab' && ev.shiftKey) {
+			ev.preventDefault();
+			if (onFocusBack) {
+				onFocusBack();
+			}
+			return;
+		}
 		const candidateNodes = getCandidateNodes();
 		if (ev.key === 'ArrowLeft') {
 			lastFocusedIndex.current = mod((lastFocusedIndex.current - 1), candidateNodes.length);

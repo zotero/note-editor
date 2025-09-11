@@ -194,6 +194,12 @@ class EditorInstance {
 				onToggleContextPane={() => {
 					this._postMessage({ action: 'toggleContextPane' });
 				}}
+				onFocusBack={() => {
+					this._postMessage({ action: 'focusBack' });
+				}}
+				onFocusForward={() => {
+					this._postMessage({ action: 'focusForward' });
+				}}
 				onShowNote={() => {
 					this._postMessage({ action: 'showNote' });
 				}}

@@ -65,6 +65,8 @@ function Editor(props) {
 				searchState={editorState.search}
 				onClickReturn={props.onClickReturn}
 				onToggleContextPane={props.onToggleContextPane}
+				onFocusBack={props.onFocusBack}
+				onFocusForward={props.onFocusForward}
 				onShowNote={props.onShowNote}
 				onOpenWindow={props.onOpenWindow}
 				onInsertTable={handleInsertTable}

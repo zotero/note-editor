@@ -34,6 +34,7 @@
 	.end {
 		display: flex;
 		align-items: center;
+		gap: 8px;
 	}
 
 	@media (-moz-platform: macos) {
@@ -89,6 +90,9 @@
 }
 
 .toolbar-button-toggleContextPane {
+	// To align with the tab bar buttons in the client, where there is a 1px separator
+	margin-left: 1px;
+
 	&.standard:-moz-locale-dir(ltr) {
 		transform: scaleX(-1);
 	}

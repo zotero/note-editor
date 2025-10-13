@@ -8,7 +8,8 @@
 		"build:zotero": "webpack --node-env production --config-name zotero",
 		"build:ios": "webpack --node-env production --config-name ios",
 		"start": "webpack serve --node-env development --config-name dev",
-		"test": "echo \"No tests yet\""
+		"test": "mocha",
+		"test:watch": "mocha -w"
 	},
 	"author": "Martynas Bagdonas",
 	"license": "AGPL-3.0",
@@ -54,6 +55,7 @@
 		"autoprefixer": "^10.4.7",
 		"babel-loader": "^8.2.5",
 		"babel-runtime": "^6.26.0",
+		"chai": "^6.2.0",
 		"clean-webpack-plugin": "^4.0.0",
 		"css-loader": "^6.7.1",
 		"css-minimizer-webpack-plugin": "^4.0.0",
@@ -62,6 +64,7 @@
 		"html-webpack-plugin": "^5.5.0",
 		"js-beautify": "^1.14.4",
 		"mini-css-extract-plugin": "^2.6.1",
+		"mocha": "^11.7.4",
 		"postcss": "^8.4.14",
 		"postcss-loader": "^7.0.1",
 		"postcss-rtlcss": "^3.7.2",

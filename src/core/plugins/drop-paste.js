@@ -1,6 +1,8 @@
 import { Plugin } from 'prosemirror-state';
-import { Fragment, Slice } from 'prosemirror-model';
+import { DOMParser as PMDOMParser, Fragment, Slice } from 'prosemirror-model';
 import { schema } from '../schema';
+import { rtfToHtml } from '../rtf';
+import { isMac } from '../utils';
 
 // This plugin intercepts all paste/drop/move actions
 
@@ -37,6 +39,15 @@ function isImageValid(node) {
 		// Data URL is too long
 		|| src.length > IMAGE_DATA_URL_MAX_LENGTH
 	);
+}
+
+// Convert an HTML string into a ProseMirror Slice using the current schema
+function htmlToSlice(html) {
+	const parser = PMDOMParser.fromSchema(schema);
+	const container = document.createElement('div');
+	container.innerHTML = html;
+	// Use parseSlice to preserve inline structure where appropriate
+	return parser.parseSlice(container, { preserveWhitespace: true });
 }
 
 function transformFragment(schema, fragment, data, ignoreImages) {
@@ -142,7 +153,19 @@ export function dropPaste(options) {
 				}
 				let text = event.clipboardData.getData('text/plain');
 				let html = event.clipboardData.getData('text/html');
+				let rtf = event.clipboardData.getData('text/rtf');
+
+				let convertedFromRTF = false;
+				if (!html && rtf && isMac()) {
+					html = rtfToHtml(rtf);
+					convertedFromRTF = true;
+				}
+
 				if (!event.shiftKey && html) {
+					if (convertedFromRTF) {
+						// Parse the converted HTML into a Slice for insertion
+						slice = htmlToSlice(html);
+					}
 					slice = transformSlice(schema, slice, options.ignoreImages);
 					dispatch(state.tr.replaceSelection(slice));
 					return true;

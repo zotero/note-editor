@@ -239,6 +239,21 @@ class EditorInstance {
 				this._editorCore.updateCitationItems(citationItems);
 				return;
 			}
+			case 'updateIncrementally': {
+				let { noteData, preserveSelection } = message;
+				let success = false;
+				try {
+					success = this._editorCore.applyExternalChanges(noteData, preserveSelection);
+				} catch (e) {
+					success = false;
+				}
+				
+				if (!success) {
+					// Notify parent that incremental update failed
+					this._postMessage({ action: 'incrementalUpdateFailed' });
+				}
+				return;
+			}
 			case 'attachImportedImage': {
 				let { nodeID, attachmentKey } = message;
 				this._editorCore.attachImportedImage(nodeID, attachmentKey);

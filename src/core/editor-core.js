@@ -1,4 +1,4 @@
-import { EditorState } from 'prosemirror-state';
+import { EditorState, TextSelection } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { DOMParser as DOMParser2, Node } from 'prosemirror-model';
 import { dropCursor } from 'prosemirror-dropcursor';
@@ -250,13 +250,13 @@ class EditorCore {
 						updateImageDimensions(node.attrs.nodeID, width, height)(this.view.state, this.view.dispatch);
 					},
 					onOpenURL: options.onOpenURL.bind(this),
-					metadata: this.metadata
+					get metadata() { return that.metadata; }
 				}),
 				highlight: nodeViews.highlight({
-					metadata: this.metadata
+					get metadata() { return that.metadata; }
 				}),
 				citation: nodeViews.citation({
-					metadata: this.metadata
+					get metadata() { return that.metadata; }
 				}),
 				table: nodeViews.table()
 			},
@@ -491,6 +491,181 @@ class EditorCore {
 			},
 			html: this.getHTML()
 		};
+	}
+
+	/**
+	 * Apply external changes to the editor incrementally without reinitializing
+	 * @param {Object} newData - The new data containing state and html
+	 * @param {boolean} preserveSelection - Whether to try to preserve the current selection
+	 */
+	applyExternalChanges(newData, preserveSelection = true) {
+		if (!newData || this.readOnly) {
+			return false;
+		}
+
+		let { state: newStateData, html: newHtml } = newData;
+		
+		// Cache selection info before applying changes
+		let selectionInfo = null;
+		if (preserveSelection) {
+			let oldDoc = this.view.state.doc;
+			let oldAnchor = this.view.state.selection.anchor;
+			let oldHead = this.view.state.selection.head;
+			let selStart = Math.min(oldAnchor, oldHead);
+			let selEnd = Math.max(oldAnchor, oldHead);
+			
+			// Find the node path and offset for the selection start position
+			let $oldPos = oldDoc.resolve(selStart);
+			let path = [];
+			for (let d = $oldPos.depth; d > 0; d--) {
+				path.unshift($oldPos.index(d - 1));
+			}
+			
+			selectionInfo = {
+				anchor: oldAnchor,
+				head: oldHead,
+				selStart,
+				selEnd,
+				selLength: selEnd - selStart,
+				path,
+				offset: $oldPos.parentOffset
+			};
+		}
+
+		try {
+			let newDoc;
+			let newMetadata = new Metadata();
+
+			if (newStateData && newStateData.doc && newStateData.metadata) {
+				try {
+					newDoc = Node.fromJSON(schema, newStateData.doc);
+					newMetadata.fromJSON(newStateData.metadata);
+				} catch (e) {
+					newDoc = null;
+				}
+			}
+
+			// Fall back to HTML parsing if state data is unavailable or failed
+			if (!newDoc && newHtml) {
+				try {
+					let { html, metadataAttributes } = preprocessHTML(newHtml);
+					newMetadata.parseAttributes(metadataAttributes);
+					
+					newDoc = DOMParser2
+						.fromSchema(schema)
+						.parse((new DOMParser().parseFromString(html, 'text/html').body));
+				} catch (e) {
+					throw new Error('HTML parsing failed: ' + (e.message || 'Unknown error'));
+				}
+			}
+
+			if (!newDoc || !newDoc.content || typeof newDoc.content.size !== 'number') {
+				throw new Error('No valid document data available for incremental update');
+			}
+
+			let tr = this.view.state.tr;
+			
+			let currentDocSize = this.view.state.doc.content.size;
+			if (typeof currentDocSize !== 'number' || currentDocSize < 0) {
+				throw new Error('Invalid current document state');
+			}
+			
+			tr = tr.replaceWith(0, currentDocSize, newDoc.content);
+			
+			this.metadata = newMetadata;
+			schema.cached.metadata = this.metadata;
+
+			// Mark this as a system transaction to avoid triggering save
+			tr = tr.setMeta('system', true);
+			tr = tr.setMeta('externalUpdate', true);
+
+			let schemaTr = null;
+			try {
+				// First apply our changes and create a new state
+				let newState = this.view.state.apply(tr);
+				schemaTr = schemaTransform(newState);
+			} catch (e) {
+			}
+			
+			this.view.dispatch(tr);
+			
+			// Apply schema tr if needed
+			if (schemaTr) {
+				this.view.dispatch(schemaTr);
+			}
+
+			// Force citation nodes to re-render since metadata was updated
+			// This ensures annotations with citations display properly
+			if (!this.readOnly) {
+				touchCitations()(this.view.state, this.view.dispatch);
+			}
+
+			if (preserveSelection && selectionInfo) {
+				try {
+					let newDoc = this.view.state.doc;
+					let newDocSize = newDoc.content.size;
+					
+					let newPos = 0;
+					let currentNode = newDoc;
+					let validPath = true;
+					
+					// Navigate the same path in the new document
+					for (let i = 0; i < selectionInfo.path.length && validPath; i++) {
+						let index = selectionInfo.path[i];
+						if (index < currentNode.childCount) {
+							for (let j = 0; j < index; j++) {
+								newPos += currentNode.child(j).nodeSize;
+							}
+							newPos += 1;
+							currentNode = currentNode.child(index);
+						}
+						else {
+							validPath = false;
+							break;
+						}
+					}
+					
+					if (validPath) {
+						// Restore selection offset
+						let maxOffset = currentNode.content ? currentNode.content.size : 0;
+						let clampedOffset = Math.min(selectionInfo.offset, maxOffset);
+						newPos += clampedOffset;
+						
+						let newAnchor = Math.max(0, Math.min(newPos, newDocSize));
+						let newHead = Math.max(0, Math.min(newPos + selectionInfo.selLength, newDocSize));
+						
+						// For reverse selections
+						if (selectionInfo.anchor > selectionInfo.head) {
+							[newAnchor, newHead] = [newHead, newAnchor];
+						}
+						
+						if (newAnchor >= 0 && newHead >= 0 && newAnchor <= newDocSize && newHead <= newDocSize) {
+							let selectionTr = this.view.state.tr.setSelection(TextSelection.between(
+								this.view.state.doc.resolve(newAnchor),
+								this.view.state.doc.resolve(newHead)
+							));
+							this.view.dispatch(selectionTr);
+						}
+					}
+				}
+				catch (e) {
+				}
+			}
+
+			this.docChanged = false;
+			return true;
+
+		} catch (e) {
+			// Send message to parent to execute fallback update
+			if (typeof window !== 'undefined' && window.parent && window.parent.postMessage) {
+				window.parent.postMessage({
+					instanceID: this.instanceID,
+					message: { action: 'incrementalUpdateFailed' }
+				}, '*');
+			}
+			
+			return false;
+		}
 	}
 }
 

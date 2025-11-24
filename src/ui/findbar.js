@@ -99,6 +99,7 @@ function Findbar({ searchState, active }) {
 	function handleFindInputKeyDown(event) {
 		if (event.key === 'Escape') {
 			searchState.setActive(false);
+			event.preventDefault();
 		}
 		else if (event.key === 'Enter' && event.shiftKey) {
 			handleFindPrev();
@@ -113,6 +114,7 @@ function Findbar({ searchState, active }) {
 	function handleReplaceInputKeyDown(event) {
 		if (event.key === 'Escape') {
 			searchState.setActive(false);
+			event.preventDefault();
 		}
 		else if (event.key === 'Enter') {
 			handleReplace();

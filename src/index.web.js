@@ -47,6 +47,7 @@ class EditorInstance {
 			unsaved: false,
 			placeholder: '',
 			isAttachmentNote: this._isAttachmentNote,
+			viewMode: "web",
 			onSubscribe: (subscription) => {
 				let { id, type, data } = subscription;
 				subscription = { id, type, data };
@@ -92,9 +93,6 @@ class EditorInstance {
 			},
 			onOpenCitationPopup: (nodeID, citation) => {
 				this._postMessage({ action: 'openCitationPopup', nodeID, citation });
-			},
-			onOpenContextMenu: (pos, node, x, y) => {
-				this._postMessage({ action: 'openContextMenu', x, y, pos, itemGroups: this._getContextMenuItemGroups(node) });
 			}
 		});
 

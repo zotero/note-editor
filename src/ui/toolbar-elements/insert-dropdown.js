@@ -20,23 +20,23 @@ export default function InsertDropdown({ isAttachmentNote, onInsertTable, onInse
 			title={l10n.getString('general-insert')}
 		>
 			{ !isAttachmentNote && <button
-					role="menuitem"
-					className="toolbar-button"
-					title={l10n.getString('note-editor-insert-image')}
-					onClick={onInsertImage}
-					onMouseDown={(event) => event.preventDefault()}
+				role="menuitem"
+				className="toolbar-button"
+				title={l10n.getString('note-editor-image')}
+				onClick={onInsertImage}
+				onMouseDown={(event) => event.preventDefault()}
 			><IconImage /></button> }
 			<button
 				role="menuitem"
 				className="toolbar-button"
-				title={l10n.getString('note-editor-insert-table')}
+				title={l10n.getString('note-editor-table')}
 				onClick={onInsertTable}
 				onMouseDown={(event) => event.preventDefault()}
 			><IconTable /></button>
 			<button
 				role="menuitem"
 				className="toolbar-button"
-				title={l10n.getString('note-editor-insert-math')}
+				title={l10n.getString('note-editor-math')}
 				onClick={onInsertMath}
 				onMouseDown={(event) => event.preventDefault()}
 			><IconMath /></button>

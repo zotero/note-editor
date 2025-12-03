@@ -21,6 +21,17 @@
 			flex-direction: column;
 			overflow: auto;
 			background-color: var(--color-background);
+			--editor-padding-inline: 30px;
+			--editor-padding-block: 20px;
+
+			@if $platform == 'zotero' {
+				font-size: var(--font-size);
+
+				.primary-editor {
+					max-width: calc(70ch + var(--editor-padding-inline) * 2);
+					align-self: center;
+				}
+			}
 
 			.relative-container {
 				position: relative;
@@ -30,7 +41,7 @@
 				flex: 1;
 				// Margins must belong to editor contenteditable area to
 				// allow text selection from the margin
-				padding: 20px 30px;
+				padding: var(--editor-padding-block) var(--editor-padding-inline);
 				flex-direction: column;
 
 				& > *:first-child {

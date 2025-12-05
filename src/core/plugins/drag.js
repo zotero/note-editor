@@ -88,21 +88,15 @@ class Drag {
 
 			let padding = rect.left - parentRect.left - 4;
 			if (rtl) {
-				padding = parentRect.right - rect.right;
+				padding = parentRect.right - rect.right - 4;
 			}
 
 			if (this.node.nodeName === 'LI') {
 				padding -= 22;
 			}
 
-			if (rtl) {
-				this.dragHandleNode.style.right = padding - 22 + 'px';
-				this.dragHandleNode.style.left = 'unset';
-			}
-			else {
-				this.dragHandleNode.style.left = padding - 22 + 'px';
-				this.dragHandleNode.style.right = 'unset';
-			}
+			// The final offset is calculated in CSS for dynamic line lengths
+			this.dragHandleNode.style.setProperty('--drag-handle-default-inline-offset', `${padding - 22}px`);
 
 			this.dragHandleNode.style.display = 'block';
 			this.dragHandleNode.style.top = top - 2 + 'px';

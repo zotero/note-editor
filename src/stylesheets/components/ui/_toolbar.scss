@@ -9,7 +9,7 @@
 	height: 41px !important;
 	min-height: 41px;
 	margin: 0;
-	padding: 0 8px;
+	padding: 0 4px;
 	min-width: 1px;
 	background: var(--material-toolbar);
 	border-bottom: var(--material-panedivider);
@@ -34,7 +34,7 @@
 	.end {
 		display: flex;
 		align-items: center;
-		width: 30px;
+		gap: 8px;
 	}
 
 	@media (-moz-platform: macos) {
@@ -87,6 +87,15 @@
 
 [dir=rtl] .toolbar-button-return {
 	transform: scaleX(-1);
+}
+
+.toolbar-button-toggleContextPane {
+	// To align with the tab bar buttons in the client, where there is a 1px separator
+	margin-left: 1px;
+
+	&.standard:-moz-locale-dir(ltr) {
+		transform: scaleX(-1);
+	}
 }
 
 .dropdown {

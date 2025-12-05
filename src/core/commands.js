@@ -460,6 +460,11 @@ export function touchCitations() {
 			if (node.type === schema.nodes.citation) {
 				tr.setNodeMarkup(pos, null, { ...node.attrs, version: node.attrs.version++ });
 			}
+			// Also touch highlight and image nodes that have citation data
+			if ((node.type === schema.nodes.highlight || node.type === schema.nodes.image) 
+				&& node.attrs.annotation && node.attrs.annotation.citationItem) {
+				tr.setNodeMarkup(pos, null, { ...node.attrs, version: (node.attrs.version || 0) + 1 });
+			}
 		});
 		tr.setMeta('addToHistory', false);
 		tr.setMeta('system', true);

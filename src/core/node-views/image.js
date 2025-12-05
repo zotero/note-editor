@@ -2,6 +2,9 @@ import { formatCitation } from '../utils';
 
 class ImageView {
 	constructor(node, view, getPos, options) {
+		this.node = node;
+		this.options = options;
+		
 		if (node.attrs.attachmentKey) {
 			this.listener = (data) => {
 				// Note: If image file is modified and dimensions are changed,
@@ -126,16 +129,20 @@ class ImageView {
 			this.dom = div;
 		}
 
+		this.updateCitation();
+	}
+	
+	updateCitation() {
 		let formattedCitation = '';
-		if (node.attrs.annotation && node.attrs.annotation.citationItem) {
+		if (this.node.attrs.annotation && this.node.attrs.annotation.citationItem) {
 			try {
-				let citationItem = JSON.parse(JSON.stringify(node.attrs.annotation.citationItem));
+				let citationItem = JSON.parse(JSON.stringify(this.node.attrs.annotation.citationItem));
 				let citation = {
 					citationItems: [citationItem],
 					properties: {}
 				};
 
-				options.metadata.fillCitationItemsWithData(citation.citationItems);
+				this.options.metadata.fillCitationItemsWithData(citation.citationItems);
 				let missingItemData = citation.citationItems.find(x => !x.itemData);
 				if (!missingItemData) {
 					formattedCitation = formatCitation(citation);
@@ -148,8 +155,18 @@ class ImageView {
 
 		if (formattedCitation) {
 			this.dom.title = formattedCitation;
+		} else {
+			this.dom.removeAttribute('title');
 		}
-
+	}
+	
+	update(node) {
+		if (node.type !== this.node.type) {
+			return false;
+		}
+		this.node = node;
+		this.updateCitation();
+		return true;
 	}
 
 	selectNode() {

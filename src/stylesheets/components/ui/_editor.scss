@@ -23,12 +23,14 @@
 			background-color: var(--color-background);
 			--editor-padding-inline: 30px;
 			--editor-padding-block: 20px;
+			--editor-max-inner-width: 70ch;
+			--editor-max-width: calc(var(--editor-max-inner-width) + var(--editor-padding-inline) * 2);
 
 			@if $platform == 'zotero' {
 				font-size: var(--font-size);
 
 				.primary-editor {
-					max-width: calc(70ch + var(--editor-padding-inline) * 2);
+					max-width: var(--editor-max-width);
 					align-self: center;
 				}
 			}

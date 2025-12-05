@@ -328,8 +328,7 @@ export class SetAttrsStep extends Step {
  *
  * From http://lehelk.com/2011/05/06/script-to-remove-diacritics/
  */
-export function removeDiacritics(str) {
-	let map = {
+const DIACRITICS_MAP = {
 		'A':'A','Ⓐ':'A','Ａ':'A','À':'A','Á':'A','Â':'A','Ầ':'A','Ấ':'A','Ẫ':'A','Ẩ':'A','Ã':'A','Ā':'A','Ă':'A',
 		'Ằ':'A','Ắ':'A','Ẵ':'A','Ẳ':'A','Ȧ':'A','Ǡ':'A','Ä':'A','Ǟ':'A','Ả':'A','Å':'A','Ǻ':'A','Ǎ':'A','Ȁ':'A',
 		'Ȃ':'A','Ạ':'A','Ậ':'A','Ặ':'A','Ḁ':'A','Ą':'A','Ⱥ':'A','Ɐ':'A','Ꜳ':'AA','Æ':'AE','Ǽ':'AE','Ǣ':'AE',
@@ -397,9 +396,11 @@ export function removeDiacritics(str) {
 		'ẉ':'w','ⱳ':'w','x':'x','ⓧ':'x','ｘ':'x','ẋ':'x','ẍ':'x','y':'y','ⓨ':'y','ｙ':'y','ỳ':'y','ý':'y','ŷ':'y',
 		'ỹ':'y','ȳ':'y','ẏ':'y','ÿ':'y','ỷ':'y','ẙ':'y','ỵ':'y','ƴ':'y','ɏ':'y','ỿ':'y','z':'z','ⓩ':'z','ｚ':'z',
 		'ź':'z','ẑ':'z','ż':'z','ž':'z','ẓ':'z','ẕ':'z','ƶ':'z','ȥ':'z','ɀ':'z','ⱬ':'z','ꝣ':'z'};
+
+export function removeDiacritics(str) {
 	let chars = [];
 	for (let i = 0; i < str.length; i++) {
-		let plain = map[str[i]];
+		let plain = DIACRITICS_MAP[str[i]];
 		if (!plain) {
 			chars.push([i, str[i]]);
 		}

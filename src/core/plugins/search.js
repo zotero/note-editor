@@ -17,6 +17,20 @@ class Search {
 		this.results = [];
 		this.selectedResultIndex = 0;
 		this.triggerUpdate = true;
+		this.debounceTimer = null;
+		this.scrollTimer = null;
+		// Debounce delays for search updates in ms
+		this.updateDebounceDelay = 300;
+		this.selectionDebounceDelay = 10;
+		// Debounce delay for scroll updates in ms
+		this.scrollDebounceDelay = 100;
+		// Height buffer for range of decorations beyond viewport in px
+		this.decorationBuffer = 500;
+		// Maximum number of decorations to render at once
+		this.maxDecorations = 500;
+		this.handleScroll = this._handleScroll.bind(this);
+		this.scrollListenerAttached = false;
+		this.scrollContainer = null;
 	}
 
 	focusSelectedResult() {
@@ -76,7 +90,7 @@ class Search {
 		let result = this.results[this.selectedResultIndex];
 		tr.setSelection(TextSelection.between(state.doc.resolve(result.from), state.doc.resolve(result.from)));
 
-		this.triggerUpdate = true;
+		this.triggerDecorations = true;
 		dispatch(tr);
 
 		this.focusSelectedResult();
@@ -96,7 +110,7 @@ class Search {
 		let result = this.results[this.selectedResultIndex];
 		tr.setSelection(TextSelection.between(state.doc.resolve(result.from), state.doc.resolve(result.from)));
 
-		this.triggerUpdate = true;
+		this.triggerDecorations = true;
 		dispatch(tr);
 		this.focusSelectedResult();
 	}
@@ -122,12 +136,16 @@ class Search {
 			if (node.isText) {
 				let chars = removeDiacritics(node.text);
 				if (mergedTextNodes[index]) {
-					let shift = [...new Set(mergedTextNodes[index].chars.map(x => x[0]))].length;
-					chars = chars.map(x => [x[0] + shift, x[1]]);
-					mergedTextNodes[index].chars = [...mergedTextNodes[index].chars, ...chars];
+					let currentTextNode = mergedTextNodes[index];
+					let shift = currentTextNode.textLength;
+					for (let i = 0; i < chars.length; i++) {
+						chars[i][0] += shift;
+						currentTextNode.chars.push(chars[i]);
+					}
+					currentTextNode.textLength += node.text.length;
 				}
 				else {
-					mergedTextNodes[index] = { chars, pos };
+					mergedTextNodes[index] = { chars, pos, textLength: node.text.length };
 				}
 			}
 			else {
@@ -207,6 +225,19 @@ class Search {
 			if (tr.docChanged) {
 				this.triggerUpdate = true;
 			}
+			else if (tr.selectionSet && this.results.length) {
+				// Update selectedResultIndex based on current selection
+				let pos = tr.selection.from;
+				let index = this.results.findIndex(r => r.from <= pos && r.to >= pos);
+				if (index === -1) {
+					index = this.results.findIndex(r => r.from > pos);
+					if (index === -1) index = 0;
+				}
+				if (index !== this.selectedResultIndex) {
+					this.selectedResultIndex = index;
+					this.triggerDecorations = true;
+				}
+			}
 		}
 		else {
 			this.decorations = DecorationSet.empty;
@@ -214,32 +245,124 @@ class Search {
 	}
 
 	updateView() {
-		if (this.triggerUpdate) {
-			this.triggerUpdate = false;
-
-			let { state, dispatch } = this.view;
-			let { tr } = state;
-
-			this.search(tr.doc);
-
-			if (this.triggerFocus && this.results.length) {
-				this.triggerFocus = false;
-				let pos = state.selection.from;
-				let index = this.results.findIndex(x => x.from >= pos);
-				this.selectedResultIndex = index === -1 ? 0 : index;
-				let result = this.results[this.selectedResultIndex];
-				tr.setSelection(TextSelection.between(state.doc.resolve(result.from), state.doc.resolve(result.from)));
-				this.focusSelectedResult();
+		if (!this.active || !this.searchTerm) {
+			// If search is not active, clear decorations
+			if (!this.active && this.decorations !== DecorationSet.empty) {
+				this.decorations = DecorationSet.empty;
+				let { state, dispatch } = this.view;
+				dispatch(state.tr);
 			}
-			let list = this.results.map((deco, index) => (
-				Decoration.inline(deco.from, deco.to, {
-					class: index === this.selectedResultIndex
-						? this.findSelectedClass : this.findClass
-				})
-			));
-			this.decorations = DecorationSet.create(tr.doc, list);
-			dispatch(tr);
+			return;
 		}
+
+		if (this.debounceTimer) {
+			clearTimeout(this.debounceTimer);
+		}
+		this.debounceTimer = setTimeout(() => {
+			if (this.triggerUpdate) {
+				this.triggerUpdate = false;
+				this.triggerDecorations = false;
+
+				let { state, dispatch } = this.view;
+				let { tr } = state;
+
+				this.search(tr.doc);
+
+				if (this.triggerFocus && this.results.length) {
+					this.triggerFocus = false;
+					let pos = state.selection.from;
+					let index = this.results.findIndex(x => x.from >= pos);
+					this.selectedResultIndex = index === -1 ? 0 : index;
+					let result = this.results[this.selectedResultIndex];
+					tr.setSelection(TextSelection.between(state.doc.resolve(result.from), state.doc.resolve(result.from)));
+					this.focusSelectedResult();
+				}
+				
+				this.updateDecorations(tr.doc);
+
+				dispatch(tr.setMeta('addToHistory', false));
+			}
+			else if (this.triggerDecorations) {
+				this.triggerDecorations = false;
+				this.updateDecorations(this.view.state.doc);
+				this.view.dispatch(this.view.state.tr.setMeta('addToHistory', false));
+			}
+		}, this.triggerUpdate ? this.updateDebounceDelay : this.selectionDebounceDelay);
+	}
+
+	updateScrollListener() {
+		if (this.active && !this.scrollListenerAttached) {
+			let container = this.view.dom.closest('.editor-core') || this.view.dom.parentElement;
+			if (container) {
+				container.addEventListener('scroll', this._handleScroll);
+				this.scrollListenerAttached = true;
+				this.scrollContainer = container;
+			}
+		}
+		else if (!this.active && this.scrollListenerAttached) {
+			if (this.scrollContainer) {
+				this.scrollContainer.removeEventListener('scroll', this._handleScroll);
+			}
+			this.scrollListenerAttached = false;
+			this.scrollContainer = null;
+		}
+	}
+
+	_handleScroll() {
+		if (!this.active || !this.results.length) return;
+
+		if (this.scrollTimer) clearTimeout(this.scrollTimer);
+		this.scrollTimer = setTimeout(() => {
+			this.updateDecorations(this.view.state.doc);
+			this.view.dispatch(this.view.state.tr.setMeta('addToHistory', false));
+		}, this.scrollDebounceDelay);
+	}
+
+	updateDecorations(doc) {
+		let { view } = this;
+		if (!view) return;
+
+		let visibleFrom = 0;
+		let visibleTo = doc.content.size;
+
+		let container = view.dom.closest('.editor-core') || view.dom.parentElement;
+		if (container) {
+			let rect = container.getBoundingClientRect();
+			let editorRect = view.dom.getBoundingClientRect();
+			let left = editorRect.left + (editorRect.width / 2);
+
+			// Extend decoration range beyond viewport for smoother scrolling
+			let startObj = view.posAtCoords({ left, top: rect.top - this.decorationBuffer });
+			let endObj = view.posAtCoords({ left, top: rect.bottom + this.decorationBuffer });
+
+			if (startObj) visibleFrom = startObj.pos;
+			if (endObj) visibleTo = endObj.pos;
+		}
+
+		let list = [];
+
+		// Always render selected result
+		if (this.results[this.selectedResultIndex]) {
+			let res = this.results[this.selectedResultIndex];
+			list.push(Decoration.inline(res.from, res.to, { class: this.findSelectedClass }));
+		}
+
+		// Render decorations within visible range
+		let startIndex = this.results.findIndex(r => r.to >= visibleFrom);
+		if (startIndex === -1) startIndex = this.results.length;
+
+		for (let i = startIndex; i < this.results.length; i++) {
+			let res = this.results[i];
+			if (res.from > visibleTo) break;
+
+			if (i === this.selectedResultIndex) continue;
+
+			list.push(Decoration.inline(res.from, res.to, { class: this.findClass }));
+
+			if (list.length > this.maxDecorations) break;
+		}
+
+		this.decorations = DecorationSet.create(doc, list);
 	}
 }
 
@@ -260,9 +383,18 @@ export function search() {
 		view: (view) => {
 			let pluginState = searchKey.getState(view.state);
 			pluginState.view = view;
+			pluginState.updateScrollListener();
+
 			return {
 				update(view, lastState) {
+					let pluginState = searchKey.getState(view.state);
 					pluginState.updateView(view.state, lastState);
+					pluginState.updateScrollListener();
+				},
+				destroy() {
+					if (pluginState.scrollListenerAttached && pluginState.scrollContainer) {
+						pluginState.scrollContainer.removeEventListener('scroll', pluginState.onScroll);
+					}
 				}
 			};
 		},

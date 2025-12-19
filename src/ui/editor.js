@@ -18,6 +18,7 @@ function Editor(props) {
 
 	const editorRef = useRef(null);
 	const [editorState, setEditorState] = useState(props.editorCore.pluginState);
+	const [contextPaneButtonMode, setContextPaneButtonMode] = useState(props.contextPaneButtonMode);
 
 	const [refReady, setRefReady] = useState(false);
 	useEffect(() => {
@@ -28,6 +29,7 @@ function Editor(props) {
 		props.editorCore.onUpdateState = (state) => {
 			setEditorState(props.editorCore.pluginState);
 		};
+		props.editorCore.setContextPaneButtonMode = setContextPaneButtonMode;
 		editorRef.current.appendChild(props.editorCore.view.dom);
 	}, []);
 
@@ -51,6 +53,7 @@ function Editor(props) {
 			{!props.disableUI && <Toolbar
 				viewMode={props.viewMode}
 				enableReturnButton={props.enableReturnButton}
+				contextPaneButtonMode={contextPaneButtonMode}
 				textColorState={editorState.textColor}
 				highlightColorState={editorState.highlightColor}
 				underlineColorState={editorState.underlineColor}
@@ -61,6 +64,9 @@ function Editor(props) {
 				unsaved={editorState.core.unsaved}
 				searchState={editorState.search}
 				onClickReturn={props.onClickReturn}
+				onToggleContextPane={props.onToggleContextPane}
+				onFocusBack={props.onFocusBack}
+				onFocusForward={props.onFocusForward}
 				onShowNote={props.onShowNote}
 				onOpenWindow={props.onOpenWindow}
 				onInsertTable={handleInsertTable}

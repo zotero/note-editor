@@ -63,6 +63,7 @@ class EditorInstance {
 		this._placeholder = options.placeholder;
 		this._dir = window.dir = options.dir;
 		this._enableReturnButton = options.enableReturnButton;
+		this._contextPaneButtonMode = options.contextPaneButtonMode;
 		this._isAttachmentNote = options.isAttachmentNote;
 		this._smartQuotes = options.smartQuotes;
 		this._editorCore = null;
@@ -98,6 +99,17 @@ class EditorInstance {
 			document.head.appendChild(node);
 		}
 		node.innerHTML = style;
+	}
+
+	_focusToolbar() {
+		document.querySelector('.toolbar button').focus();
+	}
+
+	_setToggleContextPaneButtonMode(mode) {
+		this._contextPaneButtonMode = mode;
+		if (this._editorCore && this._editorCore.setContextPaneButtonMode) {
+			this._editorCore.setContextPaneButtonMode(mode);
+		}
 	}
 
 	_postMessage(message) {
@@ -172,11 +184,21 @@ class EditorInstance {
 				disableUI={this._disableUI}
 				// TODO: Rename this to something like 'inContextPane`
 				enableReturnButton={this._enableReturnButton}
+				contextPaneButtonMode={this._contextPaneButtonMode}
 				viewMode={this._viewMode}
 				showUpdateNotice={this._editorCore.unsupportedSchema}
 				editorCore={this._editorCore}
 				onClickReturn={() => {
 					this._postMessage({ action: 'return' });
+				}}
+				onToggleContextPane={() => {
+					this._postMessage({ action: 'toggleContextPane' });
+				}}
+				onFocusBack={() => {
+					this._postMessage({ action: 'focusBack' });
+				}}
+				onFocusForward={() => {
+					this._postMessage({ action: 'focusForward' });
 				}}
 				onShowNote={() => {
 					this._postMessage({ action: 'showNote' });
@@ -217,6 +239,21 @@ class EditorInstance {
 				this._editorCore.updateCitationItems(citationItems);
 				return;
 			}
+			case 'updateIncrementally': {
+				let { noteData, preserveSelection } = message;
+				let success = false;
+				try {
+					success = this._editorCore.applyExternalChanges(noteData, preserveSelection);
+				} catch (e) {
+					success = false;
+				}
+				
+				if (!success) {
+					// Notify parent that incremental update failed
+					this._postMessage({ action: 'incrementalUpdateFailed' });
+				}
+				return;
+			}
 			case 'attachImportedImage': {
 				let { nodeID, attachmentKey } = message;
 				this._editorCore.attachImportedImage(nodeID, attachmentKey);
@@ -236,13 +273,24 @@ class EditorInstance {
 				this._editorCore.focus();
 				return;
 			}
+			case 'focusToolbar': {
+				this._focusToolbar();
+				return;
+			}
 			case 'setFont': {
 				let { font } = message;
 				this._setFont(font);
+				return;
 			}
 			case 'setStyle': {
 				let { style } = message;
 				this._setStyle(style);
+				return;
+			}
+			case 'setToggleContextPaneButtonMode': {
+				let { mode } = message;
+				this._setToggleContextPaneButtonMode(mode);
+				return;
 			}
 		}
 	}

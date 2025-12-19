@@ -311,14 +311,27 @@ $indent-width: 30;
 }
 
 .drag-handle {
+	--drag-handle-width: 24px;
 	position: absolute;
-	width: 24px;
+	width: var(--drag-handle-width);
 	height: 24px;
 	z-index: 99;
 	background-image: url('data:image/svg+xml,<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="%23777"><circle cx="9" cy="6" r="1"/><circle cx="14" cy="6" r="1"/><circle cx="9" cy="10" r="1"/><circle cx="9" cy="14" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="14" cy="10" r="1"/><circle cx="14" cy="14" r="1"/><circle cx="14" cy="18" r="1"/></svg>');
 	background-repeat: no-repeat;
 	background-position: top 1px left;
 	cursor: grab;
+	@if $platform == 'zotero' {
+		// When reaching the max width, keep the drag handle attached to the editor edge
+		--drag-handle-max-width-inline-offset: calc((100% - var(--editor-max-inner-width)) / 2 - var(--drag-handle-width) - 4px);
+	}
+	@else {
+		--drag-handle-max-width-inline-offset: 0px;
+	}
+	// The default offset is set dynamically in JS based on the editor padding
+	--drag-handle-inline-offset: calc(var(--drag-handle-default-inline-offset) + max(0px, var(--drag-handle-max-width-inline-offset)));
+
+	left: var(--drag-handle-inline-offset);
+	right: unset;
 }
 
 .ProseMirror-selectednode {

@@ -31,6 +31,7 @@
 
 				.primary-editor {
 					// Need this for wide image/math nodes otherwise content overflows
+					// TODO: Replace with stretch after updating to fx146
 					width: -moz-available;
 					max-width: var(--editor-max-width);
 					min-width: min(100%, var(--editor-max-width));

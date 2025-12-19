@@ -30,6 +30,8 @@
 				font-size: var(--font-size);
 
 				.primary-editor {
+					// Need this for wide image/math nodes otherwise content overflows
+					width: -moz-available;
 					max-width: var(--editor-max-width);
 					min-width: min(100%, var(--editor-max-width));
 					align-self: center;

@@ -308,7 +308,7 @@ class Search {
 		}
 	}
 
-	_handleScroll() {
+	_handleScroll = () => {
 		if (!this.active || !this.results.length) return;
 
 		if (this.scrollTimer) clearTimeout(this.scrollTimer);
@@ -316,7 +316,7 @@ class Search {
 			this.updateDecorations(this.view.state.doc);
 			this.view.dispatch(this.view.state.tr.setMeta('addToHistory', false));
 		}, this.scrollDebounceDelay);
-	}
+	};
 
 	updateDecorations(doc) {
 		let { view } = this;

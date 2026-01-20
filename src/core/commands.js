@@ -465,6 +465,9 @@ export function touchCitations() {
 				&& node.attrs.annotation && node.attrs.annotation.citationItem) {
 				tr.setNodeMarkup(pos, null, { ...node.attrs, version: (node.attrs.version || 0) + 1 });
 			}
+			else if (node.type === schema.nodes.image && node.attrs.attachmentKey) {
+				tr.setNodeMarkup(pos, null, { ...node.attrs, version: (node.attrs.version || 0) + 1 });
+			}
 		});
 		tr.setMeta('addToHistory', false);
 		tr.setMeta('system', true);

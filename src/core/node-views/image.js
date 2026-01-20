@@ -164,6 +164,27 @@ class ImageView {
 		if (node.type !== this.node.type) {
 			return false;
 		}
+
+		if (node.attrs.version !== this.node.attrs.version ||
+			node.attrs.attachmentKey !== this.node.attrs.attachmentKey ||
+			node.attrs.src !== this.node.attrs.src ||
+			node.attrs.nodeID !== this.node.attrs.nodeID) {
+			return false;
+		}
+
+		// Make sure the newly created image uses correct dimensions
+		if (node.attrs.attachmentKey && (node.attrs.width !== this.node.attrs.width || node.attrs.height !== this.node.attrs.height)) {
+			let resizedWrapper = this.dom.querySelector('.resized-wrapper');
+			if (resizedWrapper) {
+				if (node.attrs.width !== null) {
+					resizedWrapper.style.width = node.attrs.width + 'px';
+				}
+				else {
+					resizedWrapper.style.width = '';
+				}
+			}
+		}
+
 		this.node = node;
 		this.updateCitation();
 		return true;

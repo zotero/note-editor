@@ -76,6 +76,7 @@ class EditorInstance {
 		}
 
 		this._setFont(options.font);
+		this._setContentViewMode(options.contentViewMode);
 		if (options.style) {
 			this._setStyle(options.style);
 		}
@@ -90,6 +91,11 @@ class EditorInstance {
 		let root = document.documentElement;
 		root.style.setProperty('--font-family', font.fontFamily);
 		root.style.setProperty('--font-size', font.fontSize + 'px');
+	}
+
+	_setContentViewMode(contentViewMode) {
+		let root = document.documentElement;
+		root.setAttribute('contentViewMode', contentViewMode);
 	}
 
 	_setStyle(style) {
@@ -280,6 +286,11 @@ class EditorInstance {
 			case 'setFont': {
 				let { font } = message;
 				this._setFont(font);
+				return;
+			}
+			case 'setContentViewMode': {
+				let { contentViewMode } = message;
+				this._setContentViewMode(contentViewMode);
 				return;
 			}
 			case 'setStyle': {

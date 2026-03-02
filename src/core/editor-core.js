@@ -582,6 +582,7 @@ class EditorCore {
 			// Mark this as a system transaction to avoid triggering save
 			tr = tr.setMeta('system', true);
 			tr = tr.setMeta('externalUpdate', true);
+			tr = tr.setMeta('suppressMathCleanup', true);
 
 			let schemaTr = null;
 			try {
@@ -595,13 +596,14 @@ class EditorCore {
 			
 			// Apply schema tr if needed
 			if (schemaTr) {
+				schemaTr = schemaTr.setMeta('suppressMathCleanup', true);
 				this.view.dispatch(schemaTr);
 			}
 
 			// Force citation nodes to re-render since metadata was updated
 			// This ensures annotations with citations display properly
 			if (!this.readOnly) {
-				touchCitations()(this.view.state, this.view.dispatch);
+				touchCitations({ suppressMathCleanup: true })(this.view.state, this.view.dispatch);
 			}
 
 			if (preserveSelection && selectionInfo) {
@@ -647,7 +649,7 @@ class EditorCore {
 							let selectionTr = this.view.state.tr.setSelection(TextSelection.between(
 								this.view.state.doc.resolve(newAnchor),
 								this.view.state.doc.resolve(newHead)
-							));
+							)).setMeta('suppressMathCleanup', true);
 							this.view.dispatch(selectionTr);
 						}
 					}

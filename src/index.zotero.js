@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { addFTL, getLocalizedString } from './fluent';
 import { randomString } from './core/utils';
 import { schema } from './core/schema';
+import { undo, redo } from 'prosemirror-history';
 import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
 
@@ -85,6 +86,26 @@ class EditorInstance {
 
 	getDataSync(onlyChanged) {
 		return this._editorCore.getData(onlyChanged);
+	}
+
+	canUndo() {
+		if (!this._editorCore?.view) return false;
+		return undo(this._editorCore.view.state);
+	}
+
+	canRedo() {
+		if (!this._editorCore?.view) return false;
+		return redo(this._editorCore.view.state);
+	}
+
+	doUndo() {
+		if (!this._editorCore?.view) return;
+		undo(this._editorCore.view.state, this._editorCore.view.dispatch);
+	}
+
+	doRedo() {
+		if (!this._editorCore?.view) return;
+		redo(this._editorCore.view.state, this._editorCore.view.dispatch);
 	}
 
 	_setFont(font) {
@@ -617,6 +638,22 @@ window.getDataSync = (onlyChanged) => {
 		return currentInstance.getDataSync(onlyChanged);
 	}
 	return null;
+};
+
+window.canUndo = () => {
+	return currentInstance?.canUndo() ?? false;
+};
+
+window.canRedo = () => {
+	return currentInstance?.canRedo() ?? false;
+};
+
+window.doUndo = () => {
+	currentInstance?.doUndo();
+};
+
+window.doRedo = () => {
+	currentInstance?.doRedo();
 };
 
 // Called from Zotero, because file picker can only be opened from user-triggered event or privileged code

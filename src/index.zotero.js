@@ -283,6 +283,10 @@ class EditorInstance {
 				this._focusToolbar();
 				return;
 			}
+			case 'openFindBar': {
+				this._editorCore.openFindbar();
+				return;
+			}
 			case 'setFont': {
 				let { font } = message;
 				this._setFont(font);

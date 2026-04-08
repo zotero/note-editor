@@ -7,6 +7,7 @@ import { removeDiacritics } from '../utils';
 class Search {
 	constructor(options = {}) {
 		this.active = false;
+		this.openFindbarRequestID = 0;
 		this.searchTerm = '';
 		this.caseSensitive = false;
 		this.wholeWords = false;
@@ -49,6 +50,14 @@ class Search {
 			// up/down arrow keys doesn't work in Firefox if editor area is not focused
 			this.view.dom.focus();
 		}
+		this.triggerUpdate = true;
+		dispatch(state.tr);
+	}
+
+	openFindbar() {
+		let { state, dispatch } = this.view;
+		this.active = true;
+		this.openFindbarRequestID += 1;
 		this.triggerUpdate = true;
 		dispatch(state.tr);
 	}

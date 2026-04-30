@@ -3,11 +3,12 @@
 
 .math-node.empty-math .math-render::before {
 	content: "Click to insert LaTex ...";
-    color: black;
+	color: var(--fill-secondary);
 }
 
 .math-node .math-render.parse-error::before {
 	content: "Cannot parse LaTeX.";
+	color: var(--accent-red);
 	cursor: help;
 }
 

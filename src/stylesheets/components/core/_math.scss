@@ -3,11 +3,12 @@
 
 .math-node.empty-math .math-render::before {
 	content: "Click to insert LaTex ...";
-    color: black;
+	color: var(--fill-tertiary);
 }
 
 .math-node .math-render.parse-error::before {
 	content: "Cannot parse LaTeX.";
+	color: var(--accent-red);
 	cursor: help;
 }
 
@@ -43,4 +44,8 @@ math-display {
 
 .math-src {
 	font-size: 0.90em;
+}
+
+.math-node .math-src {
+	color: var(--fill-primary);
 }

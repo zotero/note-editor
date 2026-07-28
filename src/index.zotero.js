@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { addFTL, getLocalizedString } from './fluent';
 import { randomString } from './core/utils';
 import { schema } from './core/schema';
-import { undo, redo } from 'prosemirror-history';
+import { undoCommand, redoCommand } from './core/history-commands';
 import Editor from './ui/editor';
 import EditorCore from './core/editor-core';
 
@@ -88,24 +88,29 @@ class EditorInstance {
 		return this._editorCore.getData(onlyChanged);
 	}
 
+	_getHistoryView() {
+		let editorCore = this._editorCore;
+		return editorCore?.view && !editorCore.readOnly ? editorCore.view : null;
+	}
+
 	canUndo() {
-		if (!this._editorCore?.view) return false;
-		return undo(this._editorCore.view.state);
+		let view = this._getHistoryView();
+		return view ? undoCommand(view.state) : false;
 	}
 
 	canRedo() {
-		if (!this._editorCore?.view) return false;
-		return redo(this._editorCore.view.state);
+		let view = this._getHistoryView();
+		return view ? redoCommand(view.state) : false;
 	}
 
 	doUndo() {
-		if (!this._editorCore?.view) return;
-		undo(this._editorCore.view.state, this._editorCore.view.dispatch);
+		let view = this._getHistoryView();
+		return view ? undoCommand(view.state, view.dispatch) : false;
 	}
 
 	doRedo() {
-		if (!this._editorCore?.view) return;
-		redo(this._editorCore.view.state, this._editorCore.view.dispatch);
+		let view = this._getHistoryView();
+		return view ? redoCommand(view.state, view.dispatch) : false;
 	}
 
 	_setFont(font) {
@@ -649,11 +654,11 @@ window.canRedo = () => {
 };
 
 window.doUndo = () => {
-	currentInstance?.doUndo();
+	return currentInstance?.doUndo() ?? false;
 };
 
 window.doRedo = () => {
-	currentInstance?.doRedo();
+	return currentInstance?.doRedo() ?? false;
 };
 
 // Called from Zotero, because file picker can only be opened from user-triggered event or privileged code

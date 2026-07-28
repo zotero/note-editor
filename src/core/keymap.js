@@ -3,10 +3,10 @@ import {
 	joinUp, joinDown, lift, newlineInCode, liftEmptyBlock, createParagraphNear
 } from 'prosemirror-commands';
 import { wrapInList, splitListItem } from 'prosemirror-schema-list';
-import { undo, redo } from 'prosemirror-history';
 import { undoInputRule } from 'prosemirror-inputrules';
 import { schema } from './schema';
 import { changeIndent, removeBlockIndent, customSplitBlock } from './commands';
+import { undoCommand, redoCommand } from './history-commands';
 import { isMac } from './utils';
 
 export function buildKeymap(options) {
@@ -19,11 +19,11 @@ export function buildKeymap(options) {
 		keys[key] = cmd;
 	}
 
-	bind('Mod-z', customUndo);
-	bind('Shift-Mod-z', redo);
+	bind('Mod-z', undoCommand);
+	bind('Shift-Mod-z', redoCommand);
 	bind('Backspace', undoInputRule);
 	bind('Backspace', removeBlockIndent());
-	if (!isMac()) bind('Ctrl-y', redo);
+	if (!isMac()) bind('Ctrl-y', redoCommand);
 
 	bind('Alt-F10', focusToolbar);
 	bind('Alt-ArrowUp', joinUp);
@@ -98,14 +98,6 @@ export function buildKeymap(options) {
 	),);
 
 	return keys;
-}
-
-function customUndo(state, dispatch) {
-  if(undoInputRule(state, dispatch)) {
-    return true;
-  } else {
-    return undo(state, dispatch);
-  }
 }
 
 function focusToolbar() {

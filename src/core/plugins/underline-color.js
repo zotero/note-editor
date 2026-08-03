@@ -181,9 +181,6 @@ export function underlineColor(options) {
 			return {
 				update(view, lastState) {
 					pluginState.update(view.state, lastState);
-				},
-				destroy() {
-					pluginState.destroy();
 				}
 			};
 		}

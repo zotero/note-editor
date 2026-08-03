@@ -20,6 +20,7 @@ class Search {
 		this.triggerUpdate = true;
 		this.debounceTimer = null;
 		this.scrollTimer = null;
+		this.focusTimer = null;
 		// Debounce delays for search updates in ms
 		this.updateDebounceDelay = 300;
 		this.selectionDebounceDelay = 10;
@@ -29,13 +30,14 @@ class Search {
 		this.decorationBuffer = 500;
 		// Maximum number of decorations to render at once
 		this.maxDecorations = 500;
-		this.handleScroll = this._handleScroll.bind(this);
 		this.scrollListenerAttached = false;
 		this.scrollContainer = null;
 	}
 
 	focusSelectedResult() {
-		setTimeout(() => {
+		clearTimeout(this.focusTimer);
+		this.focusTimer = setTimeout(() => {
+			this.focusTimer = null;
 			let node = this.view.dom.querySelector('.' + this.findSelectedClass);
 			if (node) {
 				node.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -317,6 +319,21 @@ class Search {
 		}
 	}
 
+	destroy() {
+		clearTimeout(this.debounceTimer);
+		clearTimeout(this.scrollTimer);
+		clearTimeout(this.focusTimer);
+		this.debounceTimer = null;
+		this.scrollTimer = null;
+		this.focusTimer = null;
+		if (this.scrollContainer) {
+			this.scrollContainer.removeEventListener('scroll', this._handleScroll);
+		}
+		this.scrollListenerAttached = false;
+		this.scrollContainer = null;
+		this.view = null;
+	}
+
 	_handleScroll = () => {
 		if (!this.active || !this.results.length) return;
 
@@ -392,6 +409,7 @@ export function search() {
 		view: (view) => {
 			let pluginState = searchKey.getState(view.state);
 			pluginState.view = view;
+			pluginState.updateView();
 			pluginState.updateScrollListener();
 
 			return {
@@ -401,9 +419,7 @@ export function search() {
 					pluginState.updateScrollListener();
 				},
 				destroy() {
-					if (pluginState.scrollListenerAttached && pluginState.scrollContainer) {
-						pluginState.scrollContainer.removeEventListener('scroll', pluginState.onScroll);
-					}
+					pluginState.destroy();
 				}
 			};
 		},

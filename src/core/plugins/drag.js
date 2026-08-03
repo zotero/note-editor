@@ -10,17 +10,12 @@ class Drag {
 		this.dragHandleNode = null;
 		this.mouseIsDown = false;
 
-		this.handlers = ['mousemove'].map((name) => {
-			let handler = (e) => {
-				return this[name](e);
-			};
-			view.dom.addEventListener(name, handler);
-			return { name: name, handler: handler };
-		});
-
-		window.addEventListener('mouseup', () => {
+		this.handleMouseMove = event => this.mousemove(event);
+		this.handleMouseUp = () => {
 			this.mouseIsDown = false;
-		})
+		};
+		view.dom.addEventListener('mousemove', this.handleMouseMove);
+		window.addEventListener('mouseup', this.handleMouseUp);
 
 		this.updateDragHandle = throttle(() => {
 			let parentRect = this.view.dom.getBoundingClientRect();
@@ -104,9 +99,11 @@ class Drag {
 	}
 
 	destroy() {
-		this.handlers.forEach((name, handler) => {
-			return this.editorView.dom.removeEventListener(name, handler);
-		});
+		this.view.dom.removeEventListener('mousemove', this.handleMouseMove);
+		window.removeEventListener('mouseup', this.handleMouseUp);
+		this.updateDragHandle.cancel();
+		this.dragHandleNode?.remove();
+		this.dragHandleNode = null;
 	}
 
 

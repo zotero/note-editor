@@ -120,7 +120,7 @@ export function throttle(func, wait, options) {
 		result = func.apply(context, args);
 		if (!timeout) context = args = null;
 	};
-	return function () {
+	var throttled = function () {
 		var now = Date.now();
 		if (!previous && options.leading === false) previous = now;
 		var remaining = wait - (now - previous);
@@ -140,6 +140,12 @@ export function throttle(func, wait, options) {
 		}
 		return result;
 	};
+	throttled.cancel = function () {
+		clearTimeout(timeout);
+		previous = 0;
+		timeout = context = args = null;
+	};
+	return throttled;
 }
 
 // https://stackoverflow.com/a/6713782

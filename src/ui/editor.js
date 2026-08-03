@@ -68,6 +68,7 @@ function Editor(props) {
 				onFocusBack={props.onFocusBack}
 				onFocusForward={props.onFocusForward}
 				onShowNote={props.onShowNote}
+				onOpenTab={props.onOpenTab}
 				onOpenWindow={props.onOpenWindow}
 				onInsertTable={handleInsertTable}
 				onInsertMath={handleInsertMath}

@@ -453,7 +453,7 @@ export function setCitation(nodeID, citation) {
 }
 
 // Triggers note serialization and updates citation node views
-export function touchCitations() {
+export function touchCitations(options = {}) {
 	return function (state, dispatch) {
 		let { tr } = state;
 		state.doc.descendants((node, pos) => {
@@ -471,6 +471,9 @@ export function touchCitations() {
 		});
 		tr.setMeta('addToHistory', false);
 		tr.setMeta('system', true);
+		if (options.suppressMathCleanup) {
+			tr.setMeta('suppressMathCleanup', true);
+		}
 		dispatch(tr);
 	}
 }

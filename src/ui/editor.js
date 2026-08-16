@@ -53,6 +53,7 @@ function Editor(props) {
 			{!props.disableUI && <Toolbar
 				viewMode={props.viewMode}
 				enableReturnButton={props.enableReturnButton}
+				showIndentButtons={props.showIndentButtons}
 				contextPaneButtonMode={contextPaneButtonMode}
 				textColorState={editorState.textColor}
 				highlightColorState={editorState.highlightColor}

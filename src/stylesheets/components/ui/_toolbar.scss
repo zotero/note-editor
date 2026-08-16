@@ -63,6 +63,24 @@
 	}
 }
 
+// Keep the additional iPhone indentation buttons on the single fixed-height
+// toolbar row, including on 320-point-wide devices.
+@media (max-width: 340px) {
+	.toolbar-indent-buttons {
+		.start {
+			width: 0;
+		}
+
+		.middle {
+			gap: 0;
+
+			& > :not(:first-child) {
+				margin-left: 0;
+			}
+		}
+	}
+}
+
 .toolbar-button {
 	color: var(--fill-secondary);
 	width: 28px;
@@ -86,6 +104,11 @@
 }
 
 [dir=rtl] .toolbar-button-return {
+	transform: scaleX(-1);
+}
+
+[dir=rtl] .toolbar-button-indent svg,
+[dir=rtl] .toolbar-button-outdent svg {
 	transform: scaleX(-1);
 }
 

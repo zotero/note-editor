@@ -12,6 +12,7 @@ class EditorInstance {
 		window._currentEditorInstance = this;
 		this.instanceID = options.instanceID;
 		this._readOnly = options.readOnly;
+		this._showIndentButtons = options.showIndentButtons;
 		this._editorCore = null;
 		this._reactRoot = null;
 
@@ -88,6 +89,7 @@ class EditorInstance {
 				readOnly={this._readOnly}
 				disableUI={false}
 				enableReturnButton={false}
+				showIndentButtons={this._showIndentButtons}
 				viewMode="ios"
 				showUpdateNotice={this._editorCore.unsupportedSchema}
 				editorCore={this._editorCore}

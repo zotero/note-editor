@@ -16,14 +16,17 @@ import IconChevronLeft from '../../res/icons/20/chevron-left.svg';
 import IconToggleContext from "../../res/icons/20/sidebar.svg";
 import IconToggleContextBottom from "../../res/icons/20/sidebar-bottom.svg";
 import IconCitation from '../../res/icons/20/cite.svg';
+import IconIndent from '../../res/icons/20/indent.svg';
 import IconLink from '../../res/icons/20/link.svg';
 import IconMore from '../../res/icons/20/options.svg';
+import IconOutdent from '../../res/icons/20/outdent.svg';
 import IconRemoveFormatting from '../../res/icons/20/clear-format.svg';
 import IconSearch from '../../res/icons/20/magnifier.svg';
 
 function Toolbar({
 	viewMode,
 	enableReturnButton,
+	showIndentButtons,
 	contextPaneButtonMode,
 	textColorState,
 	highlightColorState,
@@ -92,7 +95,7 @@ function Toolbar({
 
 	return (
 		<div
-			className="toolbar"
+			className={showIndentButtons ? 'toolbar toolbar-indent-buttons' : 'toolbar'}
 			onFocus={handleFocus}
 			onBlur={handleBlur}
 			onKeyDown={handleKeyDown}
@@ -125,6 +128,18 @@ function Toolbar({
 					onClick={() => linkState.toggle()}
 				/>
 				{['ios', 'web'].includes(viewMode) && <AlignDropdown menuState={menuState}/>}
+				{showIndentButtons && <Button
+					className="toolbar-button-outdent"
+					icon={<IconOutdent/>}
+					title="Decrease Indent"
+					onClick={() => menuState.outdent.run()}
+				/>}
+				{showIndentButtons && <Button
+					className="toolbar-button-indent"
+					icon={<IconIndent/>}
+					title="Increase Indent"
+					onClick={() => menuState.indent.run()}
+				/>}
 				{!['ios', 'web'].includes(viewMode) && <Button
 					icon={<IconCitation/>}
 					title={l10n.getString('note-editor-insert-citation')}

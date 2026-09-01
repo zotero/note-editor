@@ -131,13 +131,13 @@ function Toolbar({
 				{showIndentButtons && <Button
 					className="toolbar-button-outdent"
 					icon={<IconOutdent/>}
-					title="Decrease Indent"
+					title={l10n.getString('note-editor-decrease-indent')}
 					onClick={() => menuState.outdent.run()}
 				/>}
 				{showIndentButtons && <Button
 					className="toolbar-button-indent"
 					icon={<IconIndent/>}
-					title="Increase Indent"
+					title={l10n.getString('note-editor-increase-indent')}
 					onClick={() => menuState.indent.run()}
 				/>}
 				{!['ios', 'web'].includes(viewMode) && <Button

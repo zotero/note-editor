@@ -42,6 +42,7 @@ function Toolbar({
 	onFocusBack,
 	onFocusForward,
 	onShowNote,
+	onOpenTab,
 	onOpenWindow,
 	onInsertTable,
 	onInsertMath,
@@ -168,6 +169,11 @@ function Toolbar({
 						{!unsaved && viewMode !== 'library' && (
 							<button className="option" onClick={onShowNote}>
 								{l10n.getString('general-show-in-library')}
+							</button>
+						)}
+						{viewMode !== 'tab' && viewMode !== 'ios' && (
+							<button className="option" onClick={onOpenTab}>
+								{l10n.getString('note-editor-edit-in-tab')}
 							</button>
 						)}
 						{viewMode !== 'window' && viewMode !== 'ios' && (

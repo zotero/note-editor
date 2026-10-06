@@ -3,6 +3,7 @@ import { DOMParser as PMDOMParser, Fragment, Slice } from 'prosemirror-model';
 import { schema } from '../schema';
 import { rtfToHtml } from '../rtf';
 import { isMac } from '../utils';
+import { transformMathSlice } from '../paste-math';
 
 // This plugin intercepts all paste/drop/move actions
 
@@ -165,6 +166,15 @@ export function dropPaste(options) {
 					if (convertedFromRTF) {
 						// Parse the converted HTML into a Slice for insertion
 						slice = htmlToSlice(html);
+					}
+					// ClipboardEvent has no shiftKey; mirror ProseMirror's paste modifier check.
+					let plain = view.input?.shiftKey && view.input.lastKeyCode !== 45;
+					let parent = state.selection.$from.parent;
+					let internal = /\bdata-(?:pm-slice|schema-version)\s*=|\bclass\s*=\s*["'](?:[^"']*\s)?zotero-notes?(?:\s[^"']*)?["']/i.test(html);
+					if (!convertedFromRTF && !plain && !internal
+						&& (!parent.inlineContent || parent.type === schema.nodes.paragraph)
+						&& !schema.marks.code.isInSet(state.storedMarks || state.selection.$from.marks())) {
+						slice = transformMathSlice(slice);
 					}
 					slice = transformSlice(schema, slice, options.ignoreImages);
 					dispatch(state.tr.replaceSelection(slice));

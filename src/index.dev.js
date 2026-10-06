@@ -224,6 +224,9 @@ function main(html) {
 			onShowNote={() => {
 				console.log('Show Note');
 			}}
+			onOpenTab={() => {
+				console.log('Open Tab');
+			}}
 			onOpenWindow={() => {
 				console.log('Open Window');
 			}}

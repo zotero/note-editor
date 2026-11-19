@@ -42,12 +42,25 @@ function Toolbar({
 	onFocusBack,
 	onFocusForward,
 	onShowNote,
+	onOpenTab,
 	onOpenWindow,
 	onInsertTable,
 	onInsertMath,
 	onInsertImage,
 }) {
 	const { l10n } = useLocalization();
+
+	// A note tab offers Show in Library and Move to New Window on the tab itself, and the
+	// Android app doesn't handle them
+	const canShowNote = !unsaved && !['library', 'tab', 'android'].includes(viewMode);
+	const canOpenNote = !['window', 'tab', 'ios', 'android'].includes(viewMode);
+	const canApplyAnnotationColors = highlightColorState.state.canApplyAnnotationColors
+		|| underlineColorState.state.canApplyAnnotationColors;
+	const canRemoveAnnotationColors = highlightColorState.state.canRemoveAnnotationColors
+		|| underlineColorState.state.canRemoveAnnotationColors;
+	const hasNoteOptions = canShowNote || canOpenNote;
+	const hasContentOptions = canApplyAnnotationColors || canRemoveAnnotationColors
+		|| citationState.state.canAddCitations || citationState.state.canRemoveCitations;
 	const toolbarRef = useRef(null);
 	const lastFocusedIndex = useRef(0);
 
@@ -159,28 +172,31 @@ function Toolbar({
 				/>
 			</div>
 			<div className="end">
-				{!['ios', 'web'].includes(viewMode) && (
+				{!['ios', 'web'].includes(viewMode) && (hasNoteOptions || hasContentOptions) && (
 					<Dropdown
 						className="more-dropdown"
 						icon={<IconMore />}
 						title={l10n.getString('note-editor-more')}
 					>
-						{!unsaved && viewMode !== 'library' && (
+						{canShowNote && (
 							<button className="option" onClick={onShowNote}>
 								{l10n.getString('general-show-in-library')}
 							</button>
 						)}
-						{viewMode !== 'window' && viewMode !== 'ios' && (
-							<button className="option" onClick={onOpenWindow}>
-								{l10n.getString('note-editor-edit-in-window')}
+						{canOpenNote && (
+							<button className="option" onClick={onOpenTab}>
+								{l10n.getString('general-open-in-new-tab')}
 							</button>
 						)}
-						{(!unsaved && viewMode !== 'library') ||
-						(viewMode !== 'window' && viewMode !== 'ios') && (
+						{canOpenNote && (
+							<button className="option" onClick={onOpenWindow}>
+								{l10n.getString('general-open-in-new-window')}
+							</button>
+						)}
+						{hasNoteOptions && hasContentOptions && (
 							<div className="separator" />
 						)}
-						{(highlightColorState.state.canApplyAnnotationColors ||
-							underlineColorState.state.canApplyAnnotationColors) && (
+						{canApplyAnnotationColors && (
 							<button
 								className="option"
 								onClick={() => {
@@ -191,8 +207,7 @@ function Toolbar({
 								{l10n.getString('note-editor-apply-annotation-colors')}
 							</button>
 						)}
-						{(highlightColorState.state.canRemoveAnnotationColors ||
-							underlineColorState.state.canRemoveAnnotationColors) && (
+						{canRemoveAnnotationColors && (
 							<button
 								className="option"
 								onClick={() => {

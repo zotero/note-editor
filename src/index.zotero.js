@@ -235,6 +235,9 @@ class EditorInstance {
 				onShowNote={() => {
 					this._postMessage({ action: 'showNote' });
 				}}
+				onOpenTab={() => {
+					this._postMessage({ action: 'openTab' });
+				}}
 				onOpenWindow={() => {
 					this._postMessage({ action: 'openWindow' });
 				}}

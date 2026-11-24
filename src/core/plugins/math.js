@@ -3,11 +3,14 @@ import { schema } from '../schema';
 
 class Math {
 	constructor(state, options) {
-
+		this.suppressCleanup = false;
 	}
 
 	update(newState, oldState) {
 		if (!this.view) {
+			return;
+		}
+		if (this.suppressCleanup) {
 			return;
 		}
 		let { dispatch } = this.view;
@@ -39,6 +42,7 @@ export function math(options) {
 				return new Math(state, options);
 			},
 			apply(tr, pluginState, oldState, newState) {
+				pluginState.suppressCleanup = !!tr.getMeta('suppressMathCleanup');
 				return pluginState;
 			}
 		},
